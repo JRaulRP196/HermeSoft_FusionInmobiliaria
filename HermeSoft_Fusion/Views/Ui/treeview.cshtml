@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "treeview";
+    ViewBag.pTitle = "Ui";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+
+    <div class="col-12 col-xl-6">
+        <div class="card card-h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Basic Example</h5>
+            </div>
+            <div class="card-body">
+                <div id="tree-container-2" class="tree"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-6">
+        <div class="card card-h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Default Close</h5>
+            </div>
+            <div class="card-body">
+                <div id="tree-container-3" class="tree"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-6">
+        <div class="card card-h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Custom Icons and Colors</h5>
+            </div>
+            <div class="card-body">
+                <div id="tree-container-1" class="tree"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+@section scripts{
+
+    <script src="~/assets/js/ui/jstree.init.js"></script>
+    <script src="~/assets/js/app.js"></script>
+}

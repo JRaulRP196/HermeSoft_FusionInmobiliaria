@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <partial name="~/Views/Shared/TitleMeta.cshtml" />
+    @RenderSection("styles", false)
+    <partial name="~/Views/Shared/HeadCss.cshtml" />
+</head>
+<body>
+    <!-- Begin page -->
+    <div id="layout-wrapper">
+
+        <partial name="~/Views/Shared/Header.cshtml" />
+        <partial name="~/Views/Shared/Sidebar.cshtml" />
+        <partial name="~/Views/Shared/Horizontal.cshtml" />
+
+        <main class="app-wrapper">
+            <div class="container-fluid">
+                <partial name="~/Views/Shared/PageTitle.cshtml" />
+                @RenderBody()
+            </div>
+            <!-- end container -->
+        </main>
+
+        <partial name="~/Views/Shared/Switcher.cshtml" />
+        <partial name="~/Views/Shared/ScrollToTop.cshtml" />
+        <partial name="~/Views/Shared/Footer.cshtml" />
+    </div>
+
+    <partial name="~/Views/Shared/VendorScripts.cshtml" />
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

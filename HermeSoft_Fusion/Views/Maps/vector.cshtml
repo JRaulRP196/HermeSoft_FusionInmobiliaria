@@ -1,0 +1,36 @@
+﻿
+@{
+    ViewBag.Title = "vector";
+    ViewBag.pTitle = "Maps";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles{
+
+    <!-- plugin css -->
+    <link rel="stylesheet" type="text/css" href="~/assets/libs/jsvectormap/jsvectormap.min.css">
+}
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">World Map Markers</h5>
+            </div>
+            <div class="card-body">
+                <div id="world-map" class="min-h-320px"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">World Map With Marker Lines</h5>
+            </div>
+            <div class="card-body">
+                <div id="world-map-markers-line" class="min-h-320px"></div>
+            </div>
+        </div>
+    </div>
+</div>
