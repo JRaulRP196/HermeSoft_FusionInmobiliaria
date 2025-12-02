@@ -20,5 +20,10 @@ namespace HermeSoft_Fusion.Controllers
             return View();
         }
 
+        public IActionResult Editar()
+        {
+            return View();
+        }
+
     }
 }

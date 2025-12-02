@@ -5,6 +5,13 @@
         "<button type='button' class='btn btn-danger deleteInputs'>-</button> ";
     var contadorEscenarios = 1;
 
+    function cargarDatos() {
+        var escenarios = $(".escenarios");
+        console.log(document.querySelectorAll(".escenarios"));
+    } 
+
+    cargarDatos();
+
     $("#addEscenario").on("click", function () {
         contadorEscenarios++;
 
