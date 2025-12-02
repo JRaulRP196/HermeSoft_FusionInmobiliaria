@@ -118,9 +118,26 @@
 
                 <li>
                     <a asp-controller="Banco" asp-action="Index" class="has-arrow waves-effect">
-                        <i class="uim uim-sign-in-alt"></i>
+                        <i class="ri-bank-fill"></i>
                         <span>Bancos</span>
                     </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Lote" asp-action="Index" class="has-arrow waves-effect">
+                        <i class="uim uim-sign-in-alt"></i>
+                        <span>Lotes</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Estadistica" asp-action="Index" class="has-arrow waves-effect">
+                        <i class="uim uim-horizontal-align-left"></i>
+                        <span>Estadisticas</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a asp-controller="Pages" asp-action="Maintenance">Listado de Primas</a></li>
+                    </ul>
                 </li>
 
                 <li>

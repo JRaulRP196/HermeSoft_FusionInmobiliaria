@@ -19,6 +19,9 @@ File: Main Css File
     gap: 3%;
 }
 
+#nombreCondominio {
+    transition: opacity 0.6s ease-in-out;
+}
 
 .navbar-header {
   display: -webkit-box;

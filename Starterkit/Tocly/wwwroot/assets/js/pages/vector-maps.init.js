@@ -20,8 +20,29 @@ File: Vector Maps init Js File
 			hoverColor : false,
 			regionStyle : {
 				initial : {
-					fill : '#d4dadd'
+					fill : 'auto'
 				}
+			},
+			series: {
+				regions: [{
+					scale: {
+						green: "#28a745",
+						yellow: "#ffc107",
+						red: "#dc3545",
+						blue: "#0d6efd"
+					},
+					values: {
+						"US": "green",
+						"BR": "green",
+						"MX": "yellow",
+						"IN": "yellow",
+						"RU": "red",
+						"CN": "red",
+						"CA": "blue",
+						"AU": "blue"
+					},
+					attribute: "fill"
+				}]
 			},
 			 markerStyle: {
                 initial: {
