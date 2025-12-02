@@ -771,7 +771,7 @@ body[data-sidebar-size="small"] {
 
 body[data-sidebar="colored"] {
     .vertical-menu {
-        background: $primary;
+        background: #1b2b4c;
         border-color: $primary;
 
         .vertical-menu-btn {
@@ -780,7 +780,7 @@ body[data-sidebar="colored"] {
     }
 
     .navbar-brand-box {
-        background-color: $primary;
+        background-color: #1b2b4c;
 
         .logo-dark {
             display: none;
@@ -842,14 +842,13 @@ body[data-sidebar="colored"] {
             }
         }
     }
-
     // Enlarge menu
     &.vertical-collpsed {
         .vertical-menu {
             #sidebar-menu {
-                >ul {
-                    >li {
-                        &:hover>a {
+                > ul {
+                    > li {
+                        &:hover > a {
                             background-color: lighten($primary, 2%);
                             color: $white;
 
@@ -857,14 +856,13 @@ body[data-sidebar="colored"] {
                                 color: $white;
                             }
                         }
-
                     }
                 }
 
                 ul {
 
-                    >li {
-                        >a {
+                    > li {
+                        > a {
                             &.mm-active {
                                 color: $sidebar-dark-menu-item-active-color !important;
                             }
@@ -876,7 +874,7 @@ body[data-sidebar="colored"] {
 
                             &.mm-active,
                             &.active {
-                                >a {
+                                > a {
                                     color: $sidebar-menu-item-active-color !important;
                                 }
                             }
@@ -887,13 +885,9 @@ body[data-sidebar="colored"] {
                                 &.active {
                                     color: $sidebar-menu-item-active-color !important;
                                 }
-
-
                             }
                         }
                     }
-
-
                 }
             }
         }
@@ -902,7 +896,7 @@ body[data-sidebar="colored"] {
     .mm-active {
         color: $white !important;
 
-        >a {
+        > a {
             color: $white !important;
 
             i {
@@ -910,7 +904,7 @@ body[data-sidebar="colored"] {
             }
         }
 
-        >i {
+        > i {
             color: $white !important;
         }
 

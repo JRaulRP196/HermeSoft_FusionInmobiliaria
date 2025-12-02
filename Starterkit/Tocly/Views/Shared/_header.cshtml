@@ -24,7 +24,7 @@
             </div>
 
             <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect vertical-menu-btn" id="vertical-menu-btn">
-                <i class="ri-menu-2-line align-middle"></i>
+                <i onclick="toggleSidebar()" class="ri-menu-2-line align-middle"></i>
             </button>
 
             <!-- start page title -->
@@ -51,15 +51,14 @@
                                 </a>
                             </div>
                             <div class="col">
+                                <a id="toggleLayout" class="dropdown-icon-item" href="#">
+                                    <i class="ri-moon-line"></i>
+                                    <span>DarkMode</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="dropdown d-inline-block">
-                <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
-                    <i class="ri-settings-2-line"></i>
-                </button>
             </div>
 
         </div>

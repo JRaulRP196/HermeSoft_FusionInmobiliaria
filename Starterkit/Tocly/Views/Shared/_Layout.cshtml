@@ -7,7 +7,7 @@
     @RenderSection("styles", false)
 
     @Html.Partial("~/Views/Shared/_headCSS.cshtml")
-
+    <link href="~/assets/css/personal.css" rel="stylesheet" />
 </head>
 <body data-sidebar="colored">
 
@@ -57,6 +57,23 @@
     <script src="~/assets/js/darkmode.js"></script>
     <!-- Icon -->
     <script src="https://unicons.iconscout.com/release/v2.0.1/script/monochrome/bundle.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const body = document.body;
+            const estado = localStorage.getItem("sidebar-collapsed");
+
+            if (estado === "true") {
+                body.classList.add("vertical-collpsed");
+            }
+        });
+
+        function toggleSidebar() {
+            const body = document.body;
+
+            const collapsed = body.classList.toggle("vertical-collpsed");
+            localStorage.setItem("sidebar-collapsed", collapsed);
+        }
+    </script>
 
     @RenderSection("scripts", required: false)
 </body>
