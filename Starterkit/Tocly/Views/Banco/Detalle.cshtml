@@ -1,0 +1,176 @@
+﻿@{
+    ViewBag.Title = "Bancos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container-fluid p-4">
+
+    <!-- HEADER -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 px-3 py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 fw-bold">BAC San José</h4>
+            <div>
+                <button class="btn btn-outline-primary px-4 rounded-pill">
+                    <i class="fas fa-edit me-2"></i> Editar
+                </button>
+                <a href="javascript:history.back()" class="btn btn-light border px-4 rounded-pill">
+                    <i class="fas fa-arrow-left me-2"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGO + INFO GENERAL -->
+    <div class="row g-4 mb-4">
+
+        <!-- LOGO -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 d-flex align-items-center justify-content-center">
+                <img src="~/assets/images/Bancos/BAC.png"
+                     class="img-fluid"
+                     style="max-height:260px; object-fit:contain;">
+            </div>
+        </div>
+
+        <!-- INFO GENERAL -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h3 class="fw-bold mb-3">Información General</h3>
+
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Nombre:</div>
+                    <div class="col-8">BAC San José</div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Enlace:</div>
+                    <div class="col-8">
+                        <a href="https://www.baccredomatic.com/es-cr" target="_blank">https://www.baccredomatic.com/es-cr</a>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Plazo Máximo Crédito:</div>
+                    <div class="col-8">35 años</div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Comisión:</div>
+                    <div class="col-8">5%</div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Honorarios Abogados:</div>
+                    <div class="col-8">7%</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BLOQUES MEDIOS -->
+    <div class="row g-4 mb-1">
+
+        <!-- Info Seguros -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-4 text-center fw-bold">
+                <h3 class="mb-3">Seguros</h3>
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Vida:</div>
+                    <div class="col-8">3%</div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Desempleo:</div>
+                    <div class="col-8">3%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Endeudamiento -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-4 text-center fw-bold">
+                <h3 class="mb-3">Endeudamiento Máximo por Tipo de Asalariado</h3>
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Público:</div>
+                    <div class="col-8">40%</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Privado:</div>
+                    <div class="col-8">60%</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Profesional Independiente:</div>
+                    <div class="col-8">80%</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 text-muted fw-semibold">Trabajador Independiente:</div>
+                    <div class="col-8">70%</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ESCENARIOS -->
+    <div class="card border-0 shadow-sm rounded-4 p-4">
+        <h5 class="fw-bold mb-3">Tablas de escenarios de los tipos de interés</h5>
+
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Plazo</th>
+                    <th>Porcentaje Banco</th>
+                    <th>Indicador Bancario</th>
+                    <th>Tipo de Interés</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>12 meses</td>
+                    <td>7%</td>
+                    <td>TBP</td>
+                    <td>Variable</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4">
+        <h5 class="fw-bold mb-3">Tablas de escenarios de los tipos de interés</h5>
+
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Plazo</th>
+                    <th>Porcentaje Banco</th>
+                    <th>Indicador Bancario</th>
+                    <th>Tipo de Interés</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>17 meses</td>
+                    <td>2%</td>
+                    <td>TBP</td>
+                    <td>Escalonada</td>
+                </tr>
+                <tr>
+                    <td>25 meses</td>
+                    <td>5%</td>
+                    <td>TBP</td>
+                    <td>Escalonada</td>
+                </tr>
+                <tr>
+                    <td>... meses</td>
+                    <td>7%</td>
+                    <td>N/A</td>
+                    <td>Escalonada</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+

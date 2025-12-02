@@ -15,5 +15,10 @@ namespace HermeSoft_Fusion.Controllers
             return View();
         }
 
+        public IActionResult Detalle()
+        {
+            return View();
+        }
+
     }
 }
