@@ -1,4 +1,83 @@
 ﻿@{
-    ViewBag.Title = "Estaditicas";
+    ViewBag.Title = "Estadisticas";
     Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Detalles de Proximos Cobros</h4>
+                <p class="card-title-desc">
+                    Esta es una tabla que detalla los proximos cobros que puede realizar el personal de ventas sobre las primas
+                </p>
+
+                <table id="key-datatable" class="table dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Código de Venta</th>
+                            <th>Fecha Cobro</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                        <tr><td>Juan Pérez</td><td>VNT-002201</td><td>2025-01-05</td><td>₡215,400</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>María Gómez</td><td>VNT-002202</td><td>2025-01-06</td><td>₡342,800</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Carlos Rodríguez</td><td>VNT-002203</td><td>2025-01-07</td><td>₡298,500</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Daniela López</td><td>VNT-002204</td><td>2025-01-08</td><td>₡410,900</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Pedro Sánchez</td><td>VNT-002205</td><td>2025-01-09</td><td>₡225,300</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+
+                        <tr><td>Laura Hernández</td><td>VNT-002206</td><td>2025-01-10</td><td>₡530,000</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Miguel Castro</td><td>VNT-002207</td><td>2025-01-11</td><td>₡265,900</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Sofía Vargas</td><td>VNT-002208</td><td>2025-01-12</td><td>₡312,700</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>José Martínez</td><td>VNT-002209</td><td>2025-01-13</td><td>₡289,400</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Valeria Rojas</td><td>VNT-002210</td><td>2025-01-14</td><td>₡450,600</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+
+                        <tr><td>Andrés Torres</td><td>VNT-002211</td><td>2025-01-15</td><td>₡378,900</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Camila Méndez</td><td>VNT-002212</td><td>2025-01-16</td><td>₡260,300</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Ricardo Salazar</td><td>VNT-002213</td><td>2025-01-17</td><td>₡599,000</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Karla Jiménez</td><td>VNT-002214</td><td>2025-01-18</td><td>₡244,800</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Javier Navarro</td><td>VNT-002215</td><td>2025-01-19</td><td>₡322,200</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+
+                        <tr><td>Lucía Barrios</td><td>VNT-002216</td><td>2025-01-20</td><td>₡487,500</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Samuel Vega</td><td>VNT-002217</td><td>2025-01-21</td><td>₡268,400</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Isabella Mora</td><td>VNT-002218</td><td>2025-01-22</td><td>₡540,900</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Diego Castillo</td><td>VNT-002219</td><td>2025-01-23</td><td>₡230,600</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                        <tr><td>Paola Rivera</td><td>VNT-002220</td><td>2025-01-24</td><td>₡620,300</td><td><span class="badge bg-warning text-dark">Pendiente</span></td></tr>
+                    </tbody>
+                </table>
+            </div> <!-- end card body-->
+        </div> <!-- end card -->
+    </div><!-- end col-->
+</div>
+<!-- end row-->
+@section scripts{
+    <!-- Required datatable js -->
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/assets/libs/jszip/jszip.min.js"></script>
+    <script src="~/assets/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/assets/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+
+    <script src="~/assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/assets/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+
+    <!-- Responsive examples -->
+    <script src="~/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+
+    <!-- Datatable init js -->
+    <script src="~/assets/js/pages/datatables.init.js"></script>
+
+    <script src="~/assets/js/app.js"></script>
 }

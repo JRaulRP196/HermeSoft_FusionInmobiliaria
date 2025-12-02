@@ -8,5 +8,11 @@ namespace HermeSoft_Fusion.Controllers
         {
             return View();
         }
+
+        public IActionResult Primas() 
+        {
+            return View();
+        }
+
     }
 }
