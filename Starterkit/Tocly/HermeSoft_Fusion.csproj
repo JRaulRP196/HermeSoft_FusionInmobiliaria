@@ -200,6 +200,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\assets\images\Mapas\Mapa_Condominio.jpg" />
     <None Include="wwwroot\assets\libs\datatables.net-autofill-bs4\node_modules\jquery\external\sizzle\sizzle.min.js" />
     <None Include="wwwroot\assets\libs\datatables.net-autofill-bs4\node_modules\jquery\jquery.min.js" />
     <None Include="wwwroot\assets\libs\datatables.net-autofill-bs4\node_modules\jquery\jquery.slim.min.js" />
