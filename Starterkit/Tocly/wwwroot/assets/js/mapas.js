@@ -20,6 +20,7 @@
         azul: "#3b82f6"
     };
 
+    let markers = [];
     function crearPunto(lote) {
 
         const marker = L.circleMarker([lote.y, lote.x], {
@@ -27,34 +28,61 @@
             color: colores[lote.estado],
             fillColor: colores[lote.estado],
             fillOpacity: 0.9
-        }).addTo(map);
+        });
+
+        marker.estado = lote.estado; 
 
         marker.on("click", () => {
-            console.log("CLICK EN:", lote);
-
             document.getElementById("contenidoModal").innerHTML = `
-        <h4>${lote.nombre}</h4>
-        <br>
-        <p><b>Código:</b> ${lote.codigo}</p>
-        <p><b>Área:</b> ${lote.area} m²</p>
-        <p><b>Frente:</b> ${lote.frente} m</p>
-        <p><b>Fondo:</b> ${lote.fondo} m</p>
-        <p><b>Precio m²:</b> ₡${lote.precioM2.toLocaleString()}</p>
-        <p><b>Precio Lista:</b> ₡${lote.precioLista.toLocaleString()}</p>
-        <p><b>Precio Venta:</b> ₡${lote.precioVenta.toLocaleString()}</p>
-        ${lote.estado === "verde" ? `
-        <a class="btn btn-primary waves-effect waves-light" href="/Ventas/Registro">
-            <i class="ri-wallet-3-line align-middle me-2"></i> Iniciar Proceso de Venta
-        </a>
-    ` : ``}
-    `;
+            <h4>${lote.nombre}</h4>
+            <br>
+            <p><b>Código:</b> ${lote.codigo}</p>
+            <p><b>Área:</b> ${lote.area} m²</p>
+            <p><b>Frente:</b> ${lote.frente} m</p>
+            <p><b>Fondo:</b> ${lote.fondo} m</p>
+            <p><b>Precio m²:</b> ₡${lote.precioM2.toLocaleString()}</p>
+            <p><b>Precio Lista:</b> ₡${lote.precioLista.toLocaleString()}</p>
+            <p><b>Precio Venta:</b> ₡${lote.precioVenta.toLocaleString()}</p>
+            ${lote.estado === "verde" ? `
+                <a class="btn btn-primary waves-effect waves-light" href="/Ventas/Registro">
+                    <i class="ri-wallet-3-line align-middle me-2"></i> Iniciar Proceso de Venta
+                </a>
+            ` : ``}
+        `;
 
             const modal = new bootstrap.Modal(document.getElementById("miModalCentro"));
             modal.show();
         });
 
+        markers.push(marker);      
+        marker.addTo(map);         
+
         return marker;
     }
+
+    function aplicarFiltro(tipo) {
+        markers.forEach(m => {
+            map.removeLayer(m);
+        });
+
+        if (tipo === "Disponibilidad") {
+            markers
+                .filter(m => m.estado === "verde")
+                .forEach(m => map.addLayer(m));
+        }
+        else if (tipo === "Ventas_Mes") {
+            markers
+                .filter(m => m.estado === "amarillo")
+                .forEach(m => map.addLayer(m));
+        }
+        else {
+            markers.forEach(m => map.addLayer(m));
+        }
+    }
+
+    document.getElementById("filtro").addEventListener("change", function () {
+        aplicarFiltro(this.value);
+    });
 
 
     // ========= SLIDER / SELECTOR DE MAPAS ============
@@ -423,11 +451,18 @@
     };
 
     let overlayActual = null;
-    let markers = [];
+
+    function limpiarMapa() {
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+    }
 
     function cargarMapa(nombreMapa) {
 
         const data = mapas[nombreMapa];
+
+        limpiarMapa();
+
         if (!data) return;
 
         if (overlayActual) map.removeLayer(overlayActual);

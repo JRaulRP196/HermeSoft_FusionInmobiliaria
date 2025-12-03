@@ -1,6 +1,6 @@
 ﻿@{
-    ViewBag.Title = "Lotes";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Reportes";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
 }
 
 <!-- Selector de Condominios -->
@@ -27,34 +27,27 @@
 
 <div class="col-12">
     <div class="card">
+        <div class="card-header border-0 d-flex justify-content-between align-items-center px-4 pt-4 rounded-4">
+            <h4>Condominio</h4>
+            <div class="d-flex align-items-center gap-3">
+                <select class="form-select w-auto" id="filtro">
+                    <option value="-1" hidden selected>Filtros</option>
+                    <option value="Ventas_Mes">Ventas Mes</option>
+                    <option value="Disponibilidad">Disponibilidad</option>
+                </select>
 
+                <button class="btn btn-outline-secondary btn-sm px-3">
+                    Descargar
+                </button>
+            </div>
+
+        </div>
         <div class="card-body">
-            <h4 class="card-title">Mapa del Condominio</h4>
-            <p class="card-title-dsec">Este es el mapa de los lotes.</p>
             <div id="map" style="height: 350px"></div>
         </div> <!-- end card-body-->
     </div> <!-- end card-->
 </div>
 
-
-<!-- Modal -->
-<div id="miModalCentro" class="modal fade bs-example-modal-center" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Información del Lote</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="contenidoModal">
-                <!-- Aquí meto la info dinámica -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<select id="filtro" hidden>
-    <option value="-1" hidden selected>Filtros</option>
-</select>
 @section scripts{
     <script src="~/assets/js/mapas.js"></script>
     <script src="~/assets/js/app.js"></script>
