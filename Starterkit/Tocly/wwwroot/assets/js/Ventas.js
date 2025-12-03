@@ -297,7 +297,7 @@
         function renderTabla(ventas) {
             tablaBody.innerHTML = "";
             if (!ventas.length) {
-                historialMessages.innerHTML = `<div class="alert alert-warning">No se encontraron resultados</div>`;
+                historialMessages.innerHTML = `<div class="alert alert-danger">No se encontraron resultados</div>`;
                 return;
             }
             historialMessages.innerHTML = "";
