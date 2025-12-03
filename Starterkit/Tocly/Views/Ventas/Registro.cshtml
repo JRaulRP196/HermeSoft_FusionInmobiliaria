@@ -59,12 +59,17 @@
                             <div class="invalid-feedback">Ingrese la fecha de la venta.</div>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-1">
                             <label class="form-label">Moneda *</label>
                             <select id="moneda" class="form-select" required>
-                                <option value="CRC" selected>Colones (₡)</option>
-                                <option value="USD">Dólares ($)</option>
+                                <option value="CRC" selected>(₡)</option>
+                                <option value="USD">($)</option>
                             </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">% Descuento *</label>
+                            <input type="number" id="descuento" class="form-control" required value="0">
                         </div>
 
                         <div class="col-md-3">
