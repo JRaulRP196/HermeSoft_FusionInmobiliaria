@@ -1,0 +1,392 @@
+﻿@{
+    ViewData["Title"] = "Usuarios";
+    Layout = "~/Views/Shared/_Layout.cshtml";  // ajusta el layout si tu archivo se llama distinto
+}
+
+<div class="container-fluid py-4">
+
+    <!-- Título y botón principal -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Usuarios</h2>
+            <p class="text-muted mb-0">Administra los accesos del sistema</p>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary btn-lg d-flex align-items-center"
+                data-bs-toggle="modal"
+                data-bs-target="#modalNuevoUsuario">
+            <span class="me-2 fw-bold">+</span> Nuevo Usuario
+        </button>
+    </div>
+
+    <!-- Filtros (solo diseño, sin lógica) -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Buscar</label>
+                    <div class="input-group">
+                        <span class="input-group-text border-end-0 bg-white">
+                            <i class="ri-search-line"></i>
+
+                        </span>
+                        <input type="text" class="form-control border-start-0" placeholder="Nombre o correo">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Rol</label>
+                    <select class="form-select">
+                        <option>– Todos los roles –</option>
+                        <option>Administrador</option>
+                        <option>Ventas</option>                        
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Estado</label>
+                    <select class="form-select">
+                        <option>– Todos –</option>
+                        <option>Activo</option>
+                        <option>Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 text-md-end">
+                    <button class="btn btn-outline-primary w-100 mb-2">
+                        Aplicar filtros
+                    </button>
+                    <button class="btn btn-link w-100 text-decoration-none">
+                        Limpiar filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de usuarios (3 quemados) -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Usuario</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Último acceso</th>
+                            <th class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 1) Administrador -->
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <img src="~/assets/images/users/avatar-2.jpg"
+                                             class="avatar-img rounded-circle"
+                                             alt="Admin">
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">Ana Rodríguez</div>
+                                        <div class="text-muted small">admin@fusion.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>                               
+                                <span class="badge badge-soft-primary font-size-12">Administrador</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-soft-success font-size-12">Activo</span>
+                            </td>
+                            <td class="text-muted">30/11/2024</td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Editar -->
+                                    <button class="btn btn-light border-0"
+                                            title="Editar"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalEditarUsuario"
+                                            data-nombre="Ana Rodríguez"
+                                            data-correo="admin@fusion.com"
+                                            data-rol="Administrador"
+                                            data-estado="Activo">
+                                        <i class="ri-pencil-line"></i>
+                                    </button>
+                                </div>
+                            </td>
+
+                        </tr>
+
+                        <!-- 2) Vendedor activo -->
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <img src="~/assets/images/users/avatar-3.jpg"
+                                             class="avatar-img rounded-circle"
+                                             alt="Vendedor activo">
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">Carlos Vega</div>
+                                        <div class="text-muted small">cvega@fusion.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-soft-primary font-size-12">Ventas</span>
+                            </td>
+                            <td>
+
+                                <span class="badge badge-soft-success font-size-12">Activo</span>
+                             
+                            </td>
+                            <td class="text-muted">28/11/2024</td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Editar -->
+                                    <button class="btn btn-light border-0"
+                                            title="Editar"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalEditarUsuario"
+                                            data-nombre="Carlos Vega"
+                                            data-correo="cvega@fusion.com"
+                                            data-rol="Ventas"
+                                            data-estado="Activo">
+                                        <i class="ri-pencil-line"></i>
+                                    </button>
+
+                                </div>
+                            </td>
+
+
+
+                        </tr>
+
+                        <!-- 3) Vendedor inactivo -->
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <img src="~/assets/images/users/avatar-1.jpg"
+                                             class="avatar-img rounded-circle"
+                                             alt="Vendedor inactivo">
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">María López</div>
+                                        <div class="text-muted small">mlopez@fusion.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-soft-primary font-size-12">Ventas</span>
+                            </td>
+                            <td>                                                             
+                                <span class="badge badge-soft-danger font-size-12">Inactivo</span>                                
+                            </td>
+                            <td class="text-muted">15/10/2024</td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Editar -->
+                                    <button class="btn btn-light border-0"
+                                            title="Editar"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalEditarUsuario"
+                                            data-nombre="María López"
+                                            data-correo="mlopez@fusion.com"
+                                            data-rol="Ventas"
+                                            data-estado="Inactivo">
+                                        <i class="ri-pencil-line"></i>
+                                    </button>
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal: Nuevo Usuario -->
+<div class="modal fade" id="modalNuevoUsuario" tabindex="-1" aria-labelledby="modalNuevoUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNuevoUsuarioLabel">Nuevo usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Por ahora solo diseño, sin lógica -->
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre completo</label>
+                            <input type="text" class="form-control" placeholder="Nombre y apellidos">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo electrónico</label>
+                            <input type="email" class="form-control" placeholder="correo@ejemplo.com">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Rol</label>
+                            <select class="form-select">
+                                <option value="Administrador">Administrador</option>
+                                <option value="Ventas" selected>Ventas</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select">
+                                <option value="Activo" selected>Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" placeholder="Contraseña temporal">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Confirmar contraseña</label>
+                            <input type="password" class="form-control" placeholder="Repetir contraseña">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary">
+                    Guardar usuario
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Editar Usuario -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-labelledby="modalEditarUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarUsuarioLabel">Editar usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre completo</label>
+                            <input type="text" class="form-control" id="editNombre">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo electrónico</label>
+                            <input type="email" class="form-control" id="editCorreo">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Rol</label>
+                            <select class="form-select" id="editRol">
+                                <option value="Administrador">Administrador</option>
+                                <option value="Ventas">Ventas</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" id="editEstado">
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Contraseña (opcional)</label>
+                            <input type="password" class="form-control" placeholder="Dejar en blanco para no cambiar">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary">
+                    Guardar cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            var modalEditar = document.getElementById('modalEditarUsuario');
+            if (modalEditar) {
+                modalEditar.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+
+                    // Tomar los valores de los data-*
+                    var nombre = button.getAttribute('data-nombre');
+                    var correo = button.getAttribute('data-correo');
+                    var rol = button.getAttribute('data-rol');
+                    var estado = button.getAttribute('data-estado');
+
+                    // Buscar los campos dentro del modal
+                    var inputNombre = modalEditar.querySelector('#editNombre');
+                    var inputCorreo = modalEditar.querySelector('#editCorreo');
+                    var selectRol = modalEditar.querySelector('#editRol');
+                    var selectEstado = modalEditar.querySelector('#editEstado');
+                    var titulo = modalEditar.querySelector('#modalEditarUsuarioLabel');
+
+                    if (inputNombre) inputNombre.value = nombre || '';
+                    if (inputCorreo) inputCorreo.value = correo || '';
+                    if (selectRol) selectRol.value = rol || 'Ventas';
+                    if (selectEstado) selectEstado.value = estado || 'Activo';
+                    if (titulo) titulo.textContent = 'Editar usuario - ' + (nombre || '');
+                });
+            }
+        });
+    </script>
+}
+
+
+@section Styles {
+    <style>
+        .avatar-img {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+        }
+
+        .badge-estado-activo {
+            background-color: #d1f7e5;
+            color: #118a55;
+        }
+
+        .badge-estado-inactivo {
+            background-color: #ffe1e1;
+            color: #b94a4a;
+        }
+
+        .badge-rol-admin {
+            background-color: #ffe1e1;
+            color: #b94a4a;
+        }
+
+        .badge-rol-ventas {
+            background-color: #e0ebff;
+            color: #3056d3;
+        }
+    </style>
+}
