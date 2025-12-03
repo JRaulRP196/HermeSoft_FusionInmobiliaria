@@ -1,0 +1,73 @@
+﻿@{
+    ViewBag.Title = "Editar Venta";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+
+                <h4 class="card-title">Edición de Venta</h4>
+                <p class="card-title-desc">
+                    Modifique los datos de la venta.
+                </p>
+
+                <form class="needs-validation" novalidate>
+
+                    <div class="row">
+                        <!-- CLIENTE -->
+                        <div class="col-md-6">
+                            <label class="form-label">Cliente</label>
+                            <select class="form-control" required>
+                                <option>Juan Pérez</option>
+                                <option>Ana Rodríguez</option>
+                            </select>
+                        </div>
+
+                        <!-- LOTE -->
+                        <div class="col-md-6">
+                            <label class="form-label">Lote</label>
+                            <select class="form-control" required>
+                                <option>Lote #3 - Vista Real</option>
+                                <option>Lote #1 - Vista Real</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <!-- FECHA -->
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Venta</label>
+                            <input type="date" class="form-control" value="2024-11-25" required>
+                        </div>
+
+                        <!-- MONTO -->
+                        <div class="col-md-6">
+                            <label class="form-label">Monto Total</label>
+                            <input type="number" class="form-control" value="35000000" required>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <!-- TIPO FINAN -->
+                        <div class="col-md-12">
+                            <label class="form-label">Tipo de Financiamiento</label>
+                            <select class="form-control" required>
+                                <option>Banco</option>
+                                <option>Contado</option>
+                                <option>Financiamiento Propio</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
