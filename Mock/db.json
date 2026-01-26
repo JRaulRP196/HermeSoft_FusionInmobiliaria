@@ -1,0 +1,307 @@
+{
+  "lotes": [
+    {
+      "codigo": "LOT-01",
+      "area": 120,
+      "fondo": 24,
+      "frente": 5.00,
+      "precioM2": 67000,
+      "precioLista": 8040000,
+      "precioVenta": 7638000,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-02",
+      "area": 130,
+      "fondo": 26,
+      "frente": 5.00,
+      "precioM2": 67000,
+      "precioLista": 8710000,
+      "precioVenta": 8274500,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-03",
+      "area": 140,
+      "fondo": 28,
+      "frente": 5.00,
+      "precioM2": 68000,
+      "precioLista": 9520000,
+      "precioVenta": 9044000,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-04",
+      "area": 150,
+      "fondo": 30,
+      "frente": 5.00,
+      "precioM2": 68000,
+      "precioLista": 10200000,
+      "precioVenta": 9690000,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-05",
+      "area": 160,
+      "fondo": 32,
+      "frente": 5.00,
+      "precioM2": 69000,
+      "precioLista": 11040000,
+      "precioVenta": 10488000,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-06",
+      "area": 170,
+      "fondo": 34,
+      "frente": 5.00,
+      "precioM2": 69000,
+      "precioLista": 11730000,
+      "precioVenta": 11143500,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-07",
+      "area": 180,
+      "fondo": 36,
+      "frente": 5.00,
+      "precioM2": 70000,
+      "precioLista": 12600000,
+      "precioVenta": 11970000,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-08",
+      "area": 125,
+      "fondo": 25,
+      "frente": 5.00,
+      "precioM2": 66000,
+      "precioLista": 8250000,
+      "precioVenta": 7837500,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-09",
+      "area": 135,
+      "fondo": 27,
+      "frente": 5.00,
+      "precioM2": 67000,
+      "precioLista": 9045000,
+      "precioVenta": 8592750,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-10",
+      "area": 145,
+      "fondo": 29,
+      "frente": 5.00,
+      "precioM2": 68000,
+      "precioLista": 9860000,
+      "precioVenta": 9367000,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-11",
+      "area": 155,
+      "fondo": 31,
+      "frente": 5.00,
+      "precioM2": 69000,
+      "precioLista": 10695000,
+      "precioVenta": 10160250,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-12",
+      "area": 165,
+      "fondo": 33,
+      "frente": 5.00,
+      "precioM2": 69000,
+      "precioLista": 11385000,
+      "precioVenta": 10815750,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-13",
+      "area": 175,
+      "fondo": 35,
+      "frente": 5.00,
+      "precioM2": 70000,
+      "precioLista": 12250000,
+      "precioVenta": 11637500,
+      "condominio": "CO-01",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-14",
+      "area": 110,
+      "fondo": 22,
+      "frente": 5.00,
+      "precioM2": 65000,
+      "precioLista": 7150000,
+      "precioVenta": 6792500,
+      "condominio": "CO-02",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-15",
+      "area": 120,
+      "fondo": 24,
+      "frente": 5.00,
+      "precioM2": 65000,
+      "precioLista": 7800000,
+      "precioVenta": 7410000,
+      "condominio": "CO-02",
+      "estado": "Disponible"
+    },
+    {
+      "codigo": "LOT-16",
+      "area": 130,
+      "fondo": 26,
+      "frente": 5.00,
+      "precioM2": 66000,
+      "precioLista": 8580000,
+      "precioVenta": 8151000,
+      "condominio": "CO-02",
+      "estado": "En Venta"
+    },
+    {
+      "codigo": "LOT-17",
+      "area": 140,
+      "fondo": 28,
+      "frente": 5.00,
+      "precioM2": 66000,
+      "precioLista": 9240000,
+      "precioVenta": 8778000,
+      "condominio": "CO-02",
+      "estado": "En Venta"
+    },
+    {
+      "codigo": "LOT-18",
+      "area": 150,
+      "fondo": 30,
+      "frente": 5.00,
+      "precioM2": 67000,
+      "precioLista": 10050000,
+      "precioVenta": 9547500,
+      "condominio": "CO-02",
+      "estado": "En Venta"
+    },
+    {
+      "codigo": "LOT-19",
+      "area": 160,
+      "fondo": 32,
+      "frente": 5.00,
+      "precioM2": 67000,
+      "precioLista": 10720000,
+      "precioVenta": 10184000,
+      "condominio": "CO-02",
+      "estado": "En Venta"
+    },
+    {
+      "codigo": "LOT-20",
+      "area": 170,
+      "fondo": 34,
+      "frente": 5.00,
+      "precioM2": 68000,
+      "precioLista": 11560000,
+      "precioVenta": 10982000,
+      "condominio": "CO-02",
+      "estado": "En Venta"
+    },
+    {
+      "codigo": "LOT-31",
+      "area": 140,
+      "fondo": 28,
+      "frente": 5.00,
+      "precioM2": 64000,
+      "precioLista": 8960000,
+      "precioVenta": 8512000,
+      "condominio": "CO-03",
+      "estado": "Vendido"
+    },
+    {
+      "codigo": "LOT-32",
+      "area": 150,
+      "fondo": 30,
+      "frente": 5.00,
+      "precioM2": 64000,
+      "precioLista": 9600000,
+      "precioVenta": 9120000,
+      "condominio": "CO-03",
+      "estado": "Vendido"
+    },
+    {
+      "codigo": "LOT-46",
+      "area": 160,
+      "fondo": 32,
+      "frente": 5.00,
+      "precioM2": 63000,
+      "precioLista": 10080000,
+      "precioVenta": 9576000,
+      "condominio": "CO-04",
+      "estado": "Entregado"
+    },
+    {
+      "codigo": "LOT-47",
+      "area": 170,
+      "fondo": 34,
+      "frente": 5.00,
+      "precioM2": 64000,
+      "precioLista": 10880000,
+      "precioVenta": 10336000,
+      "condominio": "CO-04",
+      "estado": "Entregado"
+    },
+    {
+      "codigo": "LOT-48",
+      "area": 125,
+      "fondo": 25,
+      "frente": 5.00,
+      "precioM2": 61000,
+      "precioLista": 7625000,
+      "precioVenta": 7243750,
+      "condominio": "CO-04",
+      "estado": "Entregado"
+    },
+    {
+      "codigo": "LOT-49",
+      "area": 135,
+      "fondo": 27,
+      "frente": 5.00,
+      "precioM2": 62000,
+      "precioLista": 8370000,
+      "precioVenta": 7951500,
+      "condominio": "CO-04",
+      "estado": "Entregado"
+    },
+    {
+      "codigo": "LOT-50",
+      "area": 145,
+      "fondo": 29,
+      "frente": 5.00,
+      "precioM2": 62000,
+      "precioLista": 8990000,
+      "precioVenta": 8540500,
+      "condominio": "CO-04",
+      "estado": "Entregado"
+    }
+  ],
+  "condominios": [
+    { "id": "CO-01", "nombre": "Altabrisa" },
+    { "id": "CO-02", "nombre": "Montezuma" },
+    { "id": "CO-03", "nombre": "Corteza" },
+    { "id": "CO-04", "nombre": "Las Cascadas" }
+  ]
+}

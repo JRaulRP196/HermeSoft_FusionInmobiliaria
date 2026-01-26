@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "Asignar Lote";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using HermeSoft_Fusion.Models
+@model HermeSoft_Fusion.Models.Lote
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Asignador de Lotes</h2>
+        <p class="text-muted mb-0">Asignador de los lotes del sistema</p>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-body">
+            <form asp-action="AsignarLote" method="post" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Lote Seleccionado</label>
+                    <input type="text" class="form-control" placeholder="Lote" asp-for="Codigo" name="lote" id="lote" readonly required>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Eje X</label>
+                    <input type="text" class="form-control" id="X" name="X" placeholder="Eje X" readonly required>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Eje Y</label>
+                    <input type="text" class="form-control" id="Y" name="Y" placeholder="Eje Y" readonly required>
+                </div>
+
+                <input type="hidden" id="idMapa" name="idMapa" />
+
+                <div class="col-md-2">
+                    <button class="btn btn-outline-primary w-100">
+                        Guardar Ubicación
+                    </button>
+                </div>
+            </form>
+
+    </div>
+</div>
+
+<!-- Selector de Condominios -->
+<div class="card border-0 shadow-sm rounded-4 mb-4 p-3">
+    <div class="d-flex justify-content-center align-items-center gap-3">
+
+        <!-- Nombre del Condominio -->
+        <div class="flex-grow-1 text-center">
+            <h4 id="nombreCondominio" class="fw-bold mb-0" >@Model.Condominio</h4>
+        </div>
+
+    </div>
+</div>
+
+<div class="col-12">
+    <div class="card">
+
+        <div class="card-body">
+            <h4 class="card-title">Mapa del Condominio</h4>
+            <p class="card-title-dsec">Este es el mapa de los lotes.</p>
+            <div id="map" style="height: 350px"></div>
+        </div> <!-- end card-body-->
+    </div> <!-- end card-->
+</div>
+
+@section scripts{
+    <script src="~/assets/js/asignarLote.js"></script>
+    <script src="~/assets/js/app.js"></script>
+}

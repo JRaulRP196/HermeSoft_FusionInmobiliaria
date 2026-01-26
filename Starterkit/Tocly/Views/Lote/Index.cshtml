@@ -2,6 +2,28 @@
     ViewBag.Title = "Lotes";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@model HermeSoft_Fusion.Models.Mapa
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Listado de Lotes</h2>
+        <p class="text-muted mb-0">Administra los lotes del sistema</p>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center gap-3">
+        <a class="btn btn-primary btn-lg d-flex align-items-center" id="listadoLotes" asp-action="ListadoLotes">
+            <span class="me-2 fw-bold">+</span> Listado
+        </a>
+
+        <button type="button"
+                class="btn btn-primary btn-lg d-flex align-items-center"
+                data-bs-toggle="modal"
+                data-bs-target="#modalNuevoMapa">
+            <span class="me-2 fw-bold">+</span> Agregar Mapa
+        </button>
+    </div>
+</div>
+
 
 <!-- Selector de Condominios -->
 <div class="card border-0 shadow-sm rounded-4 mb-4 p-3">
@@ -47,6 +69,36 @@
             </div>
             <div class="modal-body" id="contenidoModal">
                 <!-- Aquí meto la info dinámica -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalNuevoMapa" tabindex="-1" aria-labelledby="modalNuevoMapaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNuevoMapaLabel">Nuevo mapa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Mapa" asp-action="Registro" enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Condominio</label>
+                            <select class="form-select" id="condominios" asp-for="condominio">
+
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Imagen del Mapa</label>
+                            <input type="file" class="form-control" accept="image/*" name="ImagenMapa">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Guardar mapa
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

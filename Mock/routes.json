@@ -1,0 +1,4 @@
+{
+  "/lotes/:codigo": "/lotes?codigo=:codigo",
+  "/lotes/condominio/:condominio": "/lotes?condominio=:condominio"
+}

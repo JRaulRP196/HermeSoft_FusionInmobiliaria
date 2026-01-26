@@ -1,12 +1,4 @@
-/*
-Template Name: Tocly -  Admin & Dashboard Template
-Author: Themesdesign
-Version: 1.0.0
-Contact: themesdesign.in@gmail.com
-File: Main Js File
-*/
-​
-​(function ($) {
+(function ($) {
     ​
         'use strict';
     ​

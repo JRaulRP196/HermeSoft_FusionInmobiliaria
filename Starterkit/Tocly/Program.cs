@@ -1,7 +1,15 @@
+using HermeSoft_Fusion.Data;
+using Microsoft.EntityFrameworkCore;
+using System;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient();
+builder.Services.AddDbContext<AppDbContext>(
+        options => options.UseMySQL(builder.Configuration.GetConnectionString("MySqlConnection"))
+    );
 
 var app = builder.Build();
 
