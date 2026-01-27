@@ -2,6 +2,7 @@
     ViewBag.Title = "Registrar Venta";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <div class="row">
@@ -38,12 +39,7 @@
 
                         <div class="col-md-4">
                             <label class="form-label">Lote (disponible) *</label>
-                            <select id="lote" class="form-select" required>
-                                <option value="" selected disabled>Seleccione lote</option>
-                                <option value="Lote-001" data-estado="Disponible" data-precio="35000000">Lote-001 - Proyecto Vista (Disponible) - ₡35,000,000</option>
-                                <option value="Lote-002" data-estado="Disponible" data-precio="42000000">Lote-002 - Proyecto Sol (Disponible) - ₡42,000,000</option>
-                                <option value="Lote-003" data-estado="Vendido" data-precio="28000000">Lote-003 - Proyecto Lago (Vendido)</option>
-                            </select>
+                            <input id="lote" class="form-control" value="@ViewBag.lote" readonly required>
                             <div class="invalid-feedback">Seleccione un lote disponible.</div>
                         </div>
 
@@ -121,6 +117,10 @@
                                 <div class="col-12">
                                     <label class="form-label">Desglose Prima (automático)</label>
                                     <input type="text" id="desglosePrima" class="form-control" disabled placeholder="Se calculará automáticamente">
+                                    <br />
+                                    <button type="button" id="calcPrima" class="btn btn-outline-primary w-100 d-none">
+                                        Calcular prima
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -222,4 +222,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="~/assets/js/ventas.js"></script>
+    <script src="~/assets/js/calculos.js"></script>
 }
