@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <p><b>Precio Lista:</b> ₡${lote.precioLista.toLocaleString()}</p>
             <p><b>Precio Venta:</b> ₡${lote.precioVenta.toLocaleString()}</p>
             ${lote.estado === "verde" ? `
-                <a class="btn btn-primary waves-effect waves-light" href="/Ventas/Registro">
+                <a class="btn btn-primary waves-effect waves-light" asp-controller="Ventas" asp-action="Registro">
                     <i class="ri-wallet-3-line align-middle me-2"></i> Iniciar Proceso de Venta
                 </a>
             ` : ``}
