@@ -1,8 +1,19 @@
-﻿@{
+﻿@using HermeSoft_Fusion.Models
+@using Newtonsoft.Json
+@{
     ViewBag.Title = "Registrar Venta";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@{
+    List<DesglosesPrimas> desglose = null;
 
+    if (TempData["DesglosePrima"] != null)
+    {
+        desglose = JsonConvert.DeserializeObject<List<DesglosesPrimas>>(
+            TempData["DesglosePrima"].ToString()
+        );
+    }
+}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <div class="row">
@@ -115,12 +126,40 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label">Desglose Prima (automático)</label>
-                                    <input type="text" id="desglosePrima" class="form-control" disabled placeholder="Se calculará automáticamente">
+                                    <label class="form-label">Desglose Prima</label>
                                     <br />
                                     <button type="button" id="calcPrima" class="btn btn-outline-primary w-100 d-none">
                                         Calcular prima
                                     </button>
+                                </div>
+
+                                <div class="col-12">
+                                    @if (desglose != null && desglose.Any())
+                                    {
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fecha Cobro</th>
+                                                    <th>Monto</th>
+                                                    <th>Estado</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in desglose)
+                                                {
+                                                    <tr>
+                                                        <td>@item.FechaCobro.ToString("dd/MM/yyyy")</td>
+                                                        <td>@item.Monto.ToString("C")</td>
+                                                        <td>@item.Estado</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    @if (TempData["ErrorPrima"] != null)
+                                    {
+                                        <div class="alert alert-danger">@TempData["ErrorPrima"]</div>
+                                    }
                                 </div>
                             </div>
                         </div>

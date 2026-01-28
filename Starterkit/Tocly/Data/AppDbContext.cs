@@ -11,5 +11,7 @@ namespace HermeSoft_Fusion.Data
 
         public DbSet<Mapa> MAPAS { get; set; }
         public DbSet<Coordenadas> COORDENADAS { get; set; }
+        public DbSet<Primas> PRIMAS { get; set; }
+        public DbSet<DesglosesPrimas> DESGLOSES_PRIMAS { get; set; }
     }
 }

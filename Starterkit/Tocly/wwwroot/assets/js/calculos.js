@@ -6,28 +6,13 @@
     const resultadoPrima = $("#desglosePrima");
 
     //Para el calculo de prima automatico
+    function calcularPrima() {
+        const lote = idLote.val();
+        const fin = fechaVencimientoPrima.val();
+        const porcentaje = porcentajePrima.val();
 
-    function ObtenerLote(codigoLote) {
-        return fetch(`/Ventas/ObtenerLoteJson?lote=${codigoLote}`)
-            .then(res => res.json());
-    }
-    async function calcularPrima() {
-        const lote = await ObtenerLote(idLote.val());
-        const inicio = new Date();
-        const fin = new Date(fechaVencimientoPrima.val());
-        const porcentaje = porcentajePrima.val() * 0.01;
-
-        let meses = (fin.getFullYear() - inicio.getFullYear()) * 12 +
-                    (fin.getMonth() - inicio.getMonth());
-
-        if (fin.getDate() < inicio.getDate()) {
-            meses--;
-        }
-
-        const montoPrima = lote[0].precioVenta * porcentaje;
-        const mensualidad = montoPrima / meses;
-        console.log("mensualidad: " + mensualidad + " meses: " + meses + " montoPrima: " + montoPrima);
-
+        window.location.href =
+            `/Calculos/CalcularPrima?codigoLote=${lote}&porcentajePrima=${porcentaje}&fechaFinal=${fin}`;
     }
 
     function datosCompletosParaPrima() {
