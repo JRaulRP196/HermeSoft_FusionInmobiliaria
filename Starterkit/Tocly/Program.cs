@@ -1,4 +1,6 @@
+using HermeSoft_Fusion.Business;
 using HermeSoft_Fusion.Data;
+using HermeSoft_Fusion.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -10,6 +12,13 @@ builder.Services.AddHttpClient();
 builder.Services.AddDbContext<AppDbContext>(
         options => options.UseMySQL(builder.Configuration.GetConnectionString("MySqlConnection"))
     );
+
+builder.Services.AddScoped<LoteRepository>();
+builder.Services.AddScoped<LoteBusiness>();
+builder.Services.AddScoped<CondominioRepository>();
+builder.Services.AddScoped<CondominioBusiness>();
+builder.Services.AddScoped<CoordenadasRepository>();
+builder.Services.AddScoped<CoordenadasBusiness>();
 
 var app = builder.Build();
 

@@ -1,31 +1,42 @@
-﻿using HermeSoft_Fusion.Data;
-using HermeSoft_Fusion.Models;
+﻿using HermeSoft_Fusion.Business;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Controllers
 {
     public class CoordenadasController : Controller
     {
 
-        private readonly AppDbContext _context;
+        private readonly CoordenadasBusiness _coordenadasBusiness;
 
-        public CoordenadasController(AppDbContext context)
+        public CoordenadasController(CoordenadasBusiness coordenadasBusiness)
         {
-            _context = context;
+            _coordenadasBusiness = coordenadasBusiness;
         }
 
-        public IActionResult Index()
+        #region Vistas
+
+        [HttpPost]
+        public async Task<IActionResult> AsignarCoordenada(string lote, string X, string Y, int idMapa)
         {
-            return View();
+            if (await _coordenadasBusiness.Agregar(lote, X, Y, idMapa) != null)
+            {
+                return RedirectToAction("Index", "Lote");
+            }
+            return RedirectToAction("Index", "Lote");
         }
+
+        #endregion
+
+        #region Js
 
         [HttpGet]
         public async Task<IActionResult> GetCoordenadasPorMapa(int id)
         {
-            List<Coordenadas> coordenadas = await _context.COORDENADAS.Where(c => c.IdMapa == id).ToListAsync();
-            return Ok(coordenadas);
+            var coordenadas = await _coordenadasBusiness.GetCoordenadasPorMapa(id);
+            return Json(coordenadas);
         }
+
+        #endregion
 
     }
 }

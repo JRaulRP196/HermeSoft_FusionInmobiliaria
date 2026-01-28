@@ -14,7 +14,7 @@
 
 <div class="card shadow-sm mb-4 border-0">
     <div class="card-body">
-            <form asp-action="AsignarLote" method="post" class="row g-3 align-items-end">
+        <form asp-action="AsignarCoordenada" asp-controller="Coordenadas" method="post" class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label">Lote Seleccionado</label>
                     <input type="text" class="form-control" placeholder="Lote" asp-for="Codigo" name="lote" id="lote" readonly required>

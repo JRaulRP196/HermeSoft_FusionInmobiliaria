@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using HermeSoft_Fusion.Models;
+﻿using HermeSoft_Fusion.Models;
+using Microsoft.EntityFrameworkCore;
 namespace HermeSoft_Fusion.Data
 {
     public class AppDbContext : DbContext

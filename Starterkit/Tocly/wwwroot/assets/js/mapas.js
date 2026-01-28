@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let condominiosCargados = false;
     let mapasCargados = false;
 
-    $.get('/Lote/GetCondominios', function (data) {
+    $.get('/Condominio/Obtener', function (data) {
         condominios = data;
         condominiosCargados = true;
         intentarInicializar();
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     //Condominios en select 
-    $.get('/Lote/GetCondominios', function (data) {
+    $.get('/Condominio/Obtener', function (data) {
         for (let i = 0; i < data.length; i++) {
             $("#condominios").append("<option value='"+data[i].id+"'>"+data[i].nombre+" "+data[i].id +"</option>");
         }
