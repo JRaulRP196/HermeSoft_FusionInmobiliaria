@@ -1,181 +1,133 @@
-﻿@{
-    ViewBag.Title = "Bancos";
+﻿@model HermeSoft_Fusion.Models.Banco
+
+@{
+    ViewBag.Title = "Detalle del Banco";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var endeudamientos = ViewBag.Endeudamientos as IEnumerable<dynamic> ?? new List<dynamic>();
+    var seguros = ViewBag.Seguros as IEnumerable<dynamic> ?? new List<dynamic>();
+    var escenarios = ViewBag.Escenarios as IEnumerable<dynamic> ?? new List<dynamic>();
 }
 
+<div class="container-fluid">
 
-
-<div class="container-fluid p-4">
-
-    <!-- HEADER -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4 px-3 py-3">
-        <div class="d-flex justify-content-between align-items-center">
-            <h4 class="mb-0 fw-bold">BAC San José</h4>
-            <div>
-                <a class="btn btn-outline-primary px-4 rounded-pill" asp-action="Editar">
-                    <i class="fas fa-edit me-2"></i> Editar
-                </a>
-                <a href="javascript:history.back()" class="btn btn-light border px-4 rounded-pill">
-                    <i class="fas fa-arrow-left me-2"></i> Volver
-                </a>
-            </div>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Detalle del Banco</h4>
+        <a asp-action="Index" class="btn btn-secondary">Volver</a>
     </div>
 
-    <!-- LOGO + INFO GENERAL -->
-    <div class="row g-4 mb-4">
-
-        <!-- LOGO -->
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 d-flex align-items-center justify-content-center">
-                <img src="~/assets/images/Bancos/BAC.png"
-                     class="img-fluid"
-                     style="max-height:260px; object-fit:contain;">
-            </div>
-        </div>
-
-        <!-- INFO GENERAL -->
-        <div class="col-md-8">
-            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-                <h3 class="fw-bold mb-3">Información General</h3>
-
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Nombre:</div>
-                    <div class="col-8">BAC San José</div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <img src="@(string.IsNullOrWhiteSpace(Model.logo) ? Url.Content("~/assets/images/bancos/BAC.png") : Model.logo)"
+                         class="img-fluid rounded" alt="Logo @Model.nombre" />
                 </div>
+                <div class="col-md-9">
+                    <h4 class="mb-1">@Model.nombre</h4>
+                    <div class="text-muted">@Model.enlace</div>
 
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Enlace:</div>
-                    <div class="col-8">
-                        <a href="https://www.baccredomatic.com/es-cr" target="_blank">https://www.baccredomatic.com/es-cr</a>
+                    <div class="row mt-3">
+                        <div class="col-md-4"><b>Plazo máximo:</b> @Model.maxCredito años</div>
+                        <div class="col-md-4"><b>Comisión:</b> @Model.comision %</div>
+                        <div class="col-md-4"><b>Honorario abogado:</b> @Model.honorarioAbogado %</div>
+                        <div class="col-md-4 mt-2"><b>Tipo cambio:</b> @Model.tipoCambio</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Plazo Máximo Crédito:</div>
-                    <div class="col-8">35 años</div>
-                </div>
+    <div class="row g-3">
 
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Comisión:</div>
-                    <div class="col-8">5%</div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Honorarios Abogados:</div>
-                    <div class="col-8">7%</div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Cambio al Dolar:</div>
-                    <div class="col-8">510,10</div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5>Endeudamientos máximos</h5>
+                    @if (!endeudamientos.Any())
+                    {
+                        <div class="text-muted">No hay endeudamientos registrados.</div>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var e in endeudamientos)
+                            {
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>@e.Tipo</span>
+                                    <span>@e.Porcentaje %</span>
+                                </li>
+                            }
+                        </ul>
+                    }
                 </div>
             </div>
         </div>
 
-    </div>
-
-    <!-- BLOQUES MEDIOS -->
-    <div class="row g-4 mb-1">
-
-        <!-- Info Seguros -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4 text-center fw-bold">
-                <h3 class="mb-3">Seguros</h3>
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Vida:</div>
-                    <div class="col-8">3%</div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Desempleo:</div>
-                    <div class="col-8">3%</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Info Endeudamiento -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4 text-center fw-bold">
-                <h3 class="mb-3">Endeudamiento Máximo por Tipo de Asalariado</h3>
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Público:</div>
-                    <div class="col-8">40%</div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Privado:</div>
-                    <div class="col-8">60%</div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Profesional Independiente:</div>
-                    <div class="col-8">80%</div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-4 text-muted fw-semibold">Trabajador Independiente:</div>
-                    <div class="col-8">70%</div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5>Seguros</h5>
+                    @if (!seguros.Any())
+                    {
+                        <div class="text-muted">No hay seguros asociados.</div>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var s in seguros)
+                            {
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>@s.Seguro</span>
+                                    <span>@s.Porcentaje %</span>
+                                </li>
+                            }
+                        </ul>
+                    }
                 </div>
             </div>
         </div>
 
-    </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5>Escenarios de tasa</h5>
+                    @if (!escenarios.Any())
+                    {
+                        <div class="text-muted">No hay escenarios registrados.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Escenario</th>
+                                        <th>Tasa</th>
+                                        <th>Plazo</th>
+                                        <th>Adic.</th>
+                                        <th>Dato</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var x in escenarios)
+                                    {
+                                        <tr>
+                                            <td>@x.Escenario</td>
+                                            <td>@x.Tasa</td>
+                                            <td>@x.Plazo</td>
+                                            <td>@x.Adicional</td>
+                                            <td>@x.Dato</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
 
-    <!-- ESCENARIOS -->
-    <div class="card border-0 shadow-sm rounded-4 p-4">
-        <h5 class="fw-bold mb-3">Tablas de escenarios de los tipos de interés</h5>
-
-        <table class="table dt-responsive nowrap w-100 table-responsive">
-            <thead class="bg-body-secondary text-body">
-                <tr>
-                    <th>Plazo</th>
-                    <th>Porcentaje Banco</th>
-                    <th>Indicador Bancario</th>
-                    <th>Tipo de Interés</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>12 meses</td>
-                    <td>7%</td>
-                    <td>TBP</td>
-                    <td>Variable</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="card border-0 shadow-sm rounded-4 p-4">
-        <h5 class="fw-bold mb-3">Tablas de escenarios de los tipos de interés</h5>
-
-        <table class="table dt-responsive nowrap w-100 table-responsive">
-            <thead class="bg-body-secondary text-body">
-                <tr>
-                    <th>Plazo</th>
-                    <th>Porcentaje Banco</th>
-                    <th>Indicador Bancario</th>
-                    <th>Tipo de Interés</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>17 meses</td>
-                    <td>2%</td>
-                    <td>TBP</td>
-                    <td>Escalonada</td>
-                </tr>
-                <tr>
-                    <td>25 meses</td>
-                    <td>5%</td>
-                    <td>TBP</td>
-                    <td>Escalonada</td>
-                </tr>
-                <tr>
-                    <td>... meses</td>
-                    <td>7%</td>
-                    <td>N/A</td>
-                    <td>Escalonada</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 
 </div>
