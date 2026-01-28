@@ -18,6 +18,6 @@ namespace HermeSoft_Fusion.Data
         public DbSet<SeguroBanco> SEGUROS_BANCOS { get; set; }
         public DbSet<TasaInteres> TASAS_INTERES { get; set; }
         public DbSet<EscenarioTasaInteres> ESCENARIOS_TASAS_INTERES { get; set; }
-
+        public DbSet<HistoricoCambioBancario> HISTORICO_CAMBIOS_BANCARIOS { get; set; }
     }
 }

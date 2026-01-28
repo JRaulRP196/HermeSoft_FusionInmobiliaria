@@ -1,382 +1,293 @@
-﻿@{
-    ViewBag.Title = "Bancos";
+﻿@using HermeSoft_Fusion.Models
+@{
+    ViewBag.Title = "Editar Banco";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var banco = ViewBag.Banco as Banco;
+
+    var tipos = ViewBag.TiposAsalariado as List<TipoAsalariado> ?? new();
+    var seguros = ViewBag.Seguros as List<Seguro> ?? new();
+    var tasas = ViewBag.Tasas as List<TasaInteres> ?? new();
+
+    var endeudamientos = ViewBag.Endeudamientos as List<EndeudamientoMaximo> ?? new();
+    var segurosSeleccionados = ViewBag.SegurosSeleccionados as List<int> ?? new();
+    var escenarios = ViewBag.Escenarios as List<EscenarioTasaInteres> ?? new();
 }
 
-<div class="row">
-    <div class="col">
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Editar Banco</h4>
+        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    @if (banco == null)
+    {
+        <div class="alert alert-danger">Banco no encontrado.</div>
+    }
+    else
+    {
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Edición de Bancos</h4>
-                <p class="card-title-desc">
-                    En este apartado se podrá editar el banco seleccionado.
-                </p>
-                <form class="needs-validation" novalidate>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="validationCustom01" class="form-label">Nombre del Banco</label>
-                                <input type="text" class="form-control" id="validationCustom01"
-                                       placeholder="Nombre del Banco" value="BAC San José" required>
-                                <div class="valid-feedback">
-                                    Excelente!
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="validationCustom02" class="form-label">Enlace Web del Banco</label>
-                                <input type="text" class="form-control" id="validationCustom02"
-                                       placeholder="Last name" value="https://www.baccredomatic.com/es-cr?bacid=CRIN-MULT-ACF-000007-GL-AW-PR-GG-B5-SR-00000/SEARCH-VEL-INSTITUCIONAL-VENTAS&gad_source=1&gad_campaignid=15141072188&gbraid=0AAAAADg3AmLnGQMM-_Fg3fr91v77582eD&gclid=CjwKCAiAlrXJBhBAEiwA-5pgwigpomiEcUJgwG7IEazLimy7CmxbnAPDoBRQE0rcKv8xdtPwFSXb6xoCKv8QAvD_BwE" required>
-                                <div class="valid-feedback">
-                                    Excelente!
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="validationCustom03" class="form-label">Logo del Banco</label>
-                                <div class="input-group">
-                                    <input type="file" class="form-control" id="validationCustom03" required="">
-                                </div>
-                                <div class="invalid-feedback">
-                                    Ingrese un valor válido.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="validationCustom04" class="form-label">Plazo Máximo de Crédito</label>
-                                <input type="number" class="form-control" id="validationCustom04"
-                                       placeholder="Plazo Máximo de Crédito en Años" required value="35">
-                                <div class="invalid-feedback">
-                                    Ingrese un valor válido.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="validationCustom05" class="form-label">Comisión Bancaria</label>
-                                <input type="number" class="form-control" id="validationCustom05"
-                                       placeholder="%" required value="5">
-                                <div class="invalid-feedback">
-                                    Ingrese un valor válido.
-                                </div>
-                            </div>
-                        </div>
 
-                        <label for="validationCustom05" class="form-label">Porcentaje de Endeudamiento Máximo</label>
+                <form asp-action="Editar" asp-controller="Banco" method="post" enctype="multipart/form-data" id="frmBancoEditar">
+                    @Html.AntiForgeryToken()
 
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Público</div>
-                                    <input type="number" class="form-control" placeholder="%" required="" value="40">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Privado</div>
-                                    <input type="number" class="form-control" placeholder="%" required="" value="60">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Profesional Independiente</div>
-                                    <input type="number" class="form-control" placeholder="%" required="" value="80">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Trabajador Independiente</div>
-                                    <input type="number" class="form-control" placeholder="%" required="" value="70">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <input type="hidden" name="idBanco" value="@banco.idBanco" />
+
+                    <input type="hidden" name="endeudamientosJson" id="endeudamientosJson" />
+                    <input type="hidden" name="segurosJson" id="segurosJson" />
+                    <input type="hidden" name="escenariosJson" id="escenariosJson" />
+
+                    <h5 class="mb-3">Información del Banco</h5>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Seguro de Protección al Desempleado</label>
-                                <input type="number" class="form-control" placeholder="%" value="3" required>
-                                <div class="valid-feedback">
-                                    Excelente!
-                                </div>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" name="nombre" value="@banco.nombre" required />
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Seguro de Vida</label>
-                                <input type="number" class="form-control" placeholder="%" value="3" required>
-                                <div class="valid-feedback">
-                                    Excelente!
-                                </div>
-                            </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Enlace web *</label>
+                            <input type="url" class="form-control" name="enlace" value="@banco.enlace" required />
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Plazo máximo (años) *</label>
+                            <input type="number" class="form-control" name="maxCredito" value="@banco.maxCredito" required min="1" max="100" />
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Comisión (%) *</label>
+                            <input type="number" class="form-control" name="comision" value="@banco.comision" required min="0" max="100" step="0.01" />
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Honorarios abogado (%) *</label>
+                            <input type="number" class="form-control" name="honorarioAbogado" value="@banco.honorarioAbogado" required min="0" max="100" step="0.01" />
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Tipo de cambio *</label>
+                            <input type="text" class="form-control" name="tipoCambio" value="@banco.tipoCambio" required />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Logo (sube uno nuevo si quieres cambiarlo)</label>
+                            <input type="file" class="form-control" name="logoFile" accept=".jpg,.jpeg,.png,.webp" />
+                            <small class="text-muted">Si no subes uno nuevo, se mantiene el actual.</small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Logo actual</label><br />
+                            <img src="@(string.IsNullOrWhiteSpace(banco.logo) ? Url.Content("~/assets/images/bancos/BAC.png") : banco.logo)"
+                                 style="max-height:120px;" class="rounded" />
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="mb-3">
-                            <label class="form-label">Gastos de Honorarios de Abogados</label>
-                            <input type="number" class="form-control" placeholder="%" required value="7">
-                            <div class="valid-feedback">
-                                Excelente!
+
+                    <hr />
+
+                    <h5 class="mb-3">Endeudamiento máximo por tipo de asalariado *</h5>
+                    <div class="row">
+                        @foreach (var t in tipos)
+                        {
+                            var actual = endeudamientos.FirstOrDefault(x => x.idTipoAsalariado == t.idTipoAsalariado);
+                            var valor = actual != null ? actual.porcEndeudamiento : 0;
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">@t.nombre (%)</label>
+                                <input type="number"
+                                       class="form-control endeudamiento-input"
+                                       data-tipoid="@t.idTipoAsalariado"
+                                       value="@valor"
+                                       required min="0" max="100" step="0.01" />
                             </div>
-                        </div>
+                        }
                     </div>
 
-                    <label class="form-label">Tasas de Interes</label> <br />
-                    <label class="form-label">Escenarios: </label>
-                    <button type="button" class="btn btn-primary" id="addEscenario">+</button>
+                    <hr />
 
-                    <!-- CONTENEDOR QUE AHORA CONTIENE TODOS LOS ESCENARIOS -->
-                    <div id="listaEscenarios">
+                    <h5 class="mb-3">Seguros *</h5>
+                    <div class="row">
+                        @foreach (var s in seguros)
+                        {
+                            var checkedAttr = segurosSeleccionados.Contains(s.idSeguro) ? "checked" : "";
+                            <div class="col-md-4 mb-2">
+                                <label class="form-check">
+                                    <input class="form-check-input seguro-check" type="checkbox" value="@s.idSeguro" @checkedAttr />
+                                    <span class="form-check-label">@s.nombre (@s.porcSeguro%)</span>
+                                </label>
+                            </div>
+                        }
+                    </div>
 
-                        <!-- Escenario 1 -->
-                        <div class="row escenarios">
-                            <div class="col">
-                                <div class="card card-body">
-                                    <h3 class="card-title">Escenario #1</h3>
+                    <hr />
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Escenarios de tasas *</h5>
+                        <button type="button" class="btn btn-outline-primary" id="btnAddEscenario">+ Agregar escenario</button>
+                    </div>
+
+                    <div id="listaEscenarios" class="mt-3">
+                        @foreach (var esc in escenarios)
+                        {
+                            <div class="card mb-3 escenario-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong>Escenario</strong>
+                                        <button type="button" class="btn btn-sm btn-outline-danger btnRemoveEscenario">Eliminar</button>
+                                    </div>
 
                                     <div class="row">
-                                        <div class="col-md-9">
-                                            <label class="form-label">Tipo de Tasa de Interes</label>
-                                            <select class="form-select tipoInteres" required>
-                                                <option value="Tasa_Variable" selected>Tasa Variable</option>
-                                                <option value="Tasa_Escalonada">Tasa Escalonada</option>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Nombre *</label>
+                                            <input type="text" class="form-control escenario-nombre" required value="@esc.nombre" />
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Tipo de tasa *</label>
+                                            <select class="form-select escenario-tasa" required>
+                                                @foreach (var t in tasas)
+                                                {
+                                                    var selected = (t.idTasaInteres == esc.idTasaInteres) ? "selected" : "";
+                                                    <option value="@t.idTasaInteres" selected="@(t.idTasaInteres == esc.idTasaInteres ? "selected" : null)">
+                                                        @t.nombre
+                                                    </option>
+
+                                                }
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Nombre del Escenario</label>
-                                            <input type="text" class="form-control" placeholder="Nombre" required value="Escenario X1">
-                                        </div>
-                                    </div>
 
-                                    <br />
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Plazo (años) *</label>
+                                            <input type="number" class="form-control escenario-plazo" required min="1" max="100" value="@esc.plazo" />
+                                        </div>
 
-                                    <div class="row inputsEscenario">
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Plazo de Duración</label>
-                                                <input type="number" class="form-control" placeholder="Meses" required value="12">
-                                            </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">% Adicional *</label>
+                                            <input type="number" class="form-control escenario-adicional" required min="0" max="100" step="0.01" value="@esc.porcAdicional" />
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Porcentaje Adicional del Banco</label>
-                                                <input type="number" class="form-control" placeholder="%" required value="7">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Indicador Bancario</label>
-                                                <select class="form-select" required>
-                                                    <option value="1" selected>TBP</option>
-                                                    <option value="2">SOFT</option>
-                                                    <option value="3">TPR</option>
-                                                    <option value="4">N/A</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <div class="button-items botonesEscalonada"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Escenario 2 -->
-                        <div class="row escenarios">
-                            <div class="col">
-                                <div class="card card-body">
-                                    <h3 class="card-title">Escenario #2</h3>
-
-                                    <button type="button" class="btn btn-danger waves-effect waves-light deleteEscenario">
-                                        <i class="ri-close-line align-middle me-2"></i> Eliminar Escenario
-                                    </button>
-
-                                    <div class="row">
-                                        <div class="col-md-9">
-                                            <label class="form-label">Tipo de Tasa de Interes</label>
-                                            <select class="form-select tipoInteres" required>
-                                                <option value="Tasa_Variable">Tasa Variable</option>
-                                                <option value="Tasa_Escalonada" selected>Tasa Escalonada</option>
-                                            </select>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">% Dato bancario *</label>
+                                            <input type="number" class="form-control escenario-dato" required min="0" max="100" step="0.01" value="@esc.porcDatoBancario" />
                                         </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Nombre del Escenario</label>
-                                            <input type="text" class="form-control" placeholder="Nombre" required value="Escenario X2">
-                                        </div>
-                                    </div>
-
-                                    <br />
-
-                                    <!-- Bloque 1 -->
-                                    <div class="row inputsEscenario">
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Plazo de Duración</label>
-                                                <input type="number" class="form-control" placeholder="Meses" required value="17">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Porcentaje Adicional del Banco</label>
-                                                <input type="number" class="form-control" placeholder="%" required value="2">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Indicador Bancario</label>
-                                                <select class="form-select" required>
-                                                    <option value="1" selected>TBP</option>
-                                                    <option value="2">SOFT</option>
-                                                    <option value="3">TPR</option>
-                                                    <option value="4">N/A</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Bloque 2 -->
-                                    <div class="row inputsEscenario">
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Plazo de Duración</label>
-                                                <input type="number" class="form-control" placeholder="Meses" required value="25">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Porcentaje Adicional del Banco</label>
-                                                <input type="number" class="form-control" placeholder="%" required value="5">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Indicador Bancario</label>
-                                                <select class="form-select" required>
-                                                    <option value="1" selected>TBP</option>
-                                                    <option value="2">SOFT</option>
-                                                    <option value="3">TPR</option>
-                                                    <option value="4">N/A</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Bloque 3 -->
-                                    <div class="row inputsEscenario">
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Plazo de Duración</label>
-                                                <input type="number" class="form-control" placeholder="Meses" required value="1000">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Porcentaje Adicional del Banco</label>
-                                                <input type="number" class="form-control" placeholder="%" required value="7">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Indicador Bancario</label>
-                                                <select class="form-select" required>
-                                                    <option value="1">TBP</option>
-                                                    <option value="2">SOFT</option>
-                                                    <option value="3">TPR</option>
-                                                    <option value="4" selected>N/A</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="button-items botonesEscalonada">
-                                        <button type="button" class="btn btn-primary addInputs">+</button>
-                                        <button type="button" class="btn btn-danger deleteInputs">-</button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
 
-                    <div class="button-items">
-                        <button class="btn btn-primary" type="submit">Guardar</button>
-                        <a class="btn btn-danger" asp-action="Index">Cancelar</a>
-                    </div>
+                    <template id="tplEscenario">
+                        <div class="card mb-3 escenario-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>Escenario</strong>
+                                    <button type="button" class="btn btn-sm btn-outline-danger btnRemoveEscenario">Eliminar</button>
+                                </div>
 
-                    <!-- TEMPLATE -->
-                    <div class="row escenarios" id="escenario-template" style="display:none;">
-                        <div class="col">
-                            <div class="card card-body">
-                                <h3 class="card-title">Escenario #x</h3>
-                                <button type="button" class="btn btn-danger waves-effect waves-light deleteEscenario">
-                                    <i class="ri-close-line align-middle me-2"></i> Eliminar Escenario
-                                </button>
                                 <div class="row">
-                                    <div class="col-md-9">
-                                        <label class="form-label">Tipo de Tasa de Interes</label>
-                                        <select class="form-select tipoInteres" required>
-                                            <option value="Tasa_Variable">Tasa Variable</option>
-                                            <option value="Tasa_Escalonada">Tasa Escalonada</option>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Nombre *</label>
+                                        <input type="text" class="form-control escenario-nombre" required />
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Tipo de tasa *</label>
+                                        <select class="form-select escenario-tasa" required>
+                                            @foreach (var t in tasas)
+                                            {
+                                                <option value="@t.idTasaInteres">@t.nombre</option>
+                                            }
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Nombre del Escenario</label>
-                                        <input type="text" class="form-control" placeholder="Nombre" required>
-                                    </div>
-                                </div>
-                                <br />
-                                <div class="row inputsEscenario">
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Plazo de Duración</label>
-                                            <input type="number" class="form-control" placeholder="Meses" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Porcentaje Adicional del Banco</label>
-                                            <input type="number" class="form-control" placeholder="%" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Indicador Bancario</label>
-                                            <select class="form-select" required>
-                                                <option value="1">TBP</option>
-                                                <option value="2">SOFT</option>
-                                                <option value="3">TPR</option>
-                                                <option value="4">N/A</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div class="button-items botonesEscalonada"></div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Plazo (años) *</label>
+                                        <input type="number" class="form-control escenario-plazo" required min="1" max="100" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">% Adicional *</label>
+                                        <input type="number" class="form-control escenario-adicional" required min="0" max="100" step="0.01" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">% Dato bancario *</label>
+                                        <input type="number" class="form-control escenario-dato" required min="0" max="100" step="0.01" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </template>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Editar Banco</button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
                     </div>
 
                 </form>
+
             </div>
         </div>
-    </div>
+    }
+
 </div>
 
-@section scripts {
-    <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
-    <script src="~/assets/js/pages/form-validation.init.js"></script>
-    <script src="~/assets/js/app.js"></script>
-    <script src="~/assets/js/escenariosbanco.js"></script>
-}
+@section Scripts {
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
+  const form = document.getElementById("frmBancoEditar");
+  const lista = document.getElementById("listaEscenarios");
+  const tpl = document.getElementById("tplEscenario");
+  const btnAdd = document.getElementById("btnAddEscenario");
+
+  btnAdd?.addEventListener("click", () => {
+    lista.appendChild(tpl.content.cloneNode(true));
+  });
+
+  lista.addEventListener("click", (e) => {
+    if (e.target.classList.contains("btnRemoveEscenario")) {
+      e.target.closest(".escenario-card")?.remove();
+    }
+  });
+
+  form.addEventListener("submit", (e) => {
+
+    const endeudamientos = Array.from(document.querySelectorAll(".endeudamiento-input"))
+      .map(inp => ({
+        idTipoAsalariado: parseInt(inp.dataset.tipoid || "0", 10),
+        porcEndeudamiento: parseFloat((inp.value || "0").replace(",", "."))
+      }));
+
+    const seguros = Array.from(document.querySelectorAll(".seguro-check:checked"))
+      .map(chk => parseInt(chk.value || "0", 10));
+
+    const escenarios = Array.from(document.querySelectorAll("#listaEscenarios .escenario-card"))
+      .map(card => ({
+        nombre: (card.querySelector(".escenario-nombre")?.value || "").trim(),
+        idTasaInteres: parseInt(card.querySelector(".escenario-tasa")?.value || "0", 10),
+        plazo: parseInt(card.querySelector(".escenario-plazo")?.value || "0", 10),
+        porcAdicional: parseFloat((card.querySelector(".escenario-adicional")?.value || "0").replace(",", ".")),
+        porcDatoBancario: parseFloat((card.querySelector(".escenario-dato")?.value || "0").replace(",", "."))
+      }))
+      .filter(x => x.nombre && x.idTasaInteres > 0 && x.plazo > 0);
+
+    if (endeudamientos.length === 0) { e.preventDefault(); alert("Faltan endeudamientos."); return; }
+    if (seguros.length === 0) { e.preventDefault(); alert("Seleccione al menos un seguro."); return; }
+    if (escenarios.length === 0) { e.preventDefault(); alert("Agregue al menos un escenario de tasa."); return; }
+
+    document.getElementById("endeudamientosJson").value = JSON.stringify(endeudamientos);
+    document.getElementById("segurosJson").value = JSON.stringify(seguros);
+    document.getElementById("escenariosJson").value = JSON.stringify(escenarios);
+  });
+
+});
+</script>
+}
