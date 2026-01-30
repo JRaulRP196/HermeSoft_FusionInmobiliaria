@@ -1,0 +1,278 @@
+﻿@using HermeSoft_Fusion.Models
+@using Newtonsoft.Json
+@{
+    ViewBag.Title = "Registrar Venta";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    List<DesglosesPrimas> desglose = null;
+
+    if (TempData["DesglosePrima"] != null)
+    {
+        desglose = JsonConvert.DeserializeObject<List<DesglosesPrimas>>(
+            TempData["DesglosePrima"].ToString()
+        );
+    }
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="row">
+    <div class="col">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+
+            <!-- Título -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold">Registro de Venta</h4>
+                <a href="/Ventas/Index" class="btn btn-light border">
+                    <i class="fas fa-arrow-left me-2"></i> Volver
+                </a>
+            </div>
+
+            <form id="ventaForm" class="needs-validation" novalidate>
+
+                <!-- ============================
+                     SECCIÓN SUPERIOR
+                ============================= -->
+                <div class="card border-0 shadow-sm rounded-3 p-3 mb-4">
+                    <h5 class="mb-3">Datos Generales</h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <label class="form-label">Cliente *</label>
+                            <select id="cliente" class="form-select" required>
+                                <option value="" selected disabled>Seleccione cliente</option>
+                                <option value="juan.perez@correo.com">Juan Pérez - juan.perez@correo.com</option>
+                                <option value="ana.rodriguez@correo.com">Ana Rodríguez - ana.rodriguez@correo.com</option>
+                            </select>
+                            <div class="invalid-feedback">Seleccione un cliente válido.</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Lote (disponible) *</label>
+                            @if (ViewBag.lote != null)
+                            {
+                                <input id="lote" class="form-control" value="@ViewBag.lote" readonly required>
+                            }
+                            else
+                            {
+                                <input id="lote" class="form-control" value="@TempData["lote"]" readonly required>
+                            }
+                            <div class="invalid-feedback">Seleccione un lote disponible.</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Asesor (sesión) *</label>
+                            <input type="email" id="asesor" class="form-control" value="asesor.ventas@firma.com" required>
+                            <div class="invalid-feedback">Correo del asesor.</div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Fecha de Venta *</label>
+                            <input type="date" id="fechaVenta" class="form-control" required>
+                            <div class="invalid-feedback">Ingrese la fecha de la venta.</div>
+                        </div>
+
+                        <div class="col-md-1">
+                            <label class="form-label">Moneda *</label>
+                            <select id="moneda" class="form-select" required>
+                                <option value="CRC" selected>(₡)</option>
+                                <option value="USD">($)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2 ">
+                            <label class="form-label">% Descuento *</label>
+                            <input type="number" id="descuento" class="form-control" required value="0">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Banco (plan de pago) *</label>
+                            <select id="banco" class="form-select" required>
+                                <option value="" selected disabled>Seleccione banco</option>
+                                <option value="BAC" data-plan-vigente="true">BAC - Plan Vigente</option>
+                                <option value="BNCR" data-plan-vigente="false">BNCR - Plan No Vigente</option>
+                            </select>
+                            <div class="invalid-feedback">Seleccione un banco con plan vigente.</div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo de asalariado *</label>
+                            <select id="tipoAsalariado" class="form-select" required>
+                                <option value="" selected disabled>Seleccione</option>
+                                <option value="Privado">Privado</option>
+                                <option value="Publico">Público</option>
+                                <option value="Prof_Independiente">Profesional Independiente</option>
+                                <option value="Trab_Independiente">Trabajador Independiente</option>
+                            </select>
+                            <div class="invalid-feedback">Seleccione tipo de asalariado.</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ============================
+                     SECCIONES INFERIORES (3 COLUMNAS)
+                ============================= -->
+                <div class="row g-4 mb-4">
+
+                    <!-- PRIMA -->
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
+                            <h5 class="mb-2">Prima</h5>
+
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">% Prima *</label>
+                                    <input type="number" id="porcPrima" class="form-control" min="0" max="100" value="10" required>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Fecha de vencimiento de prima *</label>
+                                    <input type="date" id="fechaPrima" class="form-control" required>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Desglose Prima</label>
+                                    <br />
+                                    <button type="button" id="calcPrima" class="btn btn-outline-primary w-100 d-none">
+                                        Calcular prima
+                                    </button>
+                                </div>
+
+                                <div class="col-12">
+                                    @if (TempData["ErrorPrima"] != null)
+                                    {
+                                        <div class="alert alert-danger">@TempData["ErrorPrima"]</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GASTOS DE FORMALIZACIÓN -->
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
+                            <h5 class="mb-2">Gastos de Formalización</h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Seguro Vida</label>
+                                    <input type="number" id="porcSeguros" class="form-control" min="0" max="100" value="3">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Seguro Desempleado</label>
+                                    <input type="number" id="porcSeguros" class="form-control" min="0" max="100" value="3">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Honorarios abogados</label>
+                                    <input type="number" id="porcAbogados" class="form-control" min="0" max="100" value="7">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Comisión bancaria</label>
+                                    <input type="number" id="porcComision" class="form-control" min="0" max="100" value="5" readonly>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Timbre fiscal</label>
+                                    <input type="number" id="porcTimbre" class="form-control" min="0" max="100" value="0.5" readonly>
+                                </div>
+
+                                <div class="col-12">
+                                    <button type="button" id="calcGastoFormal" class="btn btn-outline-primary w-100">
+                                        Calcular gasto de formalización
+                                    </button>
+
+                                    <input type="text" id="gastoFormalizacion" class="form-control mt-2" readonly placeholder="Resultado gasto de formalización">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CUOTA BANCARIA -->
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
+                            <h5 class="mb-2">Cuota Bancaria</h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Plazo (meses)</label>
+                                    <input type="number" id="plazoMeses" class="form-control" min="1" value="360">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">% Interés</label>
+                                    <input type="number" id="tasaInteres" class="form-control" min="0" step="0.01" value="7" readonly>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Cuota Mensual (automático)</label>
+                                    <input type="text" id="cuotaMensual" class="form-control" readonly placeholder="Se calculará automáticamente">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Ingreso Neto Familiar (mínimo requerido)</label>
+                                    <input type="text" id="ingresoNeto" class="form-control" readonly placeholder="Se calculará">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ============================
+                     BOTONES
+                ============================= -->
+                <div class="card border-0 shadow-sm rounded-3 p-3">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" id="generarPdfBtn" class="btn btn-outline-secondary">Generar Comprobante (PDF)</button>
+                        <button type="button" id="enviarCorreoBtn" class="btn btn-outline-primary">Enviar por correo</button>
+                        <button type="submit" id="registrarVentaBtn" class="btn btn-success">Registrar Venta</button>
+                    </div>
+                </div>
+
+                <div id="formMessages" class="mt-3"></div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@if (desglose != null && desglose.Any())
+{
+<div class="row">
+    <div class="col">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Fecha Cobro</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in desglose)
+                        {
+                            <tr>
+                                <td>@item.FechaCobro.ToString("dd/MM/yyyy")</td>
+                                <td>@item.Monto.ToString("C")</td>
+                                <td>@item.Estado</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table> 
+        </div>
+    </div>
+</div>
+}
+
+@section scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="~/assets/js/ventas.js"></script>
+    <script src="~/assets/js/calculos.js"></script>
+}
