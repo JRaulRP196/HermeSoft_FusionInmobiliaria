@@ -63,6 +63,9 @@ namespace HermeSoft_Fusion.Controllers
         [HttpGet]
         public IActionResult Registro()
         {
+            // Obtener seguros disponibles del catálogo
+            var segurosCatalogo = _context.SEGUROS.ToList();
+            ViewBag.SegurosCatalogo = segurosCatalogo;
             return View();
         }
 
@@ -70,12 +73,14 @@ namespace HermeSoft_Fusion.Controllers
         public async Task<IActionResult> Registro(Banco banco, IFormFile LogoFile,
             decimal? endeudamientoPublico, decimal? endeudamientoPrivado,
             decimal? endeudamientoProfesional, decimal? endeudamientoIndependiente,
-            decimal? seguroDesempleo, decimal? seguroVida,
+            List<int> segurosSeleccionados,
             string tipoTasa1, string nombreEscenario1, int? plazo1, decimal? porcentajeAdicional1, string indicador1)
         {
             if (string.IsNullOrEmpty(banco.Nombre) || string.IsNullOrEmpty(banco.Enlace))
             {
                 TempData["MensajeError"] = "Por favor complete los campos requeridos.";
+                // Recargar catálogo de seguros
+                ViewBag.SegurosCatalogo = _context.SEGUROS.ToList();
                 return View(banco);
             }
 
@@ -144,36 +149,17 @@ namespace HermeSoft_Fusion.Controllers
                     });
                 }
 
-                // Guardar seguros
-                if (seguroDesempleo.HasValue)
+                // Guardar relación de seguros con el banco (mapeo muchos a muchos)
+                if (segurosSeleccionados != null && segurosSeleccionados.Any())
                 {
-                    var seguro = _context.SEGUROS.FirstOrDefault(s => s.Nombre == "Desempleo");
-                    if (seguro == null)
+                    foreach (var idSeguro in segurosSeleccionados)
                     {
-                        seguro = new Seguro { Nombre = "Desempleo", PorcSeguro = seguroDesempleo.Value };
-                        _context.SEGUROS.Add(seguro);
-                        await _context.SaveChangesAsync();
+                        _context.SEGUROS_BANCOS.Add(new SeguroBanco
+                        {
+                            IdBanco = idBanco,
+                            IdSeguro = idSeguro
+                        });
                     }
-                    _context.SEGUROS_BANCOS.Add(new SeguroBanco
-                    {
-                        IdBanco = idBanco,
-                        IdSeguro = seguro.IdSeguro
-                    });
-                }
-                if (seguroVida.HasValue)
-                {
-                    var seguro = _context.SEGUROS.FirstOrDefault(s => s.Nombre == "Vida");
-                    if (seguro == null)
-                    {
-                        seguro = new Seguro { Nombre = "Vida", PorcSeguro = seguroVida.Value };
-                        _context.SEGUROS.Add(seguro);
-                        await _context.SaveChangesAsync();
-                    }
-                    _context.SEGUROS_BANCOS.Add(new SeguroBanco
-                    {
-                        IdBanco = idBanco,
-                        IdSeguro = seguro.IdSeguro
-                    });
                 }
 
                 // Guardar escenario de tasa de interes
@@ -199,6 +185,7 @@ namespace HermeSoft_Fusion.Controllers
             catch (Exception ex)
             {
                 TempData["MensajeError"] = "Error al registrar el banco: " + ex.Message;
+                ViewBag.SegurosCatalogo = _context.SEGUROS.ToList();
                 return View(banco);
             }
         }
