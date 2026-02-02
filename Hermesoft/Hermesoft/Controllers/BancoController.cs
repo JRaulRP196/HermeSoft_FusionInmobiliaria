@@ -63,9 +63,8 @@ namespace HermeSoft_Fusion.Controllers
         [HttpGet]
         public IActionResult Registro()
         {
-            // Obtener seguros disponibles del catálogo
-            var segurosCatalogo = _context.SEGUROS.ToList();
-            ViewBag.SegurosCatalogo = segurosCatalogo;
+            TempData.Remove("MensajeExito");
+            TempData.Remove("MensajeError");
             return View();
         }
 
@@ -73,14 +72,12 @@ namespace HermeSoft_Fusion.Controllers
         public async Task<IActionResult> Registro(Banco banco, IFormFile LogoFile,
             decimal? endeudamientoPublico, decimal? endeudamientoPrivado,
             decimal? endeudamientoProfesional, decimal? endeudamientoIndependiente,
-            List<int> segurosSeleccionados,
+            decimal? seguroDesempleo, decimal? seguroVida,
             string tipoTasa1, string nombreEscenario1, int? plazo1, decimal? porcentajeAdicional1, string indicador1)
         {
             if (string.IsNullOrEmpty(banco.Nombre) || string.IsNullOrEmpty(banco.Enlace))
             {
                 TempData["MensajeError"] = "Por favor complete los campos requeridos.";
-                // Recargar catálogo de seguros
-                ViewBag.SegurosCatalogo = _context.SEGUROS.ToList();
                 return View(banco);
             }
 
@@ -149,23 +146,38 @@ namespace HermeSoft_Fusion.Controllers
                     });
                 }
 
-                // Guardar relación de seguros con el banco (mapeo muchos a muchos)
-                if (segurosSeleccionados != null && segurosSeleccionados.Any())
+                // Guardar seguros con sus porcentajes (cada banco define sus propios valores)
+                if (seguroDesempleo.HasValue)
                 {
-                    foreach (var idSeguro in segurosSeleccionados)
+                    _context.SEGUROS_BANCOS.Add(new SeguroBanco
                     {
-                        _context.SEGUROS_BANCOS.Add(new SeguroBanco
-                        {
-                            IdBanco = idBanco,
-                            IdSeguro = idSeguro
-                        });
-                    }
+                        IdBanco = idBanco,
+                        IdSeguro = 1,
+                        PorcSeguro = seguroDesempleo.Value
+                    });
+                }
+                if (seguroVida.HasValue)
+                {
+                    _context.SEGUROS_BANCOS.Add(new SeguroBanco
+                    {
+                        IdBanco = idBanco,
+                        IdSeguro = 2,
+                        PorcSeguro = seguroVida.Value
+                    });
                 }
 
                 // Guardar escenario de tasa de interes
                 if (!string.IsNullOrEmpty(tipoTasa1) && !string.IsNullOrEmpty(nombreEscenario1))
                 {
                     int idTasa = tipoTasa1 == "Tasa_Variable" ? 1 : 2;
+                    decimal porcDatoBancario = 0;
+                    
+                    // convertir indicador a porcentaje
+                    if (indicador1 == "TBP") porcDatoBancario = 8.50m;
+                    else if (indicador1 == "SOFT") porcDatoBancario = 7.25m;
+                    else if (indicador1 == "TPR") porcDatoBancario = 9.00m;
+                    else if (indicador1 == "N/A") porcDatoBancario = 0;
+                    
                     _context.ESCENARIOS_TASAS_INTERES.Add(new EscenarioTasaInteres
                     {
                         IdBanco = idBanco,
@@ -173,7 +185,7 @@ namespace HermeSoft_Fusion.Controllers
                         Nombre = nombreEscenario1,
                         Plazo = plazo1 ?? 0,
                         PorcAdicional = porcentajeAdicional1 ?? 0,
-                        PorcDatoBancario = 0
+                        PorcDatoBancario = porcDatoBancario
                     });
                 }
 
@@ -185,7 +197,6 @@ namespace HermeSoft_Fusion.Controllers
             catch (Exception ex)
             {
                 TempData["MensajeError"] = "Error al registrar el banco: " + ex.Message;
-                ViewBag.SegurosCatalogo = _context.SEGUROS.ToList();
                 return View(banco);
             }
         }

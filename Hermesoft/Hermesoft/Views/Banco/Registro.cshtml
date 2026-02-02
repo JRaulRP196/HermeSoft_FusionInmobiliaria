@@ -2,7 +2,6 @@
 @{
     ViewBag.Title = "Bancos";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var segurosCatalogo = ViewBag.SegurosCatalogo as List<Seguro>;
 }
 
 <div class="row">
@@ -103,34 +102,18 @@
                         </div>
                     </div>
 
-                    <!-- Seguros como Checkboxes -->
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Seguros Ofrecidos</label>
-                            <p class="text-muted small">Seleccione los seguros que ofrece este banco:</p>
-                            @if (segurosCatalogo != null && segurosCatalogo.Any())
-                            {
-                                <div class="row">
-                                    @foreach (var seguro in segurosCatalogo)
-                                    {
-                                        <div class="col-md-4 mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" 
-                                                       name="segurosSeleccionados" 
-                                                       value="@seguro.IdSeguro" 
-                                                       id="seguro_@seguro.IdSeguro">
-                                                <label class="form-check-label" for="seguro_@seguro.IdSeguro">
-                                                    @seguro.Nombre (@seguro.PorcSeguro%)
-                                                </label>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="alert alert-warning">No hay tipos de seguros disponibles. Contacte al administrador.</div>
-                            }
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Seguro de Proteccion al Desempleado</label>
+                                <input type="number" class="form-control" placeholder="%" name="seguroDesempleo">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Seguro de Vida</label>
+                                <input type="number" class="form-control" placeholder="%" name="seguroVida">
+                            </div>
                         </div>
                     </div>
 

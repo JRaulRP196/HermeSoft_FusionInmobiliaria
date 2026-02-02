@@ -17,5 +17,9 @@ namespace HermeSoft_Fusion.Models
         public int IdSeguro { get; set; }
         [ForeignKey("IdSeguro")]
         public Seguro Seguro { get; set; }
+
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal PorcSeguro { get; set; }
     }
 }

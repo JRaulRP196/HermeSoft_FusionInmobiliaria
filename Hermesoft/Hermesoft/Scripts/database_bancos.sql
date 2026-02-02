@@ -1,38 +1,36 @@
--- script para actualizar la estructura de la base de datos
--- este script es seguro para ejecutar en una base de datos ya existente
+-- parte 1: agregar columna logo a tabla bancos
+-- si da error 1060, la columna ya existe, ignorar y continuar
+ALTER TABLE BANCOS ADD COLUMN logo VARCHAR(500) DEFAULT NULL;
 
-USE FUSION;
+-- parte 2: agregar columna porcseguro a seguros bancos
+-- si da error 1060, la columna ya existe, ignorar y continuar
+ALTER TABLE SEGUROS_BANCOS ADD COLUMN porcSeguro DECIMAL(18,2) NOT NULL DEFAULT 0;
 
--- agregar columna logo a tabla bancos si no existe
-SELECT COUNT(*) INTO @columnExists
-FROM information_schema.COLUMNS
-WHERE TABLE_SCHEMA = 'FUSION'
-AND TABLE_NAME = 'BANCOS'
-AND COLUMN_NAME = 'logo';
-
-IF @columnExists = 0 THEN
-    ALTER TABLE BANCOS ADD COLUMN logo VARCHAR(500) DEFAULT NULL;
-END IF;
-
--- tabla tipos asalariados (catalogo con datos fijos)
+-- parte 3: crear tablas de catalogos
 CREATE TABLE IF NOT EXISTS TIPOS_ASALARIADOS (
     idTipoAsalariado INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL
 );
 
--- verificar si ya hay datos en tipos asalariados
-SELECT COUNT(*) INTO @tipoAsalariadoCount FROM TIPOS_ASALARIADOS;
+CREATE TABLE IF NOT EXISTS SEGUROS (
+    idSeguro INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    porcSeguro DECIMAL(18,2) NOT NULL DEFAULT 0
+);
 
-IF @tipoAsalariadoCount = 0 THEN
-    INSERT INTO TIPOS_ASALARIADOS (idTipoAsalariado, nombre) VALUES
-    (1, 'Publico'),
-    (2, 'Privado'),
-    (3, 'Profesional Independiente'),
-    (4, 'Trabajador Independiente')
-    ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
-END IF;
+CREATE TABLE IF NOT EXISTS INDICADORES_BANCARIOS (
+    idIndicador INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    porcIndicador DECIMAL(18,2) NOT NULL DEFAULT 0,
+    fechaVigente DATE
+);
 
--- tabla endeudamiento maximos
+CREATE TABLE IF NOT EXISTS TASAS_INTERES (
+    idTasaInteres INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL
+);
+
+-- parte 4: crear tablas de relaciones
 CREATE TABLE IF NOT EXISTS ENDEUDAMIENTOS_MAXIMOS (
     idEndeudamiento INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     porcEndeudamiento DECIMAL(18,2) NOT NULL,
@@ -42,31 +40,15 @@ CREATE TABLE IF NOT EXISTS ENDEUDAMIENTOS_MAXIMOS (
     FOREIGN KEY (idTipoAsalariado) REFERENCES TIPOS_ASALARIADOS(idTipoAsalariado)
 );
 
--- tabla seguros
-CREATE TABLE IF NOT EXISTS SEGUROS (
-    idSeguro INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL,
-    porcSeguro DECIMAL(18,2) NOT NULL DEFAULT 0
-);
-
--- tabla seguros bancos
 CREATE TABLE IF NOT EXISTS SEGUROS_BANCOS (
     idSeguroBanco INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idBanco INT NOT NULL,
     idSeguro INT NOT NULL,
+    porcSeguro DECIMAL(18,2) NOT NULL DEFAULT 0,
     FOREIGN KEY (idBanco) REFERENCES BANCOS(idBanco) ON DELETE CASCADE,
     FOREIGN KEY (idSeguro) REFERENCES SEGUROS(idSeguro)
 );
 
--- tabla indicadores bancarios
-CREATE TABLE IF NOT EXISTS INDICADORES_BANCARIOS (
-    idIndicador INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL,
-    porcIndicador DECIMAL(18,2) NOT NULL DEFAULT 0,
-    fechaVigente DATE
-);
-
--- tabla indicadores bancos
 CREATE TABLE IF NOT EXISTS INDICADORES_BANCOS (
     idIndicadorBanco INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idBanco INT NOT NULL,
@@ -75,23 +57,6 @@ CREATE TABLE IF NOT EXISTS INDICADORES_BANCOS (
     FOREIGN KEY (idIndicador) REFERENCES INDICADORES_BANCARIOS(idIndicador)
 );
 
--- tabla tasas interes (catalogo con datos fijos)
-CREATE TABLE IF NOT EXISTS TASAS_INTERES (
-    idTasaInteres INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL
-);
-
--- verificar si ya hay datos en tasas interes
-SELECT COUNT(*) INTO @tasaInteresCount FROM TASAS_INTERES;
-
-IF @tasaInteresCount = 0 THEN
-    INSERT INTO TASAS_INTERES (idTasaInteres, nombre) VALUES
-    (1, 'Tasa Variable'),
-    (2, 'Tasa Escalonada')
-    ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
-END IF;
-
--- tabla escenarios tasas interes
 CREATE TABLE IF NOT EXISTS ESCENARIOS_TASAS_INTERES (
     idEscenario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
@@ -104,4 +69,19 @@ CREATE TABLE IF NOT EXISTS ESCENARIOS_TASAS_INTERES (
     FOREIGN KEY (idTasaInteres) REFERENCES TASAS_INTERES(idTasaInteres)
 );
 
-SELECT 'base de datos actualizada correctamente' AS Resultado;
+-- parte 5: insertar datos en catalogos (solo si esta vacio)
+INSERT IGNORE INTO TIPOS_ASALARIADOS (idTipoAsalariado, nombre) VALUES
+(1, 'Publico'),
+(2, 'Privado'),
+(3, 'Profesional Independiente'),
+(4, 'Trabajador Independiente');
+
+INSERT IGNORE INTO TASAS_INTERES (idTasaInteres, nombre) VALUES
+(1, 'Tasa Variable'),
+(2, 'Tasa Escalonada');
+
+INSERT IGNORE INTO SEGUROS (idSeguro, nombre) VALUES
+(1, 'Desempleo'),
+(2, 'Vida');
+
+SELECT 'base de datos actualizada correctamente' AS resultado;

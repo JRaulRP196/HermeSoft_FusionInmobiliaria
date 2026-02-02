@@ -109,7 +109,7 @@
                                 <div class="card bg-light border-0">
                                     <div class="card-body text-center">
                                         <h5 class="card-title">@endeu.TipoAsalariado?.Nombre</h5>
-                                        <p class="card-text display-6 fw-bold">@endeu.PorcEndeudamiento%</p>
+                                        <p class="card-text display-6 fw-bold">@(endeu.PorcEndeudamiento == Math.Floor(endeu.PorcEndeudamiento) ? endeu.PorcEndeudamiento.ToString("0") : endeu.PorcEndeudamiento.ToString("0.##"))%</p>
                                     </div>
                                 </div>
                             </div>
@@ -138,7 +138,7 @@
                                 <div class="card bg-light border-0">
                                     <div class="card-body text-center">
                                         <h5 class="card-title">@seguro.Seguro?.Nombre</h5>
-                                        <p class="card-text display-6 fw-bold">@seguro.Seguro?.PorcSeguro%</p>
+                                        <p class="card-text display-6 fw-bold">@(seguro.PorcSeguro == Math.Floor(seguro.PorcSeguro) ? seguro.PorcSeguro.ToString("0") : seguro.PorcSeguro.ToString("0.##"))%</p>
                                     </div>
                                 </div>
                             </div>
@@ -178,11 +178,12 @@
                                         <td>@escenario.Nombre</td>
                                         <td>@escenario.TasaInteres?.Nombre</td>
                                         <td>@escenario.Plazo</td>
-                                        <td>@escenario.PorcAdicional%</td>
+                                        <td>@(escenario.PorcAdicional == Math.Floor(escenario.PorcAdicional) ? escenario.PorcAdicional.ToString("0") : escenario.PorcAdicional.ToString("0.##"))%</td>
                                         <td>
+                                            @{ var porcFormat = escenario.PorcDatoBancario == Math.Floor(escenario.PorcDatoBancario) ? escenario.PorcDatoBancario.ToString("0") : escenario.PorcDatoBancario.ToString("0.##"); }
                                             @if (escenario.PorcDatoBancario > 0)
                                             {
-                                                @:TBP (@escenario.PorcDatoBancario%)
+                                                @:TBP (@porcFormat%)
                                             }
                                             else
                                             {
