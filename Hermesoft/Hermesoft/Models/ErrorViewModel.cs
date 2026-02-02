@@ -1,4 +1,4 @@
-namespace Tocly.Models
+namespace HermeSoft_Fusion.Models
 {
     public class ErrorViewModel
     {

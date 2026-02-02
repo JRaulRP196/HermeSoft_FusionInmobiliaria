@@ -1,29 +1,217 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HermeSoft_Fusion.Data;
+using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Repository;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace HermeSoft_Fusion.Controllers
 {
     public class BancoController : Controller
     {
-        public IActionResult Index()
+        private readonly AppDbContext _context;
+        private readonly BancoRepository _bancoRepository;
+        private readonly IWebHostEnvironment _environment;
+
+        public BancoController(AppDbContext context, BancoRepository bancoRepository, IWebHostEnvironment environment)
         {
-            return View();
+            _context = context;
+            _bancoRepository = bancoRepository;
+            _environment = environment;
         }
 
+        public async Task<IActionResult> Index()
+        {
+            var bancos = await _bancoRepository.ObtenerTodos();
+            return View(bancos);
+        }
 
+        public async Task<IActionResult> Detalle(int id)
+        {
+            var banco = await _bancoRepository.ObtenerPorId(id);
+            if (banco == null)
+            {
+                TempData["MensajeError"] = "El banco no existe o ha sido eliminado.";
+                return RedirectToAction("Index");
+            }
+
+            var endeudamientoBancos = await _context.ENDEUDAMIENTOS_MAXIMOS
+                .Include(e => e.TipoAsalariado)
+                .Where(e => e.IdBanco == id)
+                .ToListAsync();
+
+            var segurosBancos = await _context.SEGUROS_BANCOS
+                .Include(s => s.Seguro)
+                .Where(s => s.IdBanco == id)
+                .ToListAsync();
+
+            var escenarios = await _context.ESCENARIOS_TASAS_INTERES
+                .Include(e => e.TasaInteres)
+                .Where(e => e.IdBanco == id)
+                .ToListAsync();
+
+            ViewBag.Endeudamientos = endeudamientoBancos;
+            ViewBag.Seguros = segurosBancos;
+            ViewBag.Escenarios = escenarios;
+
+            return View(banco);
+        }
+
+        [HttpGet]
         public IActionResult Registro()
         {
             return View();
         }
 
-        public IActionResult Detalle()
+        [HttpPost]
+        public async Task<IActionResult> Registro(Banco banco, IFormFile LogoFile,
+            decimal? endeudamientoPublico, decimal? endeudamientoPrivado,
+            decimal? endeudamientoProfesional, decimal? endeudamientoIndependiente,
+            decimal? seguroDesempleo, decimal? seguroVida,
+            string tipoTasa1, string nombreEscenario1, int? plazo1, decimal? porcentajeAdicional1, string indicador1)
         {
-            return View();
+            if (string.IsNullOrEmpty(banco.Nombre) || string.IsNullOrEmpty(banco.Enlace))
+            {
+                TempData["MensajeError"] = "Por favor complete los campos requeridos.";
+                return View(banco);
+            }
+
+            try
+            {
+                // Manejar carga de imagen
+                if (LogoFile != null && LogoFile.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(_environment.WebRootPath, "assets", "images", "bancos");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(LogoFile.FileName);
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await LogoFile.CopyToAsync(stream);
+                    }
+
+                    banco.Logo = "/assets/images/bancos/" + uniqueFileName;
+                }
+
+                // Guardar banco
+                _context.BANCOS.Add(banco);
+                await _context.SaveChangesAsync();
+                int idBanco = banco.IdBanco;
+
+                // Guardar porcentajes de endeudamiento
+                if (endeudamientoPublico.HasValue)
+                {
+                    _context.ENDEUDAMIENTOS_MAXIMOS.Add(new EndeudamientoMaximo
+                    {
+                        IdBanco = idBanco,
+                        IdTipoAsalariado = 1,
+                        PorcEndeudamiento = endeudamientoPublico.Value
+                    });
+                }
+                if (endeudamientoPrivado.HasValue)
+                {
+                    _context.ENDEUDAMIENTOS_MAXIMOS.Add(new EndeudamientoMaximo
+                    {
+                        IdBanco = idBanco,
+                        IdTipoAsalariado = 2,
+                        PorcEndeudamiento = endeudamientoPrivado.Value
+                    });
+                }
+                if (endeudamientoProfesional.HasValue)
+                {
+                    _context.ENDEUDAMIENTOS_MAXIMOS.Add(new EndeudamientoMaximo
+                    {
+                        IdBanco = idBanco,
+                        IdTipoAsalariado = 3,
+                        PorcEndeudamiento = endeudamientoProfesional.Value
+                    });
+                }
+                if (endeudamientoIndependiente.HasValue)
+                {
+                    _context.ENDEUDAMIENTOS_MAXIMOS.Add(new EndeudamientoMaximo
+                    {
+                        IdBanco = idBanco,
+                        IdTipoAsalariado = 4,
+                        PorcEndeudamiento = endeudamientoIndependiente.Value
+                    });
+                }
+
+                // Guardar seguros
+                if (seguroDesempleo.HasValue)
+                {
+                    var seguro = _context.SEGUROS.FirstOrDefault(s => s.Nombre == "Desempleo");
+                    if (seguro == null)
+                    {
+                        seguro = new Seguro { Nombre = "Desempleo", PorcSeguro = seguroDesempleo.Value };
+                        _context.SEGUROS.Add(seguro);
+                        await _context.SaveChangesAsync();
+                    }
+                    _context.SEGUROS_BANCOS.Add(new SeguroBanco
+                    {
+                        IdBanco = idBanco,
+                        IdSeguro = seguro.IdSeguro
+                    });
+                }
+                if (seguroVida.HasValue)
+                {
+                    var seguro = _context.SEGUROS.FirstOrDefault(s => s.Nombre == "Vida");
+                    if (seguro == null)
+                    {
+                        seguro = new Seguro { Nombre = "Vida", PorcSeguro = seguroVida.Value };
+                        _context.SEGUROS.Add(seguro);
+                        await _context.SaveChangesAsync();
+                    }
+                    _context.SEGUROS_BANCOS.Add(new SeguroBanco
+                    {
+                        IdBanco = idBanco,
+                        IdSeguro = seguro.IdSeguro
+                    });
+                }
+
+                // Guardar escenario de tasa de interes
+                if (!string.IsNullOrEmpty(tipoTasa1) && !string.IsNullOrEmpty(nombreEscenario1))
+                {
+                    int idTasa = tipoTasa1 == "Tasa_Variable" ? 1 : 2;
+                    _context.ESCENARIOS_TASAS_INTERES.Add(new EscenarioTasaInteres
+                    {
+                        IdBanco = idBanco,
+                        IdTasaInteres = idTasa,
+                        Nombre = nombreEscenario1,
+                        Plazo = plazo1 ?? 0,
+                        PorcAdicional = porcentajeAdicional1 ?? 0,
+                        PorcDatoBancario = 0
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+
+                TempData["MensajeExito"] = "Banco registrado exitosamente.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = "Error al registrar el banco: " + ex.Message;
+                return View(banco);
+            }
         }
 
-        public IActionResult Editar()
+        public async Task<IActionResult> Editar(int id)
         {
-            return View();
+            var banco = await _bancoRepository.ObtenerPorId(id);
+            if (banco == null)
+            {
+                TempData["MensajeError"] = "El banco no existe o ha sido eliminado.";
+                return RedirectToAction("Index");
+            }
+            return View(banco);
         }
-
     }
 }

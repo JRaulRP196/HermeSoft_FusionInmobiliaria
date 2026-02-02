@@ -19,6 +19,7 @@ builder.Services.AddScoped<CondominioRepository>();
 builder.Services.AddScoped<CondominioBusiness>();
 builder.Services.AddScoped<CoordenadasRepository>();
 builder.Services.AddScoped<CoordenadasBusiness>();
+builder.Services.AddScoped<BancoRepository>();
 builder.Services.AddScoped<CalculosBusiness>();
 
 var app = builder.Build();

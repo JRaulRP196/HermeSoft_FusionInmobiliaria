@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<Banco>
+@{
     ViewBag.Title = "Bancos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -11,34 +12,38 @@
     <div class="col-12">
         <h4 class="my-3">Listado de Bancos</h4>
     </div>
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <div class="card rounded-3">
-            <img src="~/assets/images/bancos/BAC.png" class="card-img-top rounded-4" />
-            <div class="card-body ">
-                <h4 class="card-title">BAC San José</h4>
-                <a class="btn btn-secondary" asp-action="Detalle">Detalle</a>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <div class="card rounded-3">
-            <img src="~/assets/images/bancos/BAC.png" class="card-img-top rounded-4" />
-            <div class="card-body ">
-                <h4 class="card-title">BAC San José</h4>
-                <a class="btn btn-secondary" asp-action="Detalle">Detalle</a>
+    @if (Model == null || !Model.Any())
+    {
+        <div class="col-12">
+            <div class="alert alert-info">
+                No hay bancos registrados.
             </div>
         </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <div class="card rounded-3">
-            <img src="~/assets/images/bancos/BAC.png" class="card-img-top rounded-4" />
-            <div class="card-body ">
-                <h4 class="card-title">BAC San José</h4>
-                <a class="btn btn-secondary" asp-action="Detalle">Detalle</a>
+    }
+    else
+    {
+        @foreach (var banco in Model)
+        {
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card rounded-3">
+                    @if (!string.IsNullOrEmpty(banco.Logo))
+                    {
+                        <img src="@banco.Logo" class="card-img-top rounded-4" alt="@banco.Nombre" />
+                    }
+                    else
+                    {
+                        <div class="card-img-top rounded-4 bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
+                            <i class="ri-bank-fill" style="font-size: 3rem; color: #6c757d;"></i>
+                        </div>
+                    }
+                    <div class="card-body">
+                        <h4 class="card-title">@banco.Nombre</h4>
+                        <a class="btn btn-secondary" asp-action="Detalle" asp-route-id="@banco.IdBanco">Detalle</a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        }
+    }
 
 </div>
