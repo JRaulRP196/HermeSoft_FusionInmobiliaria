@@ -10,7 +10,7 @@
             <div class="card-body">
                 <h4 class="card-title">Registro de Bancos</h4>
                 <p class="card-title-desc">
-                    En este apartado se podran registrar nuevos bancos completando el siguiente formulario.
+                    En este apartado se podr&aacute;n registrar nuevos bancos completando el siguiente formulario.
                 </p>
 
                 @if (TempData["MensajeError"] != null)
@@ -47,31 +47,31 @@
                                 <div class="input-group">
                                     <input type="file" class="form-control" id="LogoFile" name="LogoFile" accept="image/*">
                                 </div>
-                                <div class="invalid-feedback">Ingrese un valor valido.</div>
+                                <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="MaxCredito" class="form-label">Plazo Maximo de Credito</label>
-                                <input type="number" class="form-control" id="MaxCredito" name="MaxCredito" placeholder="Plazo Maximo de Credito en Anos" required>
-                                <div class="invalid-feedback">Ingrese un valor valido.</div>
+                                <label for="MaxCredito" class="form-label">Plazo M&aacute;ximo de Cr&eacute;dito</label>
+                                <input type="number" class="form-control" id="MaxCredito" name="MaxCredito" placeholder="Plazo M&aacute;ximo de Cr&eacute;dito en A&ntilde;os" required>
+                                <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="Comision" class="form-label">Comision Bancaria</label>
+                                <label for="Comision" class="form-label">Comisi&oacute;n Bancaria</label>
                                 <input type="number" class="form-control" id="Comision" name="Comision" placeholder="%" required>
-                                <div class="invalid-feedback">Ingrese un valor valido.</div>
+                                <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
                             </div>
                         </div>
                     </div>
 
-                    <label class="form-label">Porcentaje de Endeudamiento Maximo</label>
+                    <label class="form-label">Porcentaje de Endeudamiento M&aacute;ximo</label>
                     <div class="row">
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <div class="input-group">
-                                    <div class="input-group-text">Publico</div>
+                                    <div class="input-group-text">P&uacute;blico</div>
                                     <input type="number" class="form-control" placeholder="%" name="endeudamientoPublico">
                                 </div>
                             </div>
@@ -105,7 +105,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Seguro de Proteccion al Desempleado</label>
+                                <label class="form-label">Seguro de Protecci&oacute;n al Desempleado</label>
                                 <input type="number" class="form-control" placeholder="%" name="seguroDesempleo">
                             </div>
                         </div>
@@ -125,7 +125,7 @@
                         </div>
                     </div>
 
-                    <label class="form-label">Tasas de Interes</label>
+                    <label class="form-label">Tasas de Inter&eacute;s</label>
                     <label class="form-label">Escenarios: </label>
                     <button type="button" class="btn btn-primary" id="addEscenario">+</button>
                     <div id="listaEscenarios">
@@ -135,7 +135,7 @@
                                     <h3 class="card-title">Escenario #1</h3>
                                     <div class="row">
                                         <div class="col-md-9">
-                                            <label class="form-label">Tipo de Tasa de Interes</label>
+                                            <label class="form-label">Tipo de Tasa de Inter&eacute;s</label>
                                             <select class="form-select tipoInteres" name="tipoTasa1" required>
                                                 <option value="Tasa_Variable">Tasa Variable</option>
                                                 <option value="Tasa_Escalonada">Tasa Escalonada</option>
@@ -150,7 +150,7 @@
                                     <div class="row inputsEscenario">
                                         <div class="col-md-3">
                                             <div class="mb-3">
-                                                <label class="form-label">Plazo de Duracion</label>
+                                                <label class="form-label">Plazo de Duraci&oacute;n</label>
                                                 <input type="number" class="form-control" placeholder="Meses" name="plazo1">
                                             </div>
                                         </div>
@@ -187,7 +187,7 @@
                                 </button>
                                 <div class="row">
                                     <div class="col-md-9">
-                                        <label class="form-label">Tipo de Tasa de Interes</label>
+                                        <label class="form-label">Tipo de Tasa de Inter&eacute;s</label>
                                         <select class="form-select tipoInteres" name="tipoTasa">
                                             <option value="Tasa_Variable">Tasa Variable</option>
                                             <option value="Tasa_Escalonada">Tasa Escalonada</option>
@@ -202,7 +202,7 @@
                                 <div class="row inputsEscenario">
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <label class="form-label">Plazo de Duracion</label>
+                                            <label class="form-label">Plazo de Duraci&oacute;n</label>
                                             <input type="number" class="form-control" placeholder="Meses" name="plazo">
                                         </div>
                                     </div>
