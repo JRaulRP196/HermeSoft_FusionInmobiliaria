@@ -13,9 +13,5 @@ namespace HermeSoft_Fusion.Models
         [Required]
         [StringLength(50)]
         public string Nombre { get; set; }
-
-        [Required]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal PorcSeguro { get; set; }
     }
 }

@@ -5,10 +5,40 @@
         "<button type='button' class='btn btn-danger deleteInputs'>-</button> ";
     var contadorEscenarios = 1;
 
+    function reindexarTodo() {
+        $("#listaEscenarios .escenarios").each(function (i) {
+
+            // Reindexa escenario
+            $(this).find("input[name], select[name]").each(function () {
+                let name = $(this).attr("name");
+
+                name = name.replace(
+                    /EscenariosTasaInteres\[\d+\]/,
+                    `EscenariosTasaInteres[${i}]`
+                );
+
+                $(this).attr("name", name);
+            });
+
+            // Reindexa plazos dentro del escenario
+            $(this).find(".inputsEscenario").each(function (j) {
+                $(this).find("input, select").each(function () {
+                    let name = $(this).attr("name");
+
+                    name = name.replace(
+                        /PlazosEscenarios\[\d+\]/,
+                        `PlazosEscenarios[${j}]`
+                    );
+
+                    $(this).attr("name", name);
+                });
+            });
+        });
+    }
+
 
     $("#addEscenario").on("click", function () {
         contadorEscenarios++;
-
         let nuevo = $("#escenario-template").clone();
         nuevo.removeAttr("id");
         nuevo.show();
@@ -16,6 +46,7 @@
         nuevo.css({ opacity: 0, display: "none" });
         $("#listaEscenarios").append(nuevo);
         nuevo.slideDown(200).animate({ opacity: 1 }, { queue: false, duration: 300 });
+        reindexarTodo();
     });
 
     $(document).on("click", ".deleteEscenario", function () {
@@ -26,6 +57,7 @@
                 card.remove();
                 reindexarEscenarios();
             });
+        reindexarTodo();
     });
 
     function reindexarEscenarios() {
@@ -42,7 +74,7 @@
         var card = $(this).closest(".card-body");
         var contenedor = card.find(".botonesEscalonada");
 
-        if (valor === "Tasa_Escalonada") {
+        if (valor == 2) {
             contenedor.html(botonesEscalonada);
         } else {
             contenedor.html("");
@@ -60,6 +92,7 @@
         clon.css({ opacity: 0, display: "none" });
         card.find(".inputsEscenario").last().after(clon);
         clon.slideDown(200).animate({ opacity: 1 }, { queue: false, duration: 300 });
+        reindexarTodo();
     });
 
     $(document).on("click", ".deleteInputs", function () {
@@ -74,6 +107,7 @@
                     ultimo.remove();
                 });
         }
+        reindexarTodo();
     });
 
 });

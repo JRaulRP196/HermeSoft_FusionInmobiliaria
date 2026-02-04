@@ -20,9 +20,9 @@ namespace HermeSoft_Fusion.Data
         public DbSet<Seguro> SEGUROS { get; set; }
         public DbSet<SeguroBanco> SEGUROS_BANCOS { get; set; }
         public DbSet<IndicadoresBancarios> INDICADORES_BANCARIOS { get; set; }
-        public DbSet<IndicadoresBancos> INDICADORES_BANCOS { get; set; }
         public DbSet<TasaInteres> TASAS_INTERES { get; set; }
         public DbSet<EscenarioTasaInteres> ESCENARIOS_TASAS_INTERES { get; set; }
+        public DbSet<PlazosEscenarios> PLAZOS_ESCENARIOS { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -83,37 +83,11 @@ namespace HermeSoft_Fusion.Data
                 entity.Property(e => e.Nombre).IsRequired().HasMaxLength(50);
             });
 
-            // Configuraciones de IndicadoresBancos
-            modelBuilder.Entity<IndicadoresBancos>(entity =>
-            {
-                entity.HasKey(e => e.IdIndicadorBanco);
-                entity.HasOne(e => e.Banco)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdBanco)
-                      .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Indicador)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdIndicador);
-            });
-
             // Configuraciones de TasaInteres
             modelBuilder.Entity<TasaInteres>(entity =>
             {
                 entity.HasKey(e => e.IdTasaInteres);
                 entity.Property(e => e.Nombre).IsRequired().HasMaxLength(50);
-            });
-
-            // Configuraciones de EscenarioTasaInteres
-            modelBuilder.Entity<EscenarioTasaInteres>(entity =>
-            {
-                entity.HasKey(e => e.IdEscenario);
-                entity.HasOne(e => e.Banco)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdBanco)
-                      .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.TasaInteres)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdTasaInteres);
             });
         }
     }

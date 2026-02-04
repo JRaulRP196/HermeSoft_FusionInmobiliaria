@@ -36,4 +36,9 @@ namespace HermeSoft_Fusion.Models
 
         public string? Logo { get; set; }
     }
+
+    public class BancoRequest : Banco 
+    { 
+        public List<EscenarioTasaInteresRequest> EscenariosTasaInteres { get; set; } = new();
+    }
 }

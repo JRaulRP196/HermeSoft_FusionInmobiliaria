@@ -13,24 +13,16 @@ namespace HermeSoft_Fusion.Models
         [Required]
         [StringLength(50)]
         public string Nombre { get; set; }
-
-        [Required]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal PorcAdicional { get; set; }
-
-        [Required]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal PorcDatoBancario { get; set; }
-
-        [Required]
-        public int Plazo { get; set; }
-
         public int IdBanco { get; set; }
+        public int IdTasaInteres { get; set; }
         [ForeignKey("IdBanco")]
         public Banco Banco { get; set; }
 
-        public int IdTasaInteres { get; set; }
-        [ForeignKey("IdTasaInteres")]
-        public TasaInteres TasaInteres { get; set; }
     }
+
+    public class EscenarioTasaInteresRequest : EscenarioTasaInteres
+    {
+        public List<PlazosEscenarios> PlazosEscenarios { get; set; } = new();
+    }
+
 }

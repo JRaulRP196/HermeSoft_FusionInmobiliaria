@@ -20,7 +20,12 @@ builder.Services.AddScoped<CondominioBusiness>();
 builder.Services.AddScoped<CoordenadasRepository>();
 builder.Services.AddScoped<CoordenadasBusiness>();
 builder.Services.AddScoped<BancoRepository>();
+builder.Services.AddScoped<BancoBusiness>();
 builder.Services.AddScoped<CalculosBusiness>();
+builder.Services.AddScoped<TasaInteresRepository>();
+builder.Services.AddScoped<TasaInteresBusiness>();
+builder.Services.AddScoped<EndeudamientoMaximoRepository>();
+builder.Services.AddScoped<EndeudamientoMaximoBusiness>();
 
 var app = builder.Build();
 
