@@ -1,5 +1,16 @@
-﻿@{
-    ViewBag.Title = "Bancos";
+﻿@model Banco
+@using HermeSoft_Fusion.Models
+@using System.Linq
+@using System.Globalization
+
+@functions {
+    // HTML <input type="number"> necesita punto decimal (InvariantCulture)
+    string Num(decimal v) => v.ToString(CultureInfo.InvariantCulture);
+    string NumN(decimal? v) => (v ?? 0m).ToString(CultureInfo.InvariantCulture);
+}
+
+@{
+    ViewBag.Title = "Editar Banco";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -7,73 +18,91 @@
     <div class="col">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Edicion de Bancos</h4>
+                <h4 class="card-title">Edición de Banco</h4>
                 <p class="card-title-desc">
-                    En este apartado se podra editar el banco seleccionado.
+                    En este apartado se puede editar la información del banco y sus escenarios.
                 </p>
-                <form class="needs-validation" novalidate>
+
+                @if (TempData["MensajeError"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["MensajeError"]</div>
+                }
+
+                @if (TempData["MensajeExito"] != null)
+                {
+                    <div class="alert alert-success">@TempData["MensajeExito"]</div>
+                }
+
+                <form asp-controller="Banco" asp-action="Editar" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+
+                    <!-- ID DEL BANCO -->
+                    <input type="hidden" name="IdBanco" value="@Model.IdBanco" />
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="validationCustom01" class="form-label">Nombre del Banco</label>
-                                <input type="text" class="form-control" id="validationCustom01"
-                                       placeholder="Nombre del Banco" required>
-                                <div class="valid-feedback">
-                                    Excelente!
-                                </div>
+                                <label for="Nombre" class="form-label">Nombre del Banco</label>
+                                <input type="text" class="form-control" id="Nombre" name="Nombre" value="@Model.Nombre" placeholder="Nombre del Banco" required>
+                                <div class="valid-feedback">Excelente!</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="validationCustom02" class="form-label">Enlace Web del Banco</label>
-                                <input type="text" class="form-control" id="validationCustom02"
-                                       placeholder="Enlace Web del Banco" required>
-                                <div class="valid-feedback">
-                                    Excelente!
-                                </div>
+                                <label for="Enlace" class="form-label">Enlace Web del Banco</label>
+                                <input type="text" class="form-control" id="Enlace" name="Enlace" value="@Model.Enlace" placeholder="Enlace Web del Banco" required>
+                                <div class="valid-feedback">Excelente!</div>
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="validationCustom03" class="form-label">Logo del Banco</label>
+                                <label for="LogoFile" class="form-label">Logo del Banco</label>
                                 <div class="input-group">
-                                    <input type="file" class="form-control" id="validationCustom03" required="">
+                                    <input type="file" class="form-control" id="LogoFile" name="LogoFile" accept="image/*">
                                 </div>
-                                <div class="invalid-feedback">
-                                    Ingrese un valor valido.
-                                </div>
+                                <div class="invalid-feedback">Ingrese un valor válido.</div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="validationCustom04" class="form-label">Plazo Maximo de Credito</label>
-                                <input type="number" class="form-control" id="validationCustom04"
-                                       placeholder="Plazo Maximo de Credito en Anos" required>
-                                <div class="invalid-feedback">
-                                    Ingrese un valor valido.
-                                </div>
+                                <label for="MaxCredito" class="form-label">Plazo Máximo de Crédito</label>
+                                <input type="number" class="form-control" id="MaxCredito" name="MaxCredito"
+                                       value="@Num(Model.MaxCredito)"
+                                       placeholder="Plazo Máximo de Crédito en Años" required>
+                                <div class="invalid-feedback">Ingrese un valor válido.</div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="validationCustom05" class="form-label">Comision Bancaria</label>
-                                <input type="number" class="form-control" id="validationCustom05"
+                                <label for="Comision" class="form-label">Comisión Bancaria</label>
+                                <input type="number" class="form-control" id="Comision" name="Comision"
+                                       value="@Num(Model.Comision)"
                                        placeholder="%" required>
-                                <div class="invalid-feedback">
-                                    Ingrese un valor valido.
-                                </div>
+                                <div class="invalid-feedback">Ingrese un valor válido.</div>
                             </div>
                         </div>
+                    </div>
 
-                        <label for="validationCustom05" class="form-label">Porcentaje de Endeudamiento Maximo</label>
+                    <!-- Endeudamientos -->
+                    <label class="form-label">Porcentaje de Endeudamiento Máximo</label>
+                    @{
+                        var ends = ViewBag.Endeudamientos as List<EndeudamientoMaximo> ?? new List<EndeudamientoMaximo>();
 
+                        decimal? endPublico = ends.FirstOrDefault(x => x.IdTipoAsalariado == 1)?.PorcEndeudamiento;
+                        decimal? endPrivado = ends.FirstOrDefault(x => x.IdTipoAsalariado == 2)?.PorcEndeudamiento;
+                        decimal? endProfesional = ends.FirstOrDefault(x => x.IdTipoAsalariado == 3)?.PorcEndeudamiento;
+                        decimal? endIndependiente = ends.FirstOrDefault(x => x.IdTipoAsalariado == 4)?.PorcEndeudamiento;
+                    }
+
+                    <div class="row">
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <div class="input-group">
-                                    <div class="input-group-text">Publico</div>
-                                    <input type="number" class="form-control" placeholder="%" required="">
+                                    <div class="input-group-text">Público</div>
+                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoPublico"
+                                           value="@NumN(endPublico)">
                                 </div>
                             </div>
                         </div>
@@ -81,7 +110,8 @@
                             <div class="mb-3">
                                 <div class="input-group">
                                     <div class="input-group-text">Privado</div>
-                                    <input type="number" class="form-control" placeholder="%" required="">
+                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoPrivado"
+                                           value="@NumN(endPrivado)">
                                 </div>
                             </div>
                         </div>
@@ -89,7 +119,8 @@
                             <div class="mb-3">
                                 <div class="input-group">
                                     <div class="input-group-text">Profesional Independiente</div>
-                                    <input type="number" class="form-control" placeholder="%" required="">
+                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoProfesional"
+                                           value="@NumN(endProfesional)">
                                 </div>
                             </div>
                         </div>
@@ -97,107 +128,151 @@
                             <div class="mb-3">
                                 <div class="input-group">
                                     <div class="input-group-text">Trabajador Independiente</div>
-                                    <input type="number" class="form-control" placeholder="%" required="">
+                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoIndependiente"
+                                           value="@NumN(endIndependiente)">
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Seguros -->
+                    @{
+                        var segs = ViewBag.Seguros as List<SeguroBanco> ?? new List<SeguroBanco>();
+
+                        decimal? seguroDes = segs
+                        .FirstOrDefault(x =>
+                        x.IdSeguro == 1 ||
+                        (x.Seguro != null && x.Seguro.Nombre != null && x.Seguro.Nombre.ToLower().Contains("desemple")))
+                        ?.PorcSeguro;
+
+                        decimal? seguroVid = segs
+                        .FirstOrDefault(x =>
+                        x.IdSeguro == 2 ||
+                        (x.Seguro != null && x.Seguro.Nombre != null && x.Seguro.Nombre.ToLower().Contains("vida")))
+                        ?.PorcSeguro;
+                    }
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Seguro de Proteccion al Desempleado</label>
-                                <input type="number" class="form-control" placeholder="%" required>
-                                <div class="valid-feedback">
-                                    Excelente!
-                                </div>
+                                <label class="form-label">Seguro de Protección al Desempleado</label>
+                                <input type="number" class="form-control" placeholder="%" name="seguroDesempleo"
+                                       value="@NumN(seguroDes)">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Seguro de Vida</label>
-                                <input type="number" class="form-control" placeholder="%" required>
-                                <div class="valid-feedback">
-                                    Excelente!
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="mb-3">
-                            <label class="form-label">Gastos de Honorarios de Abogados</label>
-                            <input type="number" class="form-control" placeholder="%" required>
-                            <div class="valid-feedback">
-                                Excelente!
+                                <input type="number" class="form-control" placeholder="%" name="seguroVida"
+                                       value="@NumN(seguroVid)">
                             </div>
                         </div>
                     </div>
 
-                    <label class="form-label">Tasas de Interes</label> <br />
+                    <!-- Honorarios -->
+                    <div class="col">
+                        <div class="mb-3">
+                            <label class="form-label">Gastos de Honorarios de Abogados</label>
+                            <input type="number" class="form-control" placeholder="%" name="HonorarioAbogado"
+                                   value="@Num(Model.HonorarioAbogado)" required>
+                            <div class="valid-feedback">Excelente!</div>
+                        </div>
+                    </div>
+
+                    <!-- Escenarios -->
+                    <label class="form-label">Tasas de Interés</label>
                     <label class="form-label">Escenarios: </label>
                     <button type="button" class="btn btn-primary" id="addEscenario">+</button>
 
                     <div id="listaEscenarios">
+                        @{
+                            var escenariosList = ViewBag.Escenarios as List<EscenarioTasaInteres> ?? new List<EscenarioTasaInteres>();
 
-                        <div class="row escenarios">
-                            <div class="col">
-                                <div class="card card-body">
-                                    <h3 class="card-title">Escenario #1</h3>
+                            var escenariosAgrupados = escenariosList
+                            .GroupBy(e => new { e.Nombre, e.IdTasaInteres })
+                            .ToList();
 
-                                    <div class="row">
-                                        <div class="col-md-9">
-                                            <label class="form-label">Tipo de Tasa de Interes</label>
-                                            <select class="form-select tipoInteres" required>
-                                                <option value="Tasa_Variable">Tasa Variable</option>
-                                                <option value="Tasa_Escalonada">Tasa Escalonada</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Nombre del Escenario</label>
-                                            <input type="text" class="form-control" placeholder="Nombre" required>
-                                        </div>
-                                    </div>
+                            int idx = 1;
+                        }
 
-                                    <br />
+                        @foreach (var grupo in escenariosAgrupados)
+                        {
+                            <div class="row escenarios">
+                                <div class="col">
+                                    <div class="card card-body">
+                                        <h3 class="card-title">Escenario #@idx</h3>
 
-                                    <div class="row inputsEscenario">
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Plazo de Duracion</label>
-                                                <input type="number" class="form-control" placeholder="Meses" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Porcentaje Adicional del Banco</label>
-                                                <input type="number" class="form-control" placeholder="%" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Indicador Bancario</label>
-                                                <select class="form-select" required>
-                                                    <option value="1">TBP</option>
-                                                    <option value="2">SOFT</option>
-                                                    <option value="3">TPR</option>
-                                                    <option value="4">N/A</option>
+                                        <button type="button" class="btn btn-danger waves-effect waves-light deleteEscenario">
+                                            <i class="ri-close-line align-middle me-2"></i> Eliminar Escenario
+                                        </button>
+
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <label class="form-label">Tipo de Tasa de Interés</label>
+
+                                                <select class="form-select tipoInteres" required>
+                                                    @if (grupo.Key.IdTasaInteres == 1)
+                                                    {
+                                                        <option value="Tasa_Variable" selected="selected">Tasa Variable</option>
+                                                        <option value="Tasa_Escalonada">Tasa Escalonada</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="Tasa_Variable">Tasa Variable</option>
+                                                        <option value="Tasa_Escalonada" selected="selected">Tasa Escalonada</option>
+                                                    }
                                                 </select>
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    <div class="button-items botonesEscalonada"></div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">Nombre del Escenario</label>
+                                                <input type="text" class="form-control nombreEscenario" placeholder="Nombre" value="@grupo.Key.Nombre">
+                                            </div>
+                                        </div>
+
+                                        <br />
+
+                                        @foreach (var tramo in grupo)
+                                        {
+                                            <div class="row inputsEscenario">
+                                                <div class="col-md-3">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Plazo de Duración</label>
+                                                        <input type="number" class="form-control tramoPlazo" placeholder="Meses" value="@tramo.Plazo">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Porcentaje Adicional del Banco</label>
+                                                        <input type="number" class="form-control tramoAdicional" placeholder="%" value="@Num(tramo.PorcAdicional)">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Indicador Bancario</label>
+                                                        <select class="form-select tramoIndicador">
+                                                            <option value="TBP" selected="selected">TBP</option>
+                                                            <option value="SOFT">SOFT</option>
+                                                            <option value="TPR">TPR</option>
+                                                            <option value="N/A">N/A</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        <div class="button-items botonesEscalonada"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
+                            idx++;
+                        }
                     </div>
 
-                    <div class="button-items">
-                        <button class="btn btn-primary" type="submit">Guardar</button>
-                        <a class="btn btn-danger" asp-action="Index">Cancelar</a>
-                    </div>
-
+                    <!-- template para agregar escenarios nuevos -->
                     <div class="row escenarios" id="escenario-template" style="display:none;">
                         <div class="col">
                             <div class="card card-body">
@@ -207,47 +282,58 @@
                                 </button>
                                 <div class="row">
                                     <div class="col-md-9">
-                                        <label class="form-label">Tipo de Tasa de Interes</label>
-                                        <select class="form-select tipoInteres" required>
+                                        <label class="form-label">Tipo de Tasa de Interés</label>
+                                        <select class="form-select tipoInteres">
                                             <option value="Tasa_Variable">Tasa Variable</option>
                                             <option value="Tasa_Escalonada">Tasa Escalonada</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Nombre del Escenario</label>
-                                        <input type="text" class="form-control" placeholder="Nombre" required>
+                                        <input type="text" class="form-control nombreEscenario" placeholder="Nombre">
                                     </div>
                                 </div>
                                 <br />
                                 <div class="row inputsEscenario">
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <label class="form-label">Plazo de Duracion</label>
-                                            <input type="number" class="form-control" placeholder="Meses" required>
+                                            <label class="form-label">Plazo de Duración</label>
+                                            <input type="number" class="form-control tramoPlazo" placeholder="Meses">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label class="form-label">Porcentaje Adicional del Banco</label>
-                                            <input type="number" class="form-control" placeholder="%" required>
+                                            <input type="number" class="form-control tramoAdicional" placeholder="%">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label class="form-label">Indicador Bancario</label>
-                                            <select class="form-select" required>
-                                                <option value="1">TBP</option>
-                                                <option value="2">SOFT</option>
-                                                <option value="3">TPR</option>
-                                                <option value="4">N/A</option>
+                                            <select class="form-select tramoIndicador">
+                                                <option value="TBP">TBP</option>
+                                                <option value="SOFT">SOFT</option>
+                                                <option value="TPR">TPR</option>
+                                                <option value="N/A">N/A</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="button-items botonesEscalonada"></div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="TipoCambio" class="form-label">Tipo de Cambio</label>
+                        <input type="text" class="form-control" id="TipoCambio" name="TipoCambio" value="@Model.TipoCambio" placeholder="Tipo de Cambio" required>
+                    </div>
+
+                    <input type="hidden" id="escenariosJson" name="escenariosJson" />
+
+                    <div class="button-items">
+                        <button class="btn btn-primary" type="submit">Guardar Cambios</button>
+                        <a class="btn btn-danger" asp-action="Index">Cancelar</a>
                     </div>
 
                 </form>
@@ -259,6 +345,5 @@
 @section scripts {
     <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
     <script src="~/assets/js/pages/form-validation.init.js"></script>
-    <script src="~/assets/js/app.js"></script>
-    <script src="~/assets/js/escenariosbanco.js"></script>
+    <script src="~/assets/js/escenariosBanco.js"></script>
 }
