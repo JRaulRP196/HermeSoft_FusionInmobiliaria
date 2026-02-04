@@ -1,25 +1,25 @@
 ﻿using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Repository;
-using ZstdSharp;
 
 namespace HermeSoft_Fusion.Business
 {
     public class CalculosBusiness
     {
-
         private LoteRepository _loteRepository;
 
-        public CalculosBusiness(LoteRepository loteRepository)
+     
+        private IndicadorBancarioRepository _indicadorRepo;
+
+        public CalculosBusiness(LoteRepository loteRepository, IndicadorBancarioRepository indicadorRepo)
         {
             _loteRepository = loteRepository;
+            _indicadorRepo = indicadorRepo;
         }
-
 
         #region Utilidades
 
         public async Task<IEnumerable<DesglosesPrimas>> CalcularPrima(string codigoLote, decimal porcentajePrima, DateTime fechaFinal)
         {
-
             var lote = await _loteRepository.Obtener(codigoLote);
             VerificarDatosPrima(lote, porcentajePrima, fechaFinal);
 
@@ -86,5 +86,37 @@ namespace HermeSoft_Fusion.Business
 
         #endregion
 
+
+        
+
+
+        public async Task<decimal> CalcularPorcentajeFormalizacion(string codigoLote)
+        {
+            if (string.IsNullOrWhiteSpace(codigoLote))
+                throw new Exception("Debe seleccionar lote.");
+
+            var lote = await _loteRepository.Obtener(codigoLote);
+            if (lote == null)
+                throw new Exception("Lote inválido.");
+
+            
+            var indicador = await _indicadorRepo.ObtenerPorNombre("SOFR");
+
+            if (indicador == null)
+                throw new Exception("No existe el indicador en BD. Primero debe actualizarse desde BCCR.");
+
+            return indicador.PorcSeguro;
+        }
+
+        
+        public async Task<decimal> CalcularMontoFormalizacion(string codigoLote)
+        {
+            var lote = await _loteRepository.Obtener(codigoLote);
+            if (lote == null)
+                throw new Exception("Lote inválido.");
+
+            var porcentaje = await CalcularPorcentajeFormalizacion(codigoLote);
+            return Math.Round((porcentaje / 100m) * lote.PrecioVenta, 2);
+        }
     }
 }

@@ -1,0 +1,40 @@
+﻿@model IEnumerable<HermeSoft_Fusion.Models.IndicadorBancario>
+
+@{
+    ViewBag.Title = "Referencias Económicas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card border-0 shadow-sm rounded-4 p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">Referencias Económicas</h4>
+
+        <form asp-action="Actualizar" method="post">
+            <button type="submit" class="btn btn-primary">
+                Actualizar desde BCCR
+            </button>
+        </form>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Referencia</th>
+                <th>Valor</th>
+                <th>Fecha Vigente</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.Nombre</td>
+                    <td>@r.PorcSeguro</td>
+                    <td>@r.FechaVigente.ToString("dd/MM/yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <small class="text-muted">Valores obtenidos desde el BCCR. No editables manualmente.</small>
+</div>

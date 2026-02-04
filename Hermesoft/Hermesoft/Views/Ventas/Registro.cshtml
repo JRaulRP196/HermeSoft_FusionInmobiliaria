@@ -111,9 +111,7 @@
                     </div>
                 </div>
 
-                <!-- ============================
-                     SECCIONES INFERIORES (3 COLUMNAS)
-                ============================= -->
+                
                 <div class="row g-4 mb-4">
 
                     <!-- PRIMA -->
@@ -158,27 +156,58 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Seguro Vida</label>
-                                    <input type="number" id="porcSeguros" class="form-control" min="0" max="100" value="3">
+                                    <input type="number"
+                                           id="porcSeguroVida"
+                                           class="form-control"
+                                           min="0"
+                                           max="100"
+                                           step="0.01"
+                                           value="3">
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label">Seguro Desempleado</label>
-                                    <input type="number" id="porcSeguros" class="form-control" min="0" max="100" value="3">
+                                    <input type="number"
+                                           id="porcSeguroDesempleo"
+                                           class="form-control"
+                                           min="0"
+                                           max="100"
+                                           step="0.01"
+                                           value="3">
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label">Honorarios abogados</label>
-                                    <input type="number" id="porcAbogados" class="form-control" min="0" max="100" value="7">
+                                    <input type="number"
+                                           id="porcAbogados"
+                                           class="form-control"
+                                           min="0"
+                                           max="100"
+                                           step="0.01"
+                                           value="7">
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label">Comisión bancaria</label>
-                                    <input type="number" id="porcComision" class="form-control" min="0" max="100" value="5" readonly>
+                                    <input type="number"
+                                           id="porcComision"
+                                           class="form-control"
+                                           min="0"
+                                           max="100"
+                                           step="0.01"
+                                           value="5">
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label">Timbre fiscal</label>
-                                    <input type="number" id="porcTimbre" class="form-control" min="0" max="100" value="0.5" readonly>
+                                    <input type="number"
+                                           id="porcTimbre"
+                                           class="form-control"
+                                           min="0"
+                                           max="100"
+                                           step="0.01"
+                                           value="0.5"
+                                           readonly>
                                 </div>
 
                                 <div class="col-12">
@@ -186,11 +215,17 @@
                                         Calcular gasto de formalización
                                     </button>
 
-                                    <input type="text" id="gastoFormalizacion" class="form-control mt-2" readonly placeholder="Resultado gasto de formalización">
+                                    <input type="text"
+                                           id="gastoFormalizacion"
+                                           class="form-control mt-2"
+                                           readonly
+                                           placeholder="Resultado gasto de formalización">
                                 </div>
                             </div>
                         </div>
                     </div>
+
+
 
                     <!-- CUOTA BANCARIA -->
                     <div class="col-md-4">
@@ -270,9 +305,7 @@
 </div>
 }
 
-@section scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+}
     <script src="~/assets/js/ventas.js"></script>
     <script src="~/assets/js/calculos.js"></script>
 }
