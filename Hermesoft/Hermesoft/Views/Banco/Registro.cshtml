@@ -196,73 +196,6 @@
                         </div>
                     </div>
 
-                    <div class="row escenarios" id="escenario-template" style="display:none;">
-                        <div class="col">
-                            <div class="card card-body">
-                                <h3 class="card-title">Escenario #x</h3>
-
-                                <button type="button"
-                                        class="btn btn-danger deleteEscenario">
-                                    Eliminar Escenario
-                                </button>
-
-                                <div class="row">
-                                    <div class="col-md-9">
-                                        <label class="form-label">Tipo de Tasa de Interés</label>
-                                        <select class="form-select tipoInteres"
-                                                name="EscenariosTasaInteres[0].IdTasaInteres" required>
-                                            @foreach (TasaInteres tasa in ViewBag.TasaInteres)
-                                            {
-                                                <option value="@tasa.IdTasaInteres">@tasa.Nombre</option>
-                                            }
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label class="form-label">Nombre del Escenario</label>
-                                        <input type="text" class="form-control"
-                                               name="EscenariosTasaInteres[0].Nombre" required>
-                                    </div>
-                                </div>
-
-                                <br />
-
-                                <div class="row inputsEscenario">
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Plazo de Duración</label>
-                                            <input type="number" class="form-control"
-                                                   name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Porcentaje Adicional del Banco</label>
-                                            <input type="number" class="form-control"
-                                                   name="EscenariosTasaInteres[0].PlazosEscenarios[0].PorcAdicional" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Indicador Bancario</label>
-                                            <select class="form-select"
-                                                    name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
-                                                <option value="1">TBP</option>
-                                                <option value="2">SOFT</option>
-                                                <option value="3">TPR</option>
-                                                <option value="4">N/A</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="button-items botonesEscalonada"></div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="mb-3">
                         <label for="TipoCambio" class="form-label">Tipo de Cambio</label>
                         <input type="text" class="form-control" id="TipoCambio" name="TipoCambio" placeholder="Tipo de Cambio" required>
@@ -276,6 +209,73 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="row escenarios" id="escenario-template" style="display:none;">
+    <div class="col">
+        <div class="card card-body">
+            <h3 class="card-title">Escenario #x</h3>
+
+            <button type="button"
+                    class="btn btn-danger deleteEscenario">
+                Eliminar Escenario
+            </button>
+
+            <div class="row">
+                <div class="col-md-9">
+                    <label class="form-label">Tipo de Tasa de Interés</label>
+                    <select class="form-select tipoInteres"
+                            name="EscenariosTasaInteres[0].IdTasaInteres" required>
+                        @foreach (TasaInteres tasa in ViewBag.TasaInteres)
+                        {
+                            <option value="@tasa.IdTasaInteres">@tasa.Nombre</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Nombre del Escenario</label>
+                    <input type="text" class="form-control"
+                           name="EscenariosTasaInteres[0].Nombre" required>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="row inputsEscenario">
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Plazo de Duración</label>
+                        <input type="number" class="form-control"
+                               name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Porcentaje Adicional del Banco</label>
+                        <input type="number" class="form-control"
+                               name="EscenariosTasaInteres[0].PlazosEscenarios[0].PorcAdicional" required>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Indicador Bancario</label>
+                        <select class="form-select"
+                                name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
+                            <option value="1">TBP</option>
+                            <option value="2">SOFT</option>
+                            <option value="3">TPR</option>
+                            <option value="4">N/A</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-items botonesEscalonada"></div>
         </div>
     </div>
 </div>

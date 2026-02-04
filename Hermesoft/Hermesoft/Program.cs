@@ -1,5 +1,6 @@
 using HermeSoft_Fusion.Business;
 using HermeSoft_Fusion.Data;
+using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -26,6 +27,12 @@ builder.Services.AddScoped<TasaInteresRepository>();
 builder.Services.AddScoped<TasaInteresBusiness>();
 builder.Services.AddScoped<EndeudamientoMaximoRepository>();
 builder.Services.AddScoped<EndeudamientoMaximoBusiness>();
+builder.Services.AddScoped<EscenarioTasaInteresRepository>();
+builder.Services.AddScoped<EscenarioTasaInteresBusiness>();
+builder.Services.AddScoped<PlazosEscenariosRepository>();
+builder.Services.AddScoped<PlazosEscenariosBusiness>();
+builder.Services.AddScoped<SeguroBancoRepository>();
+builder.Services.AddScoped<SeguroBancoBusiness>();
 
 var app = builder.Build();
 

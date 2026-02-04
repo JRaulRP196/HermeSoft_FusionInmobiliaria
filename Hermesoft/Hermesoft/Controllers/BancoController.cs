@@ -14,22 +14,23 @@ namespace HermeSoft_Fusion.Controllers
 {
     public class BancoController : Controller
     {
-        private readonly AppDbContext _context;
         private BancoBusiness _bancoBusiness;
         private EndeudamientoMaximoBusiness _endeudamiento;
-        private readonly IWebHostEnvironment _environment;
         private TasaInteresBusiness _tasaInteresBusiness;
         private SeguroBancoBusiness _seguroBancoBusiness;
+        private EscenarioTasaInteresBusiness _escenarioBusiness;
+        private PlazosEscenariosBusiness _plazosBusiness;
 
-        public BancoController(AppDbContext context, BancoBusiness bancoBusiness, IWebHostEnvironment environment,
-            EndeudamientoMaximoBusiness endeudamiento, TasaInteresBusiness tasaInteresBusiness, SeguroBancoBusiness seguroBancoBusiness)
+        public BancoController(BancoBusiness bancoBusiness,EndeudamientoMaximoBusiness endeudamiento,
+            TasaInteresBusiness tasaInteresBusiness, SeguroBancoBusiness seguroBancoBusiness, EscenarioTasaInteresBusiness escenarioBusiness,
+            PlazosEscenariosBusiness plazosBusiness)
         {
-            _context = context;
             _bancoBusiness = bancoBusiness;
-            _environment = environment;
             _endeudamiento = endeudamiento;
             _tasaInteresBusiness = tasaInteresBusiness;
             _seguroBancoBusiness = seguroBancoBusiness;
+            _escenarioBusiness = escenarioBusiness;
+            _plazosBusiness = plazosBusiness;
         }
 
         public async Task<IActionResult> Index()
@@ -107,7 +108,31 @@ namespace HermeSoft_Fusion.Controllers
             await _seguroBancoBusiness.Agregar(seguroDesempleo, bank.IdBanco, 1);
             await _seguroBancoBusiness.Agregar(seguroVida, bank.IdBanco, 2);
 
-            return View();
+            foreach (EscenarioTasaInteresRequest escenarioRequest in banco.EscenariosTasaInteres)
+            {
+                EscenarioTasaInteres escenario = new EscenarioTasaInteres
+                {
+                    Nombre = escenarioRequest.Nombre,
+                    IdTasaInteres = escenarioRequest.IdTasaInteres,
+                    IdBanco = bank.IdBanco,
+                };
+                escenario = await _escenarioBusiness.Agregar(escenario);
+                
+                foreach(PlazosEscenarios plazoRequest in escenarioRequest.PlazosEscenarios)
+                {
+                    PlazosEscenarios plazo = new PlazosEscenarios
+                    {
+                        PorcAdicional = plazoRequest.PorcAdicional,
+                        Plazo = plazoRequest.Plazo,
+                        IdIndicador = plazoRequest.IdIndicador,
+                        IdEscenario = escenario.IdEscenario
+                    };
+                    await _plazosBusiness.Agregar(plazo);
+                }
+            }
+
+
+            return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Editar(int id)
