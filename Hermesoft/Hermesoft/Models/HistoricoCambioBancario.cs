@@ -15,7 +15,7 @@ namespace HermeSoft_Fusion.Models
         public int IdBanco { get; set; }
 
         [Column("fechaCambio")]
-        public DateTime FechaCambio { get; set; }
+        public DateTime FechaCambio { get; set; } = DateTime.Now;
 
         [Column("usuarioNombre")]
         public string UsuarioNombre { get; set; } = "";
