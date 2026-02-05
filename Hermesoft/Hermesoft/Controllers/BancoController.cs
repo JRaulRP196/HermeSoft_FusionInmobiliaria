@@ -102,6 +102,7 @@ namespace HermeSoft_Fusion.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
         public async Task<IActionResult> Editar(int id)
         {
             var banco = await _bancoBusiness.ObtenerPorId(id);
@@ -110,7 +111,16 @@ namespace HermeSoft_Fusion.Controllers
                 TempData["MensajeError"] = "El banco no existe o ha sido eliminado.";
                 return RedirectToAction("Index");
             }
+            ViewBag.TasaInteres = await _tasaInteresBusiness.Obtener();
             return View(banco);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Editar(Banco banco)
+        {
+
+            return RedirectToAction("Index");
+        }
+
     }
 }

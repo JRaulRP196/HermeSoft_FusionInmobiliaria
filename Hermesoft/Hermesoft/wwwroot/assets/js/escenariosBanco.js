@@ -1,4 +1,4 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿$(function () {
 
 
     var botonesEscalonada = "<button type = 'button' class='btn btn-primary addInputs'>+</button>"+
@@ -68,10 +68,9 @@
             $(this).find(".card-title").text("Escenario #" + contadorEscenarios);
         });
     }
-
-    $(document).on("change", ".tipoInteres", function () {
-        var valor = $(this).val();
-        var card = $(this).closest(".card-body");
+    function manejarTipoInteres(select) {
+        var valor = select.val();
+        var card = select.closest(".card-body");
         var contenedor = card.find(".botonesEscalonada");
 
         if (valor == 2) {
@@ -81,6 +80,14 @@
             let bloques = card.find(".inputsEscenario");
             bloques.not(":first").remove();
         }
+    }
+
+    $(document).on("change", ".tipoInteres", function () {
+        manejarTipoInteres($(this));
+    });
+
+    $(".tipoInteres").each(function () {
+        manejarTipoInteres($(this));
     });
 
     $(document).on("click", ".addInputs", function () {
@@ -109,5 +116,5 @@
         }
         reindexarTodo();
     });
-
+    reindexarEscenarios();
 });
