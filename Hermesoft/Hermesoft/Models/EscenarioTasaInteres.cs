@@ -17,18 +17,13 @@ namespace HermeSoft_Fusion.Models
         public int IdTasaInteres { get; set; }
         [ForeignKey("IdBanco")]
         public Banco Banco { get; set; }
+        public List<PlazosEscenarios> PlazosEscenarios {  get; set; }
 
     }
 
     public class EscenarioTasaInteresRequest : EscenarioTasaInteres
     {
         public List<PlazosEscenarios> PlazosEscenarios { get; set; } = new();
-    }
-
-    public class EscenarioTasaInteresResponse : EscenarioTasaInteres
-    {
-        public List<PlazosEscenarios> PlazosEscenarios { get; set; } = new();
-        public TasaInteres TasaInteres { get; set; }
     }
 
 }

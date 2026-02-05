@@ -34,9 +34,6 @@ namespace HermeSoft_Fusion.Controllers
         public async Task<IActionResult> Detalle(int id)
         {
             Banco banco = await _bancoBusiness.ObtenerPorId(id);
-            ViewBag.Endeudamientos = await _endeudamiento.ObtenerPorBanco(banco.IdBanco);
-            ViewBag.Seguros = await _seguroBancoBusiness.ObtenerPorBanco(banco.IdBanco);
-            ViewBag.Escenarios = await _escenarioBusiness.ObtenerPorBanco(banco.IdBanco);
             return View(banco);
         }
 

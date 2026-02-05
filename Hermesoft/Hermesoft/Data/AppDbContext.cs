@@ -46,14 +46,11 @@ namespace HermeSoft_Fusion.Data
             // Configuraciones de EndeudamientoMaximo
             modelBuilder.Entity<EndeudamientoMaximo>(entity =>
             {
-                entity.HasKey(e => e.IdEndeudamiento);
                 entity.HasOne(e => e.Banco)
-                      .WithMany()
+                      .WithMany(b => b.EndeudamientoMaximos)
                       .HasForeignKey(e => e.IdBanco)
                       .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.TipoAsalariado)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdTipoAsalariado);
+
             });
 
             // Configuraciones de Seguro
@@ -66,14 +63,10 @@ namespace HermeSoft_Fusion.Data
             // Configuraciones de SeguroBanco
             modelBuilder.Entity<SeguroBanco>(entity =>
             {
-                entity.HasKey(e => e.IdSeguroBanco);
                 entity.HasOne(e => e.Banco)
-                      .WithMany()
+                      .WithMany(b => b.SeguroBancos)
                       .HasForeignKey(e => e.IdBanco)
                       .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Seguro)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdSeguro);
             });
 
             // Configuraciones de IndicadoresBancarios

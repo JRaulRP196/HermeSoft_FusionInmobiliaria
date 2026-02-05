@@ -24,10 +24,5 @@ namespace HermeSoft_Fusion.Repository
             return null;
         }
 
-        public async Task<IEnumerable<EscenarioTasaInteres>> ObtenerPorBanco(int idBanco)
-        {
-            return await _context.ESCENARIOS_TASAS_INTERES.Where(e => e.IdBanco == idBanco).ToListAsync();
-        }
-
     }
 }

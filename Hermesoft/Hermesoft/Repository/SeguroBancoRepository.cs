@@ -26,16 +26,6 @@ namespace HermeSoft_Fusion.Repository
             return null;
         }
 
-        public async Task<IEnumerable<SeguroBanco>> ObtenerPorBanco(int idBanco)
-        {
-
-            return await _context.SEGUROS_BANCOS
-                .Include(s => s.Seguro)
-                .Where(s => s.IdBanco == idBanco)
-                .ToListAsync();
-
-        }
-
         #endregion
 
     }

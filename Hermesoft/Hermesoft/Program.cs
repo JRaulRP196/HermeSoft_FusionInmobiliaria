@@ -33,6 +33,10 @@ builder.Services.AddScoped<PlazosEscenariosRepository>();
 builder.Services.AddScoped<PlazosEscenariosBusiness>();
 builder.Services.AddScoped<SeguroBancoRepository>();
 builder.Services.AddScoped<SeguroBancoBusiness>();
+builder.Services.AddScoped<TipoAsalariadoRepository>();
+builder.Services.AddScoped<TipoAsalariadoBusiness>();
+builder.Services.AddScoped<SeguroRepository>();
+builder.Services.AddScoped<SeguroBusiness>();
 
 var app = builder.Build();
 

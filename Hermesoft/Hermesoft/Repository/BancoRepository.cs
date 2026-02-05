@@ -1,8 +1,6 @@
 using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace HermeSoft_Fusion.Repository
 {
@@ -32,7 +30,16 @@ namespace HermeSoft_Fusion.Repository
 
         public async Task<Banco?> ObtenerPorId(int id)
         {
-            return await _context.BANCOS.FindAsync(id);
+            var banco = await _context.BANCOS
+                .Include(b => b.EscenariosTasaInteres)
+                    .ThenInclude(pb => pb.PlazosEscenarios)
+                        .ThenInclude(ip => ip.Indicador)
+                .Include(e => e.EndeudamientoMaximos)
+                    .ThenInclude(t => t.TipoAsalariado)
+                .Include(s => s.SeguroBancos)
+                    .ThenInclude(s => s.Seguro)
+                .FirstOrDefaultAsync(b => b.IdBanco == id);
+            return banco;
         }
 
         public async Task<bool> Existe(int id)

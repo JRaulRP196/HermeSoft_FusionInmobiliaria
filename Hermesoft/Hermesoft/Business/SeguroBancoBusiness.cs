@@ -24,10 +24,5 @@ namespace HermeSoft_Fusion.Business
             return await _repository.Agregar(seguroBanco);
         }
 
-        public async Task<IEnumerable<SeguroBanco>> ObtenerPorBanco(int idBanco)
-        {
-            return await _repository.ObtenerPorBanco(idBanco);
-        }
-
     }
 }

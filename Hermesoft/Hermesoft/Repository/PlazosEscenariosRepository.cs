@@ -25,13 +25,5 @@ namespace HermeSoft_Fusion.Repository
             return null;
         }
 
-        public async Task<List<PlazosEscenarios>> ObtenerPorEscenario(int idEscenario)
-        {
-            return await _context.PLAZOS_ESCENARIOS
-                .Include(p => p.Indicador)
-                .Where(p => p.IdEscenario == idEscenario)
-                .ToListAsync();
-        }
-
     }
 }

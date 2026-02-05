@@ -24,13 +24,5 @@ namespace HermeSoft_Fusion.Repository
             return null;
         }
 
-        public async Task<IEnumerable<EndeudamientoMaximo>> ObtenerPorBanco(int idBanco)
-        {
-            return await _context.ENDEUDAMIENTOS_MAXIMOS
-                                    .Include(e => e.TipoAsalariado)
-                                    .Where(e => e.IdBanco == idBanco)
-                                    .ToListAsync();
-        }
-
     }
 }
