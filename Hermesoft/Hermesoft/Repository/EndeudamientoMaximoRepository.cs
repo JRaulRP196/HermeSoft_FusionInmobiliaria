@@ -1,5 +1,6 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Repository
 {
@@ -21,7 +22,15 @@ namespace HermeSoft_Fusion.Repository
                 return endeudamiento;
             }
             return null;
-        } 
+        }
+
+        public async Task<IEnumerable<EndeudamientoMaximo>> ObtenerPorBanco(int idBanco)
+        {
+            return await _context.ENDEUDAMIENTOS_MAXIMOS
+                                    .Include(e => e.TipoAsalariado)
+                                    .Where(e => e.IdBanco == idBanco)
+                                    .ToListAsync();
+        }
 
     }
 }

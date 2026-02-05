@@ -1,14 +1,6 @@
 ﻿using HermeSoft_Fusion.Business;
-using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
-using HermeSoft_Fusion.Models.ViewModels;
-using HermeSoft_Fusion.Repository;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace HermeSoft_Fusion.Controllers
 {
@@ -39,36 +31,14 @@ namespace HermeSoft_Fusion.Controllers
             return View(bancos);
         }
 
-        //public async Task<IActionResult> Detalle(int id)
-        //{
-        //    var banco = await _bancoRepository.ObtenerPorId(id);
-        //    if (banco == null)
-        //    {
-        //        TempData["MensajeError"] = "El banco no existe o ha sido eliminado.";
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    var endeudamientoBancos = await _context.ENDEUDAMIENTOS_MAXIMOS
-        //        .Include(e => e.TipoAsalariado)
-        //        .Where(e => e.IdBanco == id)
-        //        .ToListAsync();
-
-        //    var segurosBancos = await _context.SEGUROS_BANCOS
-        //        .Include(s => s.Seguro)
-        //        .Where(s => s.IdBanco == id)
-        //        .ToListAsync();
-
-        //    var escenarios = await _context.ESCENARIOS_TASAS_INTERES
-        //        .Include(e => e.TasaInteres)
-        //        .Where(e => e.IdBanco == id)
-        //        .ToListAsync();
-
-        //    ViewBag.Endeudamientos = endeudamientoBancos;
-        //    ViewBag.Seguros = segurosBancos;
-        //    ViewBag.Escenarios = escenarios;
-
-        //    return View(banco);
-        //}
+        public async Task<IActionResult> Detalle(int id)
+        {
+            Banco banco = await _bancoBusiness.ObtenerPorId(id);
+            ViewBag.Endeudamientos = await _endeudamiento.ObtenerPorBanco(banco.IdBanco);
+            ViewBag.Seguros = await _seguroBancoBusiness.ObtenerPorBanco(banco.IdBanco);
+            ViewBag.Escenarios = await _escenarioBusiness.ObtenerPorBanco(banco.IdBanco);
+            return View(banco);
+        }
 
         [HttpGet]
         public async  Task<IActionResult> Registro()

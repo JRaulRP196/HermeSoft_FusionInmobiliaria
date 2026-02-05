@@ -24,5 +24,10 @@ namespace HermeSoft_Fusion.Business
             return await _repository.Agregar(endeudamiento);
         }
 
+        public async Task<IEnumerable<EndeudamientoMaximo>> ObtenerPorBanco(int idBanco)
+        {
+            return await _repository.ObtenerPorBanco(idBanco);
+        }
+
     }
 }

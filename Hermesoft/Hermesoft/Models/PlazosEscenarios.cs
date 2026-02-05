@@ -17,6 +17,8 @@ namespace HermeSoft_Fusion.Models
         public int IdIndicador { get; set; }
         [Required]
         public int IdEscenario { get; set; }
+        [ForeignKey("IdIndicador")]
+        public IndicadoresBancarios Indicador { get; set; }
 
     }
 }

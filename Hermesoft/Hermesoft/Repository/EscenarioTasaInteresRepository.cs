@@ -1,5 +1,6 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Repository
 {
@@ -21,6 +22,11 @@ namespace HermeSoft_Fusion.Repository
                 return escenarioTasaInteres;
             }
             return null;
+        }
+
+        public async Task<IEnumerable<EscenarioTasaInteres>> ObtenerPorBanco(int idBanco)
+        {
+            return await _context.ESCENARIOS_TASAS_INTERES.Where(e => e.IdBanco == idBanco).ToListAsync();
         }
 
     }

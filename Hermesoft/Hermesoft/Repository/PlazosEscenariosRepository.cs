@@ -1,5 +1,6 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Repository
 {
@@ -22,6 +23,14 @@ namespace HermeSoft_Fusion.Repository
                 return plazo;
             }
             return null;
+        }
+
+        public async Task<List<PlazosEscenarios>> ObtenerPorEscenario(int idEscenario)
+        {
+            return await _context.PLAZOS_ESCENARIOS
+                .Include(p => p.Indicador)
+                .Where(p => p.IdEscenario == idEscenario)
+                .ToListAsync();
         }
 
     }

@@ -13,7 +13,7 @@ namespace HermeSoft_Fusion.Models
         public string Nombre { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal PorcIndicador { get; set; }
+        public decimal PorcSeguro { get; set; }
 
         public DateTime? FechaVigente { get; set; }
     }

@@ -1,6 +1,6 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
-using ZstdSharp.Unsafe;
+using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Repository
 {
@@ -24,6 +24,16 @@ namespace HermeSoft_Fusion.Repository
                 return seguro;
             }
             return null;
+        }
+
+        public async Task<IEnumerable<SeguroBanco>> ObtenerPorBanco(int idBanco)
+        {
+
+            return await _context.SEGUROS_BANCOS
+                .Include(s => s.Seguro)
+                .Where(s => s.IdBanco == idBanco)
+                .ToListAsync();
+
         }
 
         #endregion

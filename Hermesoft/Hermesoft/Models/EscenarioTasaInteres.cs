@@ -25,4 +25,10 @@ namespace HermeSoft_Fusion.Models
         public List<PlazosEscenarios> PlazosEscenarios { get; set; } = new();
     }
 
+    public class EscenarioTasaInteresResponse : EscenarioTasaInteres
+    {
+        public List<PlazosEscenarios> PlazosEscenarios { get; set; } = new();
+        public TasaInteres TasaInteres { get; set; }
+    }
+
 }

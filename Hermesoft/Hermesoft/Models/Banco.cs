@@ -41,4 +41,5 @@ namespace HermeSoft_Fusion.Models
     { 
         public List<EscenarioTasaInteresRequest> EscenariosTasaInteres { get; set; } = new();
     }
+
 }
