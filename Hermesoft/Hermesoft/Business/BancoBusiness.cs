@@ -1,6 +1,6 @@
-﻿using HermeSoft_Fusion.Models;
+﻿using HermeSoft_Fusion.Data;
+using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Repository;
-using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Business
 {
@@ -8,13 +8,77 @@ namespace HermeSoft_Fusion.Business
     {
 
         private BancoRepository _bancoRepository;
+        private EndeudamientoMaximoRepository _endeudamientoMaximoRepository;
+        private SeguroBancoRepository _seguroBancoRepository;
+        private EscenarioTasaInteresRepository _escenarioTasaInteresRepository;
+        private PlazosEscenariosRepository _plazosEscenariosRepository;
+        private AppDbContext _context;
 
-        public BancoBusiness(BancoRepository bancoRepository)
+        public BancoBusiness(BancoRepository bancoRepository, EndeudamientoMaximoRepository endeudamientoMaximoRepository, 
+            SeguroBancoRepository seguroBancoRepository, EscenarioTasaInteresRepository escenarioTasaInteresRepository, 
+            PlazosEscenariosRepository plazosEscenariosRepository, AppDbContext context)
         {
             _bancoRepository = bancoRepository;
+            _endeudamientoMaximoRepository = endeudamientoMaximoRepository;
+            _seguroBancoRepository = seguroBancoRepository;
+            _escenarioTasaInteresRepository = escenarioTasaInteresRepository;
+            _plazosEscenariosRepository = plazosEscenariosRepository;
+            _context = context;
         }
 
         public async Task<Banco> Agregar(Banco banco, IFormFile LogoFile)
+        {
+            banco.Logo = await GuardarLogo(LogoFile);
+            return await _bancoRepository.Agregar(banco);
+        }
+
+        public async Task<Banco> Editar(Banco banco, IFormFile LogoFile)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                Banco bancoRespuesta = await _bancoRepository.ObtenerPorId(banco.IdBanco);
+                if (LogoFile != null)
+                {
+                    bancoRespuesta.Logo = await GuardarLogo(LogoFile);
+                }
+
+                bancoRespuesta.Comision = banco.Comision;
+                bancoRespuesta.Enlace = banco.Enlace;
+                bancoRespuesta.HonorarioAbogado = banco.HonorarioAbogado;
+                bancoRespuesta.MaxCredito = banco.MaxCredito;
+                bancoRespuesta.Nombre = banco.Nombre;
+                bancoRespuesta.TipoCambio = banco.TipoCambio;
+                
+                await ActualizarEscenarios(banco, bancoRespuesta);
+                ActualizarSeguros(banco, bancoRespuesta);
+                ActualizarEndeudamientos(banco, bancoRespuesta);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return banco;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+
+        }
+
+        public async Task<IEnumerable<Banco>> ObtenerTodos()
+        {
+            return await _bancoRepository.ObtenerTodos();
+        }
+
+        public async Task<Banco?> ObtenerPorId(int id)
+        {
+            return await _bancoRepository.ObtenerPorId(id);
+        }
+
+        #region Helpers
+
+        private async Task<string> GuardarLogo(IFormFile LogoFile)
         {
             string carpetaLogos = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/logos");
             if (!Directory.Exists(carpetaLogos))
@@ -30,19 +94,93 @@ namespace HermeSoft_Fusion.Business
             }
 
             string rutaBD = $"/uploads/logos/{nombreArchivo}";
-            banco.Logo = rutaBD;
-            return await _bancoRepository.Agregar(banco);
+            return rutaBD;
         }
 
-        public async Task<IEnumerable<Banco>> ObtenerTodos()
+        private async Task ActualizarEscenarios(Banco banco, Banco bancoRespuesta)
         {
-            return await _bancoRepository.ObtenerTodos();
+
+            List<EscenarioTasaInteres> nuevos = banco.EscenariosTasaInteres;
+            var viejos = bancoRespuesta?.EscenariosTasaInteres ?? new List<EscenarioTasaInteres>();
+
+            foreach(EscenarioTasaInteres escenario in nuevos)
+            {
+                if(escenario.IdEscenario == 0)
+                {
+                    await _escenarioTasaInteresRepository.Agregar(escenario);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    var escenarioBD = viejos.Find(x => x.IdEscenario == escenario.IdEscenario);
+                    escenarioBD.Nombre = escenario.Nombre;
+                    escenarioBD.IdTasaInteres = escenario.IdTasaInteres;
+                    await ActualizarPlazos(escenario, escenarioBD);
+                }
+            }
+
+            var escenariosBorrar = viejos
+                .Where(v => !nuevos.Any(n => n.IdEscenario == v.IdEscenario))
+                .ToList();
+
+            foreach (EscenarioTasaInteres escenario in escenariosBorrar)
+            {
+                _escenarioTasaInteresRepository.Eliminar(escenario);
+            }
+
         }
 
-        public async Task<Banco?> ObtenerPorId(int id)
+        private async Task ActualizarPlazos(EscenarioTasaInteres escenario, EscenarioTasaInteres escenarioBD)
         {
-            return await _bancoRepository.ObtenerPorId(id);
+            List<PlazosEscenarios> nuevos = escenario.PlazosEscenarios;
+            var viejos = escenarioBD?.PlazosEscenarios ?? new List<PlazosEscenarios>();
+
+            foreach (PlazosEscenarios plazo in nuevos)
+            {
+                if (plazo.IdPlazoEscenario == 0)
+                {
+                    plazo.IdEscenario = escenario.IdEscenario;
+                    await _plazosEscenariosRepository.Agregar(plazo);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    var plazoBD = viejos.Find(x => x.IdPlazoEscenario == plazo.IdPlazoEscenario);
+                    plazoBD.Plazo = plazo.Plazo;
+                    plazoBD.PorcAdicional = plazo.PorcAdicional;
+                    plazoBD.IdIndicador = plazo.IdIndicador;
+                }
+            }
+
+            var plazosBorrar = viejos
+                .Where(v => !nuevos.Any(n => n.IdPlazoEscenario == v.IdPlazoEscenario))
+                .ToList();
+
+            foreach(PlazosEscenarios plazo in plazosBorrar)
+            {
+                _plazosEscenariosRepository.Eliminar(plazo);
+            }
         }
+
+        private void ActualizarSeguros(Banco banco, Banco bancoBD)
+        {
+            foreach (SeguroBanco seguroBanco in banco.SeguroBancos)
+            {
+                var seguroBD = bancoBD.SeguroBancos.Find(x => x.IdSeguroBanco == seguroBanco.IdSeguroBanco);
+                seguroBD.PorcSeguro = seguroBanco.PorcSeguro;
+            }
+        }
+
+        private void ActualizarEndeudamientos(Banco banco, Banco bancoBD)
+        {
+            foreach (EndeudamientoMaximo endeudamiento in banco.EndeudamientoMaximos)
+            {
+                var endeudamientoBD = bancoBD.EndeudamientoMaximos.Find(x => x.IdEndeudamiento == endeudamiento.IdEndeudamiento);
+                endeudamientoBD.PorcEndeudamiento = endeudamiento.PorcEndeudamiento;
+            }
+        }
+
+        #endregion
 
     }
 }

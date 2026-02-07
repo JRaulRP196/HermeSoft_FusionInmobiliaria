@@ -116,9 +116,9 @@ namespace HermeSoft_Fusion.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Editar(Banco banco)
+        public async Task<IActionResult> Editar(Banco banco, IFormFile LogoFile)
         {
-
+            await _bancoBusiness.Editar(banco, LogoFile);
             return RedirectToAction("Index");
         }
 

@@ -18,11 +18,17 @@ namespace HermeSoft_Fusion.Repository
         public async Task<PlazosEscenarios> Agregar(PlazosEscenarios plazo)
         {
             await _context.PLAZOS_ESCENARIOS.AddAsync(plazo);
-            if(await _context.SaveChangesAsync() > 0)
-            {
-                return plazo;
-            }
-            return null;
+            return plazo;
+        }
+
+        public void Editar(PlazosEscenarios plazo)
+        {
+            _context.PLAZOS_ESCENARIOS.Update(plazo);
+        }
+
+        public void Eliminar(PlazosEscenarios plazo)
+        {
+            _context.PLAZOS_ESCENARIOS.Remove(plazo);
         }
 
     }

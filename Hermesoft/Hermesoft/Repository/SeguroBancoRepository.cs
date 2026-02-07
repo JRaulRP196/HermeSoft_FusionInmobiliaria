@@ -18,12 +18,17 @@ namespace HermeSoft_Fusion.Repository
 
         public async Task<SeguroBanco> Agregar(SeguroBanco seguro)
         {
-            _context.SEGUROS_BANCOS.Add(seguro);
+            await _context.SEGUROS_BANCOS.AddAsync(seguro);
             if(await _context.SaveChangesAsync() > 0)
             {
                 return seguro;
             }
             return null;
+        }
+
+        public void Editar(SeguroBanco seguro)
+        {
+            _context.SEGUROS_BANCOS.Update(seguro);
         }
 
         #endregion

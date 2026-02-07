@@ -82,6 +82,16 @@ namespace HermeSoft_Fusion.Data
                 entity.HasKey(e => e.IdTasaInteres);
                 entity.Property(e => e.Nombre).IsRequired().HasMaxLength(50);
             });
+
+            modelBuilder.Entity<EscenarioTasaInteres>(entity =>
+            {
+                entity.HasKey(e => e.IdEscenario);
+
+                entity.HasMany(e => e.PlazosEscenarios)
+                      .WithOne(p => p.EscenarioTasaInteres)
+                      .HasForeignKey(p => p.IdEscenario)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 }

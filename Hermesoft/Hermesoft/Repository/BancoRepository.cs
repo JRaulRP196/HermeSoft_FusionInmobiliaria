@@ -23,6 +23,11 @@ namespace HermeSoft_Fusion.Repository
             return null;
         }
 
+        public void Editar(Banco banco)
+        {
+            _context.BANCOS.Update(banco);
+        }
+
         public async Task<IEnumerable<Banco>> ObtenerTodos()
         {
             return await _context.BANCOS.ToListAsync();

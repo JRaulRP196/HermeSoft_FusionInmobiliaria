@@ -29,6 +29,7 @@
                                 <label for="validationCustom02" class="form-label">Enlace Web del Banco</label>
                                 <input type="text" class="form-control" id="validationCustom02"
                                        placeholder="Enlace Web del Banco" asp-for="Enlace" required>
+                                <input type="hidden" asp-for="TipoCambio">
                                 <div class="valid-feedback">
                                     Excelente!
                                 </div>
@@ -300,6 +301,7 @@
                         <label class="form-label">Plazo de Duración</label>
                         <input type="number" class="form-control"
                                name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
+
                     </div>
                 </div>
 

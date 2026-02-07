@@ -1,6 +1,5 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Repository
 {
@@ -22,6 +21,11 @@ namespace HermeSoft_Fusion.Repository
                 return endeudamiento;
             }
             return null;
+        }
+
+        public void Editar(EndeudamientoMaximo endeudamiento)
+        {
+            _context.ENDEUDAMIENTOS_MAXIMOS.Update(endeudamiento);
         }
 
     }

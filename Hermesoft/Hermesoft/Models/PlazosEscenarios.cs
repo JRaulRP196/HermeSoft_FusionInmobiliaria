@@ -7,7 +7,7 @@ namespace HermeSoft_Fusion.Models
     {
 
         [Key]
-        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdPlazoEscenario { get; set; }
         [Required]
         public double PorcAdicional { get; set; }
