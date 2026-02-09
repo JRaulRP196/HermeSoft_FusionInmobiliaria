@@ -1,8 +1,6 @@
 using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace HermeSoft_Fusion.Repository
 {
@@ -15,6 +13,16 @@ namespace HermeSoft_Fusion.Repository
             _context = context;
         }
 
+        public async Task Agregar(Banco banco)
+        {
+            await _context.BANCOS.AddAsync(banco);
+        }
+
+        public void Editar(Banco banco)
+        {
+            _context.BANCOS.Update(banco);
+        }
+
         public async Task<IEnumerable<Banco>> ObtenerTodos()
         {
             return await _context.BANCOS.ToListAsync();
@@ -22,7 +30,30 @@ namespace HermeSoft_Fusion.Repository
 
         public async Task<Banco?> ObtenerPorId(int id)
         {
-            return await _context.BANCOS.FindAsync(id);
+            var banco = await _context.BANCOS
+                .Include(b => b.EscenariosTasaInteres)
+                    .ThenInclude(pb => pb.PlazosEscenarios)
+                        .ThenInclude(ip => ip.Indicador)
+                .Include(e => e.EndeudamientoMaximos)
+                    .ThenInclude(t => t.TipoAsalariado)
+                .Include(s => s.SeguroBancos)
+                    .ThenInclude(s => s.Seguro)
+                .FirstOrDefaultAsync(b => b.IdBanco == id);
+            return banco;
+        }
+
+        public async Task<Banco> ObtenerPorEnlace(string enlace)
+        {
+            return await _context.BANCOS
+                .Where(b => b.Enlace == enlace)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Banco> ObtenerPorNombre(string nombre)
+        {
+            return await _context.BANCOS
+                .Where(b => b.Nombre == nombre)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<bool> Existe(int id)

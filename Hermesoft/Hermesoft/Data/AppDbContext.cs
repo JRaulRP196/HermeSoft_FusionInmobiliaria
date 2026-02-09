@@ -20,12 +20,10 @@ namespace HermeSoft_Fusion.Data
         public DbSet<Seguro> SEGUROS { get; set; }
         public DbSet<SeguroBanco> SEGUROS_BANCOS { get; set; }
         public DbSet<IndicadoresBancarios> INDICADORES_BANCARIOS { get; set; }
-        public DbSet<IndicadoresBancos> INDICADORES_BANCOS { get; set; }
         public DbSet<TasaInteres> TASAS_INTERES { get; set; }
-        public DbSet<EscenarioTasaInteres> ESCENARIOS_TASAS_INTERES { get; set; }              
-        public DbSet<HistoricoCambioBancario> HISTORICO_CAMBIOS_BANCARIOS { get; set; }
-
-
+        public DbSet<EscenarioTasaInteres> ESCENARIOS_TASAS_INTERES { get; set; }
+        public DbSet<PlazosEscenarios> PLAZOS_ESCENARIOS { get; set; }
+        public DbSet<HistoricoCambiosBancarios> HISTORICO_CAMBIOS_BANCARIOS { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,14 +47,11 @@ namespace HermeSoft_Fusion.Data
             // Configuraciones de EndeudamientoMaximo
             modelBuilder.Entity<EndeudamientoMaximo>(entity =>
             {
-                entity.HasKey(e => e.IdEndeudamiento);
                 entity.HasOne(e => e.Banco)
-                      .WithMany()
+                      .WithMany(b => b.EndeudamientoMaximos)
                       .HasForeignKey(e => e.IdBanco)
                       .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.TipoAsalariado)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdTipoAsalariado);
+
             });
 
             // Configuraciones de Seguro
@@ -69,14 +64,10 @@ namespace HermeSoft_Fusion.Data
             // Configuraciones de SeguroBanco
             modelBuilder.Entity<SeguroBanco>(entity =>
             {
-                entity.HasKey(e => e.IdSeguroBanco);
                 entity.HasOne(e => e.Banco)
-                      .WithMany()
+                      .WithMany(b => b.SeguroBancos)
                       .HasForeignKey(e => e.IdBanco)
                       .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Seguro)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdSeguro);
             });
 
             // Configuraciones de IndicadoresBancarios
@@ -86,19 +77,6 @@ namespace HermeSoft_Fusion.Data
                 entity.Property(e => e.Nombre).IsRequired().HasMaxLength(50);
             });
 
-            // Configuraciones de IndicadoresBancos
-            modelBuilder.Entity<IndicadoresBancos>(entity =>
-            {
-                entity.HasKey(e => e.IdIndicadorBanco);
-                entity.HasOne(e => e.Banco)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdBanco)
-                      .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Indicador)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdIndicador);
-            });
-
             // Configuraciones de TasaInteres
             modelBuilder.Entity<TasaInteres>(entity =>
             {
@@ -106,24 +84,15 @@ namespace HermeSoft_Fusion.Data
                 entity.Property(e => e.Nombre).IsRequired().HasMaxLength(50);
             });
 
-            // Configuraciones de EscenarioTasaInteres
             modelBuilder.Entity<EscenarioTasaInteres>(entity =>
             {
                 entity.HasKey(e => e.IdEscenario);
-                entity.HasOne(e => e.Banco)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdBanco)
+
+                entity.HasMany(e => e.PlazosEscenarios)
+                      .WithOne(p => p.EscenarioTasaInteres)
+                      .HasForeignKey(p => p.IdEscenario)
                       .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.TasaInteres)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdTasaInteres);
             });
-
-            modelBuilder.Entity<HistoricoCambioBancario>(entity =>
-            {
-                entity.HasKey(e => e.IdHistorico);
-            });
-
         }
     }
 }

@@ -28,14 +28,14 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="Nombre" class="form-label">Nombre del Banco</label>
-                                <input type="text" class="form-control" id="Nombre" name="Nombre" placeholder="Nombre del Banco" required>
+                                <input type="text" class="form-control" id="Nombre" name="Nombre" asp-for="Nombre" placeholder="Nombre del Banco" required>
                                 <div class="valid-feedback">Excelente!</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="Enlace" class="form-label">Enlace Web del Banco</label>
-                                <input type="text" class="form-control" id="Enlace" name="Enlace" placeholder="Enlace Web del Banco" required>
+                                <input type="text" class="form-control" id="Enlace" name="Enlace" asp-for="Enlace" placeholder="Enlace Web del Banco" required>
                                 <div class="valid-feedback">Excelente!</div>
                             </div>
                         </div>
@@ -45,7 +45,7 @@
                             <div class="mb-3">
                                 <label for="LogoFile" class="form-label">Logo del Banco</label>
                                 <div class="input-group">
-                                    <input type="file" class="form-control" id="LogoFile" name="LogoFile" accept="image/*">
+                                    <input type="file" class="form-control" id="LogoFile" name="LogoFile" accept="image/*" required>
                                 </div>
                                 <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
                             </div>
@@ -53,14 +53,14 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="MaxCredito" class="form-label">Plazo M&aacute;ximo de Cr&eacute;dito</label>
-                                <input type="number" class="form-control" id="MaxCredito" name="MaxCredito" placeholder="Plazo M&aacute;ximo de Cr&eacute;dito en A&ntilde;os" required>
+                                <input type="number" class="form-control" id="MaxCredito" name="MaxCredito" asp-for="MaxCredito" placeholder="Plazo M&aacute;ximo de Cr&eacute;dito en A&ntilde;os" required>
                                 <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="Comision" class="form-label">Comisi&oacute;n Bancaria</label>
-                                <input type="number" class="form-control" id="Comision" name="Comision" placeholder="%" required>
+                                <input type="number" class="form-control" id="Comision" name="Comision" asp-for="Comision" placeholder="%" required>
                                 <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
                             </div>
                         </div>
@@ -68,59 +68,37 @@
 
                     <label class="form-label">Porcentaje de Endeudamiento M&aacute;ximo</label>
                     <div class="row">
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">P&uacute;blico</div>
-                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoPublico">
+                        @for(int i = 0; i < Model.EndeudamientoMaximos.Count(); i++)
+                        {
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-text">@Model.EndeudamientoMaximos[i].TipoAsalariado.Nombre</div>
+                                        <input type="number" class="form-control" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].PorcEndeudamiento" required>
+                                        <input type="hidden" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].IdTipoAsalariado" required>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Privado</div>
-                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoPrivado">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Profesional Independiente</div>
-                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoProfesional">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Trabajador Independiente</div>
-                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoIndependiente">
-                                </div>
-                            </div>
-                        </div>
+                        }
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Seguro de Protecci&oacute;n al Desempleado</label>
-                                <input type="number" class="form-control" placeholder="%" name="seguroDesempleo">
+                        @for(int i = 0; i < Model.SeguroBancos.Count(); i++)
+                        {
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Seguro de @Model.SeguroBancos[i].Seguro.Nombre</label>
+                                    <input type="number" class="form-control" placeholder="%" asp-for="@Model.SeguroBancos[i].PorcSeguro" required>
+                                    <input type="hidden" placeholder="%" asp-for="@Model.SeguroBancos[i].IdSeguro" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Seguro de Vida</label>
-                                <input type="number" class="form-control" placeholder="%" name="seguroVida">
-                            </div>
-                        </div>
+                        }
                     </div>
 
                     <div class="col">
                         <div class="mb-3">
                             <label class="form-label">Gastos de Honorarios de Abogados</label>
-                            <input type="number" class="form-control" placeholder="%" name="HonorarioAbogado" required>
+                            <input type="number" class="form-control" placeholder="%" name="HonorarioAbogado" asp-for="HonorarioAbogado" required>
                             <div class="valid-feedback">Excelente!</div>
                         </div>
                     </div>
@@ -128,104 +106,70 @@
                     <label class="form-label">Tasas de Inter&eacute;s</label>
                     <label class="form-label">Escenarios: </label>
                     <button type="button" class="btn btn-primary" id="addEscenario">+</button>
-
                     <div id="listaEscenarios">
                         <div class="row escenarios">
                             <div class="col">
                                 <div class="card card-body">
                                     <h3 class="card-title">Escenario #1</h3>
+
                                     <div class="row">
                                         <div class="col-md-9">
-                                            <label class="form-label">Tipo de Tasa de Inter&eacute;s</label>
-                                            <select class="form-select tipoInteres" name="tipoTasa1" required>
-                                                <option value="Tasa_Variable">Tasa Variable</option>
-                                                <option value="Tasa_Escalonada">Tasa Escalonada</option>
+                                            <label class="form-label">Tipo de Tasa de Interés</label>
+                                            <select class="form-select tipoInteres"
+                                                    name="EscenariosTasaInteres[0].IdTasaInteres" required>
+
+                                                @foreach (TasaInteres tasa in ViewBag.TasaInteres)
+                                                {
+                                                    <option value="@tasa.IdTasaInteres">@tasa.Nombre</option>
+                                                }
                                             </select>
                                         </div>
+
                                         <div class="col-md-3">
                                             <label class="form-label">Nombre del Escenario</label>
-                                            <input type="text" class="form-control nombreEscenario" placeholder="Nombre" name="nombreEscenario1">
+                                            <input type="text" class="form-control"
+                                                   placeholder="Nombre"
+                                                   name="EscenariosTasaInteres[0].Nombre" required>
                                         </div>
                                     </div>
+
                                     <br />
+
                                     <div class="row inputsEscenario">
                                         <div class="col-md-3">
                                             <div class="mb-3">
-                                                <label class="form-label">Plazo de Duraci&oacute;n</label>
-                                                <input type="number" class="form-control tramoPlazo" placeholder="Meses" name="plazo1">
+                                                <label class="form-label">Plazo de Duración</label>
+                                                <input type="number" class="form-control"
+                                                       placeholder="Meses"
+                                                       name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
                                             </div>
                                         </div>
+
                                         <div class="col-md-3">
                                             <div class="mb-3">
                                                 <label class="form-label">Porcentaje Adicional del Banco</label>
-                                                <input type="number" class="form-control tramoAdicional" placeholder="%" name="porcentajeAdicional1">
+                                                <input type="number" class="form-control"
+                                                       placeholder="%"
+                                                       name="EscenariosTasaInteres[0].PlazosEscenarios[0].PorcAdicional" required>
                                             </div>
                                         </div>
+
                                         <div class="col-md-3">
                                             <div class="mb-3">
                                                 <label class="form-label">Indicador Bancario</label>
-                                                <select class="form-select tramoIndicador" name="indicador1">
-                                                    <option value="TBP">TBP</option>
-                                                    <option value="SOFT">SOFT</option>
-                                                    <option value="TPR">TPR</option>
-                                                    <option value="N/A">N/A</option>
+                                                <select class="form-select"
+                                                        name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
+                                                    <option value="1">TBP</option>
+                                                    <option value="2">SOFT</option>
+                                                    <option value="3">TPR</option>
+                                                    <option value="4">N/A</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="button-items botonesEscalonada"></div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row escenarios" id="escenario-template" style="display:none;">
-                        <div class="col">
-                            <div class="card card-body">
-                                <h3 class="card-title">Escenario #x</h3>
-                                <button type="button" class="btn btn-danger waves-effect waves-light deleteEscenario">
-                                    <i class="ri-close-line align-middle me-2"></i> Eliminar Escenario
-                                </button>
-                                <div class="row">
-                                    <div class="col-md-9">
-                                        <label class="form-label">Tipo de Tasa de Inter&eacute;s</label>
-                                        <select class="form-select tipoInteres" name="tipoTasa">
-                                            <option value="Tasa_Variable">Tasa Variable</option>
-                                            <option value="Tasa_Escalonada">Tasa Escalonada</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Nombre del Escenario</label>
-                                        <input type="text" class="form-control nombreEscenario" placeholder="Nombre" name="nombreEscenario">
-                                    </div>
-                                </div>
-                                <br />
-                                <div class="row inputsEscenario">
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Plazo de Duraci&oacute;n</label>
-                                            <input type="number" class="form-control tramoPlazo" placeholder="Meses" name="plazo">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Porcentaje Adicional del Banco</label>
-                                            <input type="number" class="form-control tramoAdicional" placeholder="%" name="porcentajeAdicional">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Indicador Bancario</label>
-                                            <select class="form-select tramoIndicador" name="indicador">
-                                                <option value="TBP">TBP</option>
-                                                <option value="SOFT">SOFT</option>
-                                                <option value="TPR">TPR</option>
-                                                <option value="N/A">N/A</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="button-items botonesEscalonada"></div>
                             </div>
                         </div>
                     </div>
@@ -235,12 +179,11 @@
                         <input type="text" class="form-control" id="TipoCambio" name="TipoCambio" placeholder="Tipo de Cambio" required>
                     </div>
 
-                    <!-- IMPORTANTÍSIMO: dentro del form -->
-                    <input type="hidden" id="escenariosJson" name="escenariosJson" />
-
-                    <div class="button-items">
-                        <button class="btn btn-primary" type="submit">Guardar</button>
-                        <a class="btn btn-danger" asp-action="Index">Cancelar</a>
+                    <div>
+                        <div class="button-items">
+                            <button class="btn btn-primary" type="submit">Guardar</button>
+                            <a class="btn btn-danger" asp-action="Index">Cancelar</a>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -248,8 +191,75 @@
     </div>
 </div>
 
-@section scripts {
+<div class="row escenarios" id="escenario-template" style="display:none;">
+    <div class="col">
+        <div class="card card-body">
+            <h3 class="card-title">Escenario #x</h3>
+
+            <button type="button"
+                    class="btn btn-danger deleteEscenario">
+                Eliminar Escenario
+            </button>
+
+            <div class="row">
+                <div class="col-md-9">
+                    <label class="form-label">Tipo de Tasa de Interés</label>
+                    <select class="form-select tipoInteres"
+                            name="EscenariosTasaInteres[0].IdTasaInteres" required>
+                        @foreach (TasaInteres tasa in ViewBag.TasaInteres)
+                        {
+                            <option value="@tasa.IdTasaInteres">@tasa.Nombre</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Nombre del Escenario</label>
+                    <input type="text" class="form-control"
+                           name="EscenariosTasaInteres[0].Nombre" required>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="row inputsEscenario">
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Plazo de Duración</label>
+                        <input type="number" class="form-control"
+                               name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Porcentaje Adicional del Banco</label>
+                        <input type="number" class="form-control"
+                               name="EscenariosTasaInteres[0].PlazosEscenarios[0].PorcAdicional" required>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Indicador Bancario</label>
+                        <select class="form-select"
+                                name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
+                            <option value="1">TBP</option>
+                            <option value="2">SOFT</option>
+                            <option value="3">TPR</option>
+                            <option value="4">N/A</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-items botonesEscalonada"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
     <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
     <script src="~/assets/js/pages/form-validation.init.js"></script>
-    <script src="~/assets/js/escenariosBanco.js"></script>
+    <script src="~/assets/js/escenariosbanco.js"></script>
 }

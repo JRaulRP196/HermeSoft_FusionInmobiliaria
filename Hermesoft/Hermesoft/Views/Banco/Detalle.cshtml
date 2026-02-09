@@ -4,12 +4,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@{
-    var endeudamientoBancos = ViewBag.Endeudamientos as List<EndeudamientoMaximo>;
-    var segurosBancos = ViewBag.Seguros as List<SeguroBanco>;
-    var escenariosBancos = ViewBag.Escenarios as List<EscenarioTasaInteres>;
-}
-
 <div class="container-fluid p-4">
 
     @if (TempData["MensajeError"] != null)
@@ -100,10 +94,10 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4 p-4">
                 <h3 class="fw-bold mb-3">Porcentaje de Endeudamiento M&aacute;ximo por Tipo de Asalariado</h3>
-                @if (endeudamientoBancos != null && endeudamientoBancos.Any())
+                @if (Model.EndeudamientoMaximos != null)
                 {
                     <div class="row">
-                        @foreach (var endeu in endeudamientoBancos)
+                        @foreach (var endeu in Model.EndeudamientoMaximos)
                         {
                             <div class="col-md-3 mb-3">
                                 <div class="card bg-light border-0">
@@ -129,10 +123,10 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4 p-4">
                 <h3 class="fw-bold mb-3">Seguros</h3>
-                @if (segurosBancos != null && segurosBancos.Any())
+                @if (Model.SeguroBancos != null)
                 {
                     <div class="row">
-                        @foreach (var seguro in segurosBancos)
+                        @foreach (var seguro in Model.SeguroBancos)
                         {
                             <div class="col-md-6 mb-3">
                                 <div class="card bg-light border-0">
@@ -154,54 +148,41 @@
     </div>
 
     <!-- ESCENARIOS DE TASAS DE INTERES -->
-    <div class="row g-4 mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4">
-                <h3 class="fw-bold mb-3">Tasas de Inter&eacute;s</h3>
-                @if (escenariosBancos != null && escenariosBancos.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Nombre Escenario</th>
-                                    <th>Tipo de Tasa</th>
-                                    <th>Plazo (Meses)</th>
-                                    <th>Porcentaje Adicional</th>
-                                    <th>Indicador</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var escenario in escenariosBancos)
-                                {
-                                    <tr>
-                                        <td>@escenario.Nombre</td>
-                                        <td>@escenario.TasaInteres?.Nombre</td>
-                                        <td>@escenario.Plazo</td>
-                                        <td>@(escenario.PorcAdicional == Math.Floor(escenario.PorcAdicional) ? escenario.PorcAdicional.ToString("0") : escenario.PorcAdicional.ToString("0.##"))%</td>
-                                        <td>
-                                            @{ var porcFormat = escenario.PorcDatoBancario == Math.Floor(escenario.PorcDatoBancario) ? escenario.PorcDatoBancario.ToString("0") : escenario.PorcDatoBancario.ToString("0.##"); }
-                                            @if (escenario.PorcDatoBancario > 0)
+@if (Model.EscenariosTasaInteres != null)
+    {
+    @foreach (var escenario in Model.EscenariosTasaInteres)
+        {
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h3 class="fw-bold mb-3">Tasas de Inter&eacute;s | Escenario : @escenario.Nombre</h3>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>Plazo (Meses)</th>
+                                                <th>Porcentaje Adicional</th>
+                                                <th>Indicador</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (PlazosEscenarios plazo in escenario.PlazosEscenarios)
                                             {
-                                                @:TBP (@porcFormat%)
+                                                <tr>
+                                                    <td>@plazo.Plazo</td>
+                                                    <td>@plazo.PorcAdicional</td>
+                                                    <td>@plazo.Indicador.Nombre</td>
+                                                </tr>
                                             }
-                                            else
-                                            {
-                                                @:N/A
-                                            }
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                        </tbody>
+                                    </table>
+                                </div>
                     </div>
-                }
-                else
-                {
-                    <div class="alert alert-info">No hay escenarios de tasas de inter&eacute;s registrados.</div>
-                }
+                </div>
             </div>
-        </div>
-    </div>
-
-</div>
+        }
+}
+else
+{
+        <div class="alert alert-info">No hay escenarios de tasas de inter&eacute;s registrados.</div>
+}

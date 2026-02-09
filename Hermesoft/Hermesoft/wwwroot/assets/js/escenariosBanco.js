@@ -1,155 +1,120 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿$(function () {
 
-    const botonesEscalonada = `
-        <button type="button" class="btn btn-primary addInputs">+</button>
-        <button type="button" class="btn btn-danger deleteInputs">-</button>
-    `;
 
-    // Agregar escenario (usa tu template, no cambia UI)
-    $("#addEscenario").on("click", function () {
-        const nuevo = $("#escenario-template").clone();
-        nuevo.removeAttr("id").show();
+    var botonesEscalonada = "<button type = 'button' class='btn btn-primary addInputs'>+</button>"+
+        "<button type='button' class='btn btn-danger deleteInputs'>-</button> ";
+    var contadorEscenarios = 1;
 
-        // título (#)
-        const total = $("#listaEscenarios .escenarios").length + 1;
-        nuevo.find(".card-title").text("Escenario #" + total);
+    function reindexarTodo() {
+        $("#listaEscenarios .escenarios").each(function (i) {
 
-        // limpiar
-        nuevo.find("input").val("");
-        nuevo.find("select").each(function () {
-            const first = $(this).find("option:first").val();
-            $(this).val(first);
-        });
+            // Reindexa escenario
+            $(this).find("input[name], select[name]").each(function () {
+                let name = $(this).attr("name");
 
-        // dejar solo 1 tramo inicial
-        const bloques = nuevo.find(".inputsEscenario");
-        bloques.not(":first").remove();
+                name = name.replace(
+                    /EscenariosTasaInteres\[\d+\]/,
+                    `EscenariosTasaInteres[${i}]`
+                );
 
-        // botones escalonada inicialmente vacíos
-        nuevo.find(".botonesEscalonada").html("");
+                $(this).attr("name", name);
+            });
 
-        $("#listaEscenarios").append(nuevo);
-    });
+            // Reindexa plazos dentro del escenario
+            $(this).find(".inputsEscenario").each(function (j) {
+                $(this).find("input, select").each(function () {
+                    let name = $(this).attr("name");
 
-    // Eliminar escenario
-    $(document).on("click", ".deleteEscenario", function () {
-        $(this).closest(".escenarios").remove();
-        reindexarEscenarios();
-    });
+                    name = name.replace(
+                        /PlazosEscenarios\[\d+\]/,
+                        `PlazosEscenarios[${j}]`
+                    );
 
-    function reindexarEscenarios() {
-        let i = 0;
-        $("#listaEscenarios .escenarios .card-title").each(function () {
-            i++;
-            $(this).text("Escenario #" + i);
+                    $(this).attr("name", name);
+                });
+            });
         });
     }
 
-    // Cambio tipo tasa: si escalonada -> mostrar botones +/-
-    $(document).on("change", ".tipoInteres", function () {
-        const tipo = $(this).val();
-        const card = $(this).closest(".card-body");
-        const contenedor = card.find(".botonesEscalonada");
 
-        if (tipo === "Tasa_Escalonada") {
+    $("#addEscenario").on("click", function () {
+        contadorEscenarios++;
+        let nuevo = $("#escenario-template").clone();
+        nuevo.removeAttr("id");
+        nuevo.show();
+        nuevo.find(".card-title").text("Escenario #" + contadorEscenarios);
+        nuevo.css({ opacity: 0, display: "none" });
+        $("#listaEscenarios").append(nuevo);
+        nuevo.slideDown(200).animate({ opacity: 1 }, { queue: false, duration: 300 });
+        reindexarTodo();
+    });
+
+    $(document).on("click", ".deleteEscenario", function () {
+        let card = $(this).closest(".escenarios");
+
+        card.animate({ opacity: 0 }, 200)
+            .slideUp(250, function () {
+                card.remove();
+                reindexarEscenarios();
+            });
+        reindexarTodo();
+    });
+
+    function reindexarEscenarios() {
+        contadorEscenarios = 0;
+
+        $("#listaEscenarios .escenarios").each(function () {
+            contadorEscenarios++;
+            $(this).find(".card-title").text("Escenario #" + contadorEscenarios);
+        });
+    }
+    function manejarTipoInteres(select) {
+        var valor = select.val();
+        var card = select.closest(".card-body");
+        var contenedor = card.find(".botonesEscalonada");
+
+        if (valor == 2) {
             contenedor.html(botonesEscalonada);
         } else {
-            // Tasa Variable: solo 1 tramo
             contenedor.html("");
-            const bloques = card.find(".inputsEscenario");
+            let bloques = card.find(".inputsEscenario");
             bloques.not(":first").remove();
         }
+    }
+
+    $(document).on("change", ".tipoInteres", function () {
+        manejarTipoInteres($(this));
     });
 
-    // Agregar tramo (solo escalonada)
+    $(".tipoInteres").each(function () {
+        manejarTipoInteres($(this));
+    });
+
     $(document).on("click", ".addInputs", function () {
-        const card = $(this).closest(".card-body");
-        const original = card.find(".inputsEscenario").first();
-        const clon = original.clone();
-
+        let card = $(this).closest(".card-body");
+        let original = card.find(".inputsEscenario").first();
+        let clon = original.clone();
         clon.find("input").val("");
-        clon.find("select").each(function () {
-            const first = $(this).find("option:first").val();
-            $(this).val(first);
-        });
-
+        clon.find("select").val("1");
+        clon.css({ opacity: 0, display: "none" });
         card.find(".inputsEscenario").last().after(clon);
+        clon.slideDown(200).animate({ opacity: 1 }, { queue: false, duration: 300 });
+        reindexarTodo();
     });
 
-    // Quitar tramo (si hay > 1)
     $(document).on("click", ".deleteInputs", function () {
-        const card = $(this).closest(".card-body");
-        const bloques = card.find(".inputsEscenario");
+
+        let card = $(this).closest(".card-body");
+        let bloques = card.find(".inputsEscenario");
         if (bloques.length > 1) {
-            bloques.last().remove();
-        }
-    });
+            let ultimo = bloques.last();
 
-    // Armar JSON + Validar antes de enviar
-    $("form").on("submit", function (e) {
-        const escenarios = [];
-        const errores = [];
-
-        $("#listaEscenarios .escenarios .card-body").each(function (idx) {
-            const card = $(this);
-
-            const tipoTasa = card.find(".tipoInteres").val();
-            const nombre = (card.find(".nombreEscenario").val() || "").trim();
-
-            if (!nombre) {
-                errores.push(`Escenario #${idx + 1}: Falta el nombre del escenario.`);
-            }
-
-            const tramos = [];
-            card.find(".inputsEscenario").each(function (t) {
-                const bloque = $(this);
-
-                const plazo = parseInt(bloque.find(".tramoPlazo").val(), 10);
-                const adicional = parseFloat(bloque.find(".tramoAdicional").val());
-                const indicador = bloque.find(".tramoIndicador").val();
-
-                if (!plazo || plazo <= 0) {
-                    errores.push(`Escenario #${idx + 1}, tramo #${t + 1}: Plazo inválido.`);
-                }
-                if (isNaN(adicional)) {
-                    errores.push(`Escenario #${idx + 1}, tramo #${t + 1}: % adicional requerido.`);
-                }
-                if (!indicador) {
-                    errores.push(`Escenario #${idx + 1}, tramo #${t + 1}: Indicador requerido.`);
-                }
-
-                tramos.push({
-                    plazo: plazo,
-                    porcentajeAdicional: adicional,
-                    indicador: indicador
+            ultimo.animate({ opacity: 0 }, 200)
+                .slideUp(250, function () {
+                    ultimo.remove();
                 });
-            });
-
-            // Reglas principales
-            if (tipoTasa === "Tasa_Variable" && tramos.length !== 1) {
-                errores.push(`Escenario #${idx + 1}: Tasa Variable SOLO permite 1 tramo.`);
-            }
-            if (tipoTasa === "Tasa_Escalonada" && tramos.length < 1) {
-                errores.push(`Escenario #${idx + 1}: Tasa Escalonada requiere al menos 1 tramo.`);
-            }
-
-            escenarios.push({
-                tipoTasa: tipoTasa,
-                nombre: nombre,
-                tramos: tramos
-            });
-        });
-
-        if (escenarios.length === 0) {
-            errores.push("Debe existir al menos 1 escenario.");
         }
-
-        if (errores.length > 0) {
-            e.preventDefault();
-            alert("Corrige estos errores:\n\n" + errores.join("\n"));
-            return;
-        }
-
-        $("#escenariosJson").val(JSON.stringify(escenarios));
+        reindexarTodo();
     });
+    reindexarEscenarios();
 });

@@ -35,5 +35,9 @@ namespace HermeSoft_Fusion.Models
         public string TipoCambio { get; set; }
 
         public string? Logo { get; set; }
+        public List<EscenarioTasaInteres> EscenariosTasaInteres { get; set; } = new();
+        public List<EndeudamientoMaximo> EndeudamientoMaximos { get; set; } = new();
+        public List<SeguroBanco> SeguroBancos { get; set; } = new();
     }
+
 }

@@ -22,4 +22,5 @@ namespace HermeSoft_Fusion.Models
         [ForeignKey("IdTipoAsalariado")]
         public TipoAsalariado TipoAsalariado { get; set; }
     }
+
 }
