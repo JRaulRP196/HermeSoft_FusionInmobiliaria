@@ -40,9 +40,4 @@ namespace HermeSoft_Fusion.Models
         public List<SeguroBanco> SeguroBancos { get; set; } = new();
     }
 
-    public class BancoRequest : Banco 
-    { 
-        public List<EscenarioTasaInteresRequest> EscenariosTasaInteres { get; set; } = new();
-    }
-
 }

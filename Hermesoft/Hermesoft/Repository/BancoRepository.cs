@@ -13,14 +13,9 @@ namespace HermeSoft_Fusion.Repository
             _context = context;
         }
 
-        public async Task<Banco> Agregar(Banco banco)
+        public async Task Agregar(Banco banco)
         {
             await _context.BANCOS.AddAsync(banco);
-            if(await _context.SaveChangesAsync() > 0)
-            {
-                return banco;
-            }
-            return null;
         }
 
         public void Editar(Banco banco)

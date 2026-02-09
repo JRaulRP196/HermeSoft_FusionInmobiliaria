@@ -1,4 +1,4 @@
-﻿@model BancoRequest
+﻿@model Banco
 @{
     ViewBag.Title = "Bancos";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -68,53 +68,31 @@
 
                     <label class="form-label">Porcentaje de Endeudamiento M&aacute;ximo</label>
                     <div class="row">
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">P&uacute;blico</div>
-                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoPublico" required>
+                        @for(int i = 0; i < Model.EndeudamientoMaximos.Count(); i++)
+                        {
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-text">@Model.EndeudamientoMaximos[i].TipoAsalariado.Nombre</div>
+                                        <input type="number" class="form-control" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].PorcEndeudamiento" required>
+                                        <input type="hidden" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].IdTipoAsalariado" required>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Privado</div>
-                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoPrivado" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Profesional Independiente</div>
-                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoProfesional" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <div class="input-group-text">Trabajador Independiente</div>
-                                    <input type="number" class="form-control" placeholder="%" name="endeudamientoIndependiente" required>
-                                </div>
-                            </div>
-                        </div>
+                        }
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Seguro de Protecci&oacute;n al Desempleado</label>
-                                <input type="number" class="form-control" placeholder="%" name="seguroDesempleo" required>
+                        @for(int i = 0; i < Model.SeguroBancos.Count(); i++)
+                        {
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Seguro de @Model.SeguroBancos[i].Seguro.Nombre</label>
+                                    <input type="number" class="form-control" placeholder="%" asp-for="@Model.SeguroBancos[i].PorcSeguro" required>
+                                    <input type="hidden" placeholder="%" asp-for="@Model.SeguroBancos[i].IdSeguro" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Seguro de Vida</label>
-                                <input type="number" class="form-control" placeholder="%" name="seguroVida"  required>
-                            </div>
-                        </div>
+                        }
                     </div>
 
                     <div class="col">

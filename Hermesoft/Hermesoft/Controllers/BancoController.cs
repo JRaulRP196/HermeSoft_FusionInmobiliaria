@@ -7,22 +7,12 @@ namespace HermeSoft_Fusion.Controllers
     public class BancoController : Controller
     {
         private BancoBusiness _bancoBusiness;
-        private EndeudamientoMaximoBusiness _endeudamiento;
         private TasaInteresBusiness _tasaInteresBusiness;
-        private SeguroBancoBusiness _seguroBancoBusiness;
-        private EscenarioTasaInteresBusiness _escenarioBusiness;
-        private PlazosEscenariosBusiness _plazosBusiness;
 
-        public BancoController(BancoBusiness bancoBusiness,EndeudamientoMaximoBusiness endeudamiento,
-            TasaInteresBusiness tasaInteresBusiness, SeguroBancoBusiness seguroBancoBusiness, EscenarioTasaInteresBusiness escenarioBusiness,
-            PlazosEscenariosBusiness plazosBusiness)
+        public BancoController(BancoBusiness bancoBusiness, TasaInteresBusiness tasaInteresBusiness)
         {
             _bancoBusiness = bancoBusiness;
-            _endeudamiento = endeudamiento;
             _tasaInteresBusiness = tasaInteresBusiness;
-            _seguroBancoBusiness = seguroBancoBusiness;
-            _escenarioBusiness = escenarioBusiness;
-            _plazosBusiness = plazosBusiness;
         }
 
         public async Task<IActionResult> Index()
@@ -44,60 +34,18 @@ namespace HermeSoft_Fusion.Controllers
             TempData.Remove("MensajeError");
 
             ViewBag.TasaInteres = await _tasaInteresBusiness.Obtener();
-            return View();
+            return View(await _bancoBusiness.IniciarBanco());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Registro(BancoRequest banco, IFormFile LogoFile, decimal endeudamientoPublico, decimal endeudamientoPrivado,
-            decimal endeudamientoProfesional, decimal endeudamientoIndependiente, decimal seguroDesempleo, decimal seguroVida)
+        public async Task<IActionResult> Registro(Banco banco, IFormFile LogoFile)
         {
             if (LogoFile == null || LogoFile.Length == 0)
             {
                 TempData["MensajeError"] = "Debe seleccionar un logo válido.";
                 return View(banco);
             }
-            Banco bank = new Banco
-            {
-                Nombre = banco.Nombre,
-                Enlace = banco.Enlace,
-                MaxCredito = banco.MaxCredito,
-                HonorarioAbogado = banco.HonorarioAbogado,
-                Comision = banco.Comision,
-                TipoCambio = banco.TipoCambio,
-            };
-            bank = await _bancoBusiness.Agregar(banco, LogoFile);
-
-            await _endeudamiento.Agregar(endeudamientoPublico, bank.IdBanco, 1);
-            await _endeudamiento.Agregar(endeudamientoPrivado, bank.IdBanco, 2);
-            await _endeudamiento.Agregar(endeudamientoProfesional, bank.IdBanco, 3);
-            await _endeudamiento.Agregar(endeudamientoIndependiente, bank.IdBanco, 4);
-
-            await _seguroBancoBusiness.Agregar(seguroDesempleo, bank.IdBanco, 1);
-            await _seguroBancoBusiness.Agregar(seguroVida, bank.IdBanco, 2);
-
-            foreach (EscenarioTasaInteresRequest escenarioRequest in banco.EscenariosTasaInteres)
-            {
-                EscenarioTasaInteres escenario = new EscenarioTasaInteres
-                {
-                    Nombre = escenarioRequest.Nombre,
-                    IdTasaInteres = escenarioRequest.IdTasaInteres,
-                    IdBanco = bank.IdBanco,
-                };
-                escenario = await _escenarioBusiness.Agregar(escenario);
-                
-                foreach(PlazosEscenarios plazoRequest in escenarioRequest.PlazosEscenarios)
-                {
-                    PlazosEscenarios plazo = new PlazosEscenarios
-                    {
-                        PorcAdicional = plazoRequest.PorcAdicional,
-                        Plazo = plazoRequest.Plazo,
-                        IdIndicador = plazoRequest.IdIndicador,
-                        IdEscenario = escenario.IdEscenario
-                    };
-                    await _plazosBusiness.Agregar(plazo);
-                }
-            }
-
+            await _bancoBusiness.Agregar(banco, LogoFile);
 
             return RedirectToAction("Index");
         }

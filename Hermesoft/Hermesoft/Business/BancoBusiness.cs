@@ -8,28 +8,40 @@ namespace HermeSoft_Fusion.Business
     {
 
         private BancoRepository _bancoRepository;
-        private EndeudamientoMaximoRepository _endeudamientoMaximoRepository;
-        private SeguroBancoRepository _seguroBancoRepository;
         private EscenarioTasaInteresRepository _escenarioTasaInteresRepository;
         private PlazosEscenariosRepository _plazosEscenariosRepository;
+        private SeguroRepository _seguroRepository;
+        private TipoAsalariadoRepository _tipoAsalariadoRepository;
         private AppDbContext _context;
 
-        public BancoBusiness(BancoRepository bancoRepository, EndeudamientoMaximoRepository endeudamientoMaximoRepository, 
-            SeguroBancoRepository seguroBancoRepository, EscenarioTasaInteresRepository escenarioTasaInteresRepository, 
-            PlazosEscenariosRepository plazosEscenariosRepository, AppDbContext context)
+        public BancoBusiness(BancoRepository bancoRepository, EscenarioTasaInteresRepository escenarioTasaInteresRepository, 
+            PlazosEscenariosRepository plazosEscenariosRepository, SeguroRepository seguroRepository, 
+            TipoAsalariadoRepository tipoAsalariadoRepository, AppDbContext context)
         {
             _bancoRepository = bancoRepository;
-            _endeudamientoMaximoRepository = endeudamientoMaximoRepository;
-            _seguroBancoRepository = seguroBancoRepository;
             _escenarioTasaInteresRepository = escenarioTasaInteresRepository;
             _plazosEscenariosRepository = plazosEscenariosRepository;
+            _seguroRepository = seguroRepository;
+            _tipoAsalariadoRepository = tipoAsalariadoRepository;
             _context = context;
         }
 
         public async Task<Banco> Agregar(Banco banco, IFormFile LogoFile)
         {
-            banco.Logo = await GuardarLogo(LogoFile);
-            return await _bancoRepository.Agregar(banco);
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                banco.Logo = await GuardarLogo(LogoFile);
+                await _bancoRepository.Agregar(banco);
+                await _context.SaveChangesAsync();
+                transaction.Commit();
+                return banco;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<Banco> Editar(Banco banco, IFormFile LogoFile)
@@ -50,7 +62,7 @@ namespace HermeSoft_Fusion.Business
                 bancoRespuesta.MaxCredito = banco.MaxCredito;
                 bancoRespuesta.Nombre = banco.Nombre;
                 bancoRespuesta.TipoCambio = banco.TipoCambio;
-                
+
                 await ActualizarEscenarios(banco, bancoRespuesta);
                 ActualizarSeguros(banco, bancoRespuesta);
                 ActualizarEndeudamientos(banco, bancoRespuesta);
@@ -76,6 +88,14 @@ namespace HermeSoft_Fusion.Business
             return await _bancoRepository.ObtenerPorId(id);
         }
 
+        public async Task<Banco> IniciarBanco()
+        {
+            Banco banco = new Banco();
+            await IniciarSeguros(banco);
+            await IniciarEndeudamientos(banco);
+            return banco;
+        }
+
         #region Helpers
 
         private async Task<string> GuardarLogo(IFormFile LogoFile)
@@ -95,6 +115,30 @@ namespace HermeSoft_Fusion.Business
 
             string rutaBD = $"/uploads/logos/{nombreArchivo}";
             return rutaBD;
+        }
+
+        private async Task IniciarEndeudamientos(Banco banco)
+        {
+            var tiposAsalariados = await _tipoAsalariadoRepository.Obtener();
+            foreach (TipoAsalariado tipoAsalariado in tiposAsalariados)
+            {
+                var endeudamientoMaximo = new EndeudamientoMaximo();
+                endeudamientoMaximo.IdTipoAsalariado = tipoAsalariado.IdTipoAsalariado;
+                endeudamientoMaximo.TipoAsalariado = tipoAsalariado;
+                banco.EndeudamientoMaximos.Add(endeudamientoMaximo);
+            }
+        }
+
+        private async Task IniciarSeguros(Banco banco)
+        {
+            var seguros = await _seguroRepository.Obtener();
+            foreach (Seguro seguro in seguros)
+            {
+                var seguroBanco = new SeguroBanco();
+                seguroBanco.IdSeguro = seguro.IdSeguro;
+                seguroBanco.Seguro = seguro;
+                banco.SeguroBancos.Add(seguroBanco);
+            }
         }
 
         private async Task ActualizarEscenarios(Banco banco, Banco bancoRespuesta)
