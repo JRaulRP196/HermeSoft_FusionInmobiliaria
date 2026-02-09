@@ -23,6 +23,7 @@ namespace HermeSoft_Fusion.Data
         public DbSet<TasaInteres> TASAS_INTERES { get; set; }
         public DbSet<EscenarioTasaInteres> ESCENARIOS_TASAS_INTERES { get; set; }
         public DbSet<PlazosEscenarios> PLAZOS_ESCENARIOS { get; set; }
+        public DbSet<HistoricoCambiosBancarios> HISTORICO_CAMBIOS_BANCARIOS { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

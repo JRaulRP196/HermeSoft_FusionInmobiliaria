@@ -26,17 +26,12 @@ builder.Services.AddScoped<CalculosBusiness>();
 builder.Services.AddScoped<TasaInteresRepository>();
 builder.Services.AddScoped<TasaInteresBusiness>();
 builder.Services.AddScoped<EndeudamientoMaximoRepository>();
-builder.Services.AddScoped<EndeudamientoMaximoBusiness>();
 builder.Services.AddScoped<EscenarioTasaInteresRepository>();
-builder.Services.AddScoped<EscenarioTasaInteresBusiness>();
 builder.Services.AddScoped<PlazosEscenariosRepository>();
-builder.Services.AddScoped<PlazosEscenariosBusiness>();
 builder.Services.AddScoped<SeguroBancoRepository>();
-builder.Services.AddScoped<SeguroBancoBusiness>();
 builder.Services.AddScoped<TipoAsalariadoRepository>();
-builder.Services.AddScoped<TipoAsalariadoBusiness>();
 builder.Services.AddScoped<SeguroRepository>();
-builder.Services.AddScoped<SeguroBusiness>();
+builder.Services.AddScoped<HistoricoCambiosBancariosRepository>();
 
 var app = builder.Build();
 

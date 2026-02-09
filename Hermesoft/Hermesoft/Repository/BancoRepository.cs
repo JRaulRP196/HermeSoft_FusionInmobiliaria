@@ -42,6 +42,20 @@ namespace HermeSoft_Fusion.Repository
             return banco;
         }
 
+        public async Task<Banco> ObtenerPorEnlace(string enlace)
+        {
+            return await _context.BANCOS
+                .Where(b => b.Enlace == enlace)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Banco> ObtenerPorNombre(string nombre)
+        {
+            return await _context.BANCOS
+                .Where(b => b.Nombre == nombre)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<bool> Existe(int id)
         {
             return await _context.BANCOS.AnyAsync(b => b.IdBanco == id);

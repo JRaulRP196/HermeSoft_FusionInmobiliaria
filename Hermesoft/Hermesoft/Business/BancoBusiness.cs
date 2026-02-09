@@ -1,6 +1,8 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Repository;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HermeSoft_Fusion.Business
 {
@@ -12,22 +14,29 @@ namespace HermeSoft_Fusion.Business
         private PlazosEscenariosRepository _plazosEscenariosRepository;
         private SeguroRepository _seguroRepository;
         private TipoAsalariadoRepository _tipoAsalariadoRepository;
+        private HistoricoCambiosBancariosRepository _historicoCambiosBancariosRepository;
         private AppDbContext _context;
 
         public BancoBusiness(BancoRepository bancoRepository, EscenarioTasaInteresRepository escenarioTasaInteresRepository, 
             PlazosEscenariosRepository plazosEscenariosRepository, SeguroRepository seguroRepository, 
-            TipoAsalariadoRepository tipoAsalariadoRepository, AppDbContext context)
+            TipoAsalariadoRepository tipoAsalariadoRepository, HistoricoCambiosBancariosRepository historicoCambiosBancariosRepository,AppDbContext context)
         {
             _bancoRepository = bancoRepository;
             _escenarioTasaInteresRepository = escenarioTasaInteresRepository;
             _plazosEscenariosRepository = plazosEscenariosRepository;
             _seguroRepository = seguroRepository;
             _tipoAsalariadoRepository = tipoAsalariadoRepository;
+            _historicoCambiosBancariosRepository = historicoCambiosBancariosRepository;
             _context = context;
         }
 
         public async Task<Banco> Agregar(Banco banco, IFormFile LogoFile)
         {
+            if (await VerificarExisteBanco(banco.Enlace, banco.Nombre))
+            {
+                banco.IdBanco = -1;
+                return banco;
+            }
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -51,6 +60,17 @@ namespace HermeSoft_Fusion.Business
             try
             {
                 Banco bancoRespuesta = await _bancoRepository.ObtenerPorId(banco.IdBanco);
+                var options = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve
+                };
+                HistoricoCambiosBancarios historico = new HistoricoCambiosBancarios();
+                historico.TablaAfectada = "BANCOS";
+                historico.FechaCambio = DateTime.Now;
+                historico.UsuarioCorreo = "Admin@Admin.com";
+                historico.UsuarioNombre = "ADMIN";
+                historico.InformacionAnterior = JsonSerializer.Serialize(bancoRespuesta, options);
+
                 if (LogoFile != null)
                 {
                     bancoRespuesta.Logo = await GuardarLogo(LogoFile);
@@ -66,6 +86,9 @@ namespace HermeSoft_Fusion.Business
                 await ActualizarEscenarios(banco, bancoRespuesta);
                 ActualizarSeguros(banco, bancoRespuesta);
                 ActualizarEndeudamientos(banco, bancoRespuesta);
+                historico.InformacionNueva = JsonSerializer.Serialize(bancoRespuesta, options);
+
+                await _historicoCambiosBancariosRepository.Agregar(historico);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return banco;
@@ -97,6 +120,13 @@ namespace HermeSoft_Fusion.Business
         }
 
         #region Helpers
+
+        private async Task<bool> VerificarExisteBanco(string enlace, string nombre)
+        {
+            nombre = nombre.Trim();
+            enlace = enlace.Trim();
+            return (await _bancoRepository.ObtenerPorEnlace(enlace) != null || await _bancoRepository.ObtenerPorNombre(nombre) != null);
+        }
 
         private async Task<string> GuardarLogo(IFormFile LogoFile)
         {

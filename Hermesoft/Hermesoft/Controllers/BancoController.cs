@@ -30,9 +30,6 @@ namespace HermeSoft_Fusion.Controllers
         [HttpGet]
         public async  Task<IActionResult> Registro()
         {
-            TempData.Remove("MensajeExito");
-            TempData.Remove("MensajeError");
-
             ViewBag.TasaInteres = await _tasaInteresBusiness.Obtener();
             return View(await _bancoBusiness.IniciarBanco());
         }
@@ -40,14 +37,27 @@ namespace HermeSoft_Fusion.Controllers
         [HttpPost]
         public async Task<IActionResult> Registro(Banco banco, IFormFile LogoFile)
         {
-            if (LogoFile == null || LogoFile.Length == 0)
+            try
             {
-                TempData["MensajeError"] = "Debe seleccionar un logo válido.";
-                return View(banco);
+                if (LogoFile == null || LogoFile.Length == 0)
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un logo válido.";
+                    return View(banco);
+                }
+                Banco bancoRespuesta = await _bancoBusiness.Agregar(banco, LogoFile);
+                if (bancoRespuesta.IdBanco == -1)
+                {
+                    TempData["MensajeError"] = "Ya este banco existe";
+                    return RedirectToAction("Registro");
+                }
+                TempData["MensajeExito"] = "Banco registrado correctamente";
+                return RedirectToAction("Index");
             }
-            await _bancoBusiness.Agregar(banco, LogoFile);
-
-            return RedirectToAction("Index");
+            catch
+            {
+                TempData["MensajeError"] = "Ocurrio un error interno a la hora de registrar un banco";
+                return RedirectToAction("Registro");
+            }
         }
 
         [HttpGet]
@@ -66,8 +76,22 @@ namespace HermeSoft_Fusion.Controllers
         [HttpPost]
         public async Task<IActionResult> Editar(Banco banco, IFormFile LogoFile)
         {
-            await _bancoBusiness.Editar(banco, LogoFile);
-            return RedirectToAction("Index");
+            try
+            {
+                var bancoRespuesta = await _bancoBusiness.Editar(banco, LogoFile);
+                if (bancoRespuesta != null)
+                {
+                    TempData["MensajeExito"] = "Banco editado correctamente";
+                    return RedirectToAction("Index");
+                }
+                TempData["MensajeError"] = "Ocurrio un error a la hora de editar el banco";
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                TempData["MensajeError"] = "Ocurrio un error interno a la hora de editar el banco";
+                return RedirectToAction("Index");
+            }
         }
 
     }
