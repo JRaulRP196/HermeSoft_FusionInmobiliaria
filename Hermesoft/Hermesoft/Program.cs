@@ -42,8 +42,12 @@ builder.Services.AddScoped<TipoAsalariadoRepository>();
 builder.Services.AddScoped<SeguroRepository>();
 builder.Services.AddScoped<HistoricoCambiosBancariosRepository>();
 builder.Services.AddScoped<Configuracion>();
-builder.Services.AddScoped<TipoCambioRepository>();
+builder.Services.AddScoped<TipoCambioAPIRepository>();
 builder.Services.AddScoped<IndicadorEconomicoRepository>();
+builder.Services.AddScoped<IndicadoresBancariosRepository>();
+builder.Services.AddScoped<IndicadoresBancariosBusiness>();
+builder.Services.AddScoped<TipoCambioRepository>();
+builder.Services.AddScoped<TipoCambioBusiness>();
 
 var app = builder.Build();
 

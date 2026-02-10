@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HermeSoft_Fusion.Models
+namespace HermeSoft_Fusion.Models.Banco
 {
     [Table("HISTORICO_CAMBIOS_BANCARIOS")]
     public class HistoricoCambiosBancarios

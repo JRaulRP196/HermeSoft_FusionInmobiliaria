@@ -1,6 +1,11 @@
 CREATE DATABASE FUSION;
 USE FUSION;
 
+CREATE TABLE TIPO_CAMBIO(
+idTipoCambio int not null primary key auto_increment,
+tipoCambio double not null
+);
+
 CREATE TABLE BANCOS(
 idBanco int not null primary key auto_increment,
 nombre varchar(50) not null,
@@ -8,8 +13,9 @@ enlace varchar(250) not null,
 maxCredito decimal not null,
 honorarioAbogado decimal not null,
 comision decimal not null,
-tipoCambio varchar(30) not null,
-logo VARCHAR(500) not null
+logo VARCHAR(500) not null,
+idTipoCambio int not null,
+constraint FK_idTipoCambio_Banco foreign key (idTipoCambio) references TIPO_CAMBIO(idTipoCambio) 
 );
 
 CREATE TABLE USUARIOS(
@@ -88,7 +94,7 @@ constraint FK_idSeguro_Seguro foreign key (idSeguro) references SEGUROS(idSeguro
 CREATE TABLE INDICADORES_BANCARIOS(
 idIndicador int not null primary key auto_increment,
 nombre varchar(50) not null,
-porcSeguro decimal not null,
+porcSeguro double not null,
 fechaVigente date not null
 );
 
@@ -154,11 +160,5 @@ INSERT IGNORE INTO TASAS_INTERES (idTasaInteres, nombre) VALUES
 INSERT IGNORE INTO SEGUROS (idSeguro, nombre) VALUES
 (1, 'Desempleo'),
 (2, 'Vida');
-
-INSERT INTO INDICADORES_BANCARIOS (nombre, porcSeguro, fechaVigente) VALUES
-('TBP', 4, '2026/02/04'),
-('SOFT', 3, '2026/02/04'),
-('TPR', 5, '2026/02/04'),
-('N/A', 0, '2026/02/04');
 
 select * from fusion.historico_cambios_bancarios;

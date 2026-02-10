@@ -1,6 +1,6 @@
 ﻿namespace HermeSoft_Fusion.Models.Servicios
 {
-    public class TipoCambio
+    public class TipoCambioAPI
     {
         public bool Estado { get; set; }
         public string Mensaje { get; set; }

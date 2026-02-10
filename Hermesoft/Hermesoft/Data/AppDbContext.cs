@@ -1,4 +1,5 @@
 ﻿using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Banco;
 using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Data
@@ -24,6 +25,7 @@ namespace HermeSoft_Fusion.Data
         public DbSet<EscenarioTasaInteres> ESCENARIOS_TASAS_INTERES { get; set; }
         public DbSet<PlazosEscenarios> PLAZOS_ESCENARIOS { get; set; }
         public DbSet<HistoricoCambiosBancarios> HISTORICO_CAMBIOS_BANCARIOS { get; set; }
+        public DbSet<TipoCambio> TIPO_CAMBIO {  get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +95,18 @@ namespace HermeSoft_Fusion.Data
                       .HasForeignKey(p => p.IdEscenario)
                       .OnDelete(DeleteBehavior.Cascade);
             });
+
+            modelBuilder.Entity<TipoCambio>(entity =>
+            {
+                entity.HasKey(e=>e.IdTipoCambio);
+
+                entity.HasMany(e => e.Bancos)
+                .WithOne(b => b.TipoCambio)
+                .HasForeignKey(b => b.IdTipoCambio)
+                .OnDelete(DeleteBehavior.Restrict);
+  
+            });
+
         }
     }
 }

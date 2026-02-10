@@ -1,4 +1,5 @@
-﻿@{
+﻿@using HermeSoft_Fusion.Models.Banco
+@{
     ViewBag.Title = "Bancos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -12,6 +13,8 @@
                     En este apartado se podra editar el banco seleccionado.
                 </p>
                 <form class="needs-validation" asp-action="Editar" method="post" enctype="multipart/form-data" novalidate>
+                    <input type="hidden" asp-for="IdTipoCambio" value="@ViewBag.TipoCambio.IdTipoCambio" />
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -29,7 +32,6 @@
                                 <label for="validationCustom02" class="form-label">Enlace Web del Banco</label>
                                 <input type="text" class="form-control" id="validationCustom02"
                                        placeholder="Enlace Web del Banco" asp-for="Enlace" required>
-                                <input type="hidden" asp-for="TipoCambio">
                                 <div class="valid-feedback">
                                     Excelente!
                                 </div>
@@ -167,10 +169,10 @@
                                                     <div class="mb-3">
                                                         <label class="form-label">Indicador Bancario</label>
                                                     <select class="form-select" asp-for="@Model.EscenariosTasaInteres[0].PlazosEscenarios[i].IdIndicador" required>
-                                                            <option value="1">TBP</option>
-                                                            <option value="2">SOFT</option>
-                                                            <option value="3">TPR</option>
-                                                            <option value="4">N/A</option>
+                                                        @foreach (IndicadoresBancarios indicador in ViewBag.IndicadoresBancarios)
+                                                        {
+                                                            <option value="@indicador.IdIndicador">@indicador.Nombre</option>
+                                                        }
                                                         </select>
                                                     </div>
                                                 </div>
@@ -234,10 +236,10 @@
                                                         <div class="mb-3">
                                                             <label class="form-label">Indicador Bancario</label>
                                                             <select class="form-select" asp-for="@Model.EscenariosTasaInteres[i].PlazosEscenarios[j].IdIndicador" required>
-                                                                <option value="1">TBP</option>
-                                                                <option value="2">SOFT</option>
-                                                                <option value="3">TPR</option>
-                                                                <option value="4">N/A</option>
+                                                                @foreach (IndicadoresBancarios indicador in ViewBag.IndicadoresBancarios)
+                                                                {
+                                                                    <option value="@indicador.IdIndicador">@indicador.Nombre</option>
+                                                                }
                                                             </select>
                                                         </div>
                                                     </div>
@@ -318,10 +320,10 @@
                         <label class="form-label">Indicador Bancario</label>
                         <select class="form-select"
                                 name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
-                            <option value="1">TBP</option>
-                            <option value="2">SOFT</option>
-                            <option value="3">TPR</option>
-                            <option value="4">N/A</option>
+                            @foreach (IndicadoresBancarios indicador in ViewBag.IndicadoresBancarios)
+                            {
+                                <option value="@indicador.IdIndicador">@indicador.Nombre</option>
+                            }
                         </select>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 using HermeSoft_Fusion.Data;
-using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Banco;
 using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Repository
@@ -31,6 +31,7 @@ namespace HermeSoft_Fusion.Repository
         public async Task<Banco?> ObtenerPorId(int id)
         {
             var banco = await _context.BANCOS
+                .Include(t => t.TipoCambio)
                 .Include(b => b.EscenariosTasaInteres)
                     .ThenInclude(pb => pb.PlazosEscenarios)
                         .ThenInclude(ip => ip.Indicador)

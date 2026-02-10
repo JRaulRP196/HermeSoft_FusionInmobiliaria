@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HermeSoft_Fusion.Models
+namespace HermeSoft_Fusion.Models.Banco
 {
     [Table("BANCOS")]
     public class Banco
@@ -31,8 +31,10 @@ namespace HermeSoft_Fusion.Models
         public decimal Comision { get; set; }
 
         [Required]
-        [StringLength(30)]
-        public string TipoCambio { get; set; }
+        public int IdTipoCambio { get; set; }
+
+        [ForeignKey("IdTipoCambio")]
+        public TipoCambio TipoCambio { get; set; }
 
         public string? Logo { get; set; }
         public List<EscenarioTasaInteres> EscenariosTasaInteres { get; set; } = new();

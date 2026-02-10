@@ -1,18 +1,22 @@
 ﻿using HermeSoft_Fusion.Business;
-using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Banco;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HermeSoft_Fusion.Controllers
 {
     public class BancoController : Controller
     {
-        private BancoBusiness _bancoBusiness;
-        private TasaInteresBusiness _tasaInteresBusiness;
-
-        public BancoController(BancoBusiness bancoBusiness, TasaInteresBusiness tasaInteresBusiness)
+        private readonly BancoBusiness _bancoBusiness;
+        private readonly TasaInteresBusiness _tasaInteresBusiness;
+        private readonly IndicadoresBancariosBusiness _indicadoresBancariosBusiness;
+        private readonly TipoCambioBusiness _tipoCambioBusiness;
+        public BancoController(BancoBusiness bancoBusiness, TasaInteresBusiness tasaInteresBusiness,
+            IndicadoresBancariosBusiness indicadoresBancariosBusiness, TipoCambioBusiness tipoCambioBusiness)
         {
             _bancoBusiness = bancoBusiness;
             _tasaInteresBusiness = tasaInteresBusiness;
+            _indicadoresBancariosBusiness = indicadoresBancariosBusiness;
+            _tipoCambioBusiness = tipoCambioBusiness;
         }
 
         public async Task<IActionResult> Index()
@@ -31,6 +35,8 @@ namespace HermeSoft_Fusion.Controllers
         public async  Task<IActionResult> Registro()
         {
             ViewBag.TasaInteres = await _tasaInteresBusiness.Obtener();
+            ViewBag.IndicadoresBancarios = await _indicadoresBancariosBusiness.Obtener();
+            ViewBag.TipoCambio = await _tipoCambioBusiness.Obtener();
             return View(await _bancoBusiness.IniciarBanco());
         }
 
@@ -70,6 +76,8 @@ namespace HermeSoft_Fusion.Controllers
                 return RedirectToAction("Index");
             }
             ViewBag.TasaInteres = await _tasaInteresBusiness.Obtener();
+            ViewBag.IndicadoresBancarios = await _indicadoresBancariosBusiness.Obtener();
+            ViewBag.TipoCambio = await _tipoCambioBusiness.Obtener();
             return View(banco);
         }
 

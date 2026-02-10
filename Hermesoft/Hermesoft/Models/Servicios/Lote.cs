@@ -1,4 +1,4 @@
-﻿namespace HermeSoft_Fusion.Models
+﻿namespace HermeSoft_Fusion.Models.Servicios
 {
     public class Lote
     {

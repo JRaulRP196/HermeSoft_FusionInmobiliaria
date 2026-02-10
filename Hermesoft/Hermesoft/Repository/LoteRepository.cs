@@ -1,5 +1,5 @@
 ﻿using HermeSoft_Fusion.Data;
-using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Servicios;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 

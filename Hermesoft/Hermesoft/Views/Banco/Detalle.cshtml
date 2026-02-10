@@ -1,4 +1,5 @@
-﻿@model Banco
+﻿@using HermeSoft_Fusion.Models.Banco
+@model Banco
 @{
     ViewBag.Title = "Bancos";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -82,7 +83,7 @@
 
                 <div class="row mb-2">
                     <div class="col-4 text-muted fw-semibold">Tipo de Cambio:</div>
-                    <div class="col-8">@Model.TipoCambio</div>
+                    <div class="col-8">@Model.TipoCambio.Cambio</div>
                 </div>
             </div>
         </div>

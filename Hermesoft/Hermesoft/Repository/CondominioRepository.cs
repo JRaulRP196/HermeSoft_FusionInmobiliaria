@@ -1,4 +1,4 @@
-﻿using HermeSoft_Fusion.Models;
+﻿using HermeSoft_Fusion.Models.Servicios;
 using System.Text.Json;
 
 namespace HermeSoft_Fusion.Repository

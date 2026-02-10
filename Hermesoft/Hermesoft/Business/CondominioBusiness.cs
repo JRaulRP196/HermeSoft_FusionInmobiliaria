@@ -1,4 +1,4 @@
-﻿using HermeSoft_Fusion.Models;
+﻿using HermeSoft_Fusion.Models.Servicios;
 using HermeSoft_Fusion.Repository;
 
 namespace HermeSoft_Fusion.Business

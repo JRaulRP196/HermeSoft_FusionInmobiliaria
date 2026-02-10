@@ -3,13 +3,13 @@ using System.Text.Json;
 
 namespace HermeSoft_Fusion.Repository.Servicios
 {
-    public class TipoCambioRepository
+    public class TipoCambioAPIRepository
     {
 
         private readonly Configuracion _cofiguracion;
         private readonly IHttpClientFactory _httpClient;
 
-        public TipoCambioRepository(Configuracion cofiguracion, IHttpClientFactory httpClient)
+        public TipoCambioAPIRepository(Configuracion cofiguracion, IHttpClientFactory httpClient)
         {
             _cofiguracion = cofiguracion;
             _httpClient = httpClient;
@@ -23,7 +23,7 @@ namespace HermeSoft_Fusion.Repository.Servicios
             respuesta.EnsureSuccessStatusCode();
             var resultado = await respuesta.Content.ReadAsStringAsync();
             var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true};
-            var resultadoDeserializado = JsonSerializer.Deserialize<TipoCambio>(resultado, opciones);
+            var resultadoDeserializado = JsonSerializer.Deserialize<TipoCambioAPI>(resultado, opciones);
             return resultadoDeserializado.Datos[0].Indicadores[0].Series[0];
         }
     }

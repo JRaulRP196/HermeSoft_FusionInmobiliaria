@@ -1,4 +1,5 @@
-﻿@model Banco
+﻿@using HermeSoft_Fusion.Models.Banco
+@model Banco
 @{
     ViewBag.Title = "Bancos";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -24,6 +25,7 @@
                 }
 
                 <form asp-controller="Banco" asp-action="Registro" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <input type="hidden" asp-for="IdTipoCambio" value="@ViewBag.TipoCambio.IdTipoCambio" />
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -159,10 +161,10 @@
                                                 <label class="form-label">Indicador Bancario</label>
                                                 <select class="form-select"
                                                         name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
-                                                    <option value="1">TBP</option>
-                                                    <option value="2">SOFT</option>
-                                                    <option value="3">TPR</option>
-                                                    <option value="4">N/A</option>
+                                                    @foreach (IndicadoresBancarios indicador in ViewBag.IndicadoresBancarios)
+                                                    {
+                                                        <option value="@indicador.IdIndicador">@indicador.Nombre</option>
+                                                    }
                                                 </select>
                                             </div>
                                         </div>
@@ -172,11 +174,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="TipoCambio" class="form-label">Tipo de Cambio</label>
-                        <input type="text" class="form-control" id="TipoCambio" name="TipoCambio" placeholder="Tipo de Cambio" required>
                     </div>
 
                     <div>
@@ -244,10 +241,10 @@
                         <label class="form-label">Indicador Bancario</label>
                         <select class="form-select"
                                 name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
-                            <option value="1">TBP</option>
-                            <option value="2">SOFT</option>
-                            <option value="3">TPR</option>
-                            <option value="4">N/A</option>
+                            @foreach (IndicadoresBancarios indicador in ViewBag.IndicadoresBancarios)
+                            {
+                                <option value="@indicador.IdIndicador">@indicador.Nombre</option>
+                            }
                         </select>
                     </div>
                 </div>

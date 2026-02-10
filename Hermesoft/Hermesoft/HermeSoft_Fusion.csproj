@@ -197,6 +197,7 @@
     <Folder Include="wwwroot\assets\libs\toastr\node_modules\jquery\src\" />
     <Folder Include="wwwroot\assets\libs\toastr\tests\" />
     <Folder Include="wwwroot\assets\libs\twitter-bootstrap-wizard\examples\" />
+    <Folder Include="wwwroot\uploads\logos\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,4 @@
-﻿
-using HermeSoft_Fusion.Models;
+﻿using HermeSoft_Fusion.Models.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 

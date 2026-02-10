@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HermeSoft_Fusion.Models
+namespace HermeSoft_Fusion.Models.Banco
 {
     public class IndicadoresBancarios
     {
@@ -13,7 +13,7 @@ namespace HermeSoft_Fusion.Models
         public string Nombre { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal PorcSeguro { get; set; }
+        public double? PorcSeguro { get; set; }
 
         public DateTime? FechaVigente { get; set; }
     }
