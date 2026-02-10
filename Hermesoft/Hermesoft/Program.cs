@@ -2,14 +2,23 @@ using HermeSoft_Fusion.Business;
 using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Repository;
+using HermeSoft_Fusion.Repository.Servicios;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("BCCR", (sp, client) =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var token = configuration["BCCR:Token"];
+
+    client.DefaultRequestHeaders.Authorization =
+        new AuthenticationHeaderValue("Bearer", token);
+});
 builder.Services.AddDbContext<AppDbContext>(
         options => options.UseMySQL(builder.Configuration.GetConnectionString("MySqlConnection"))
     );
@@ -32,6 +41,9 @@ builder.Services.AddScoped<SeguroBancoRepository>();
 builder.Services.AddScoped<TipoAsalariadoRepository>();
 builder.Services.AddScoped<SeguroRepository>();
 builder.Services.AddScoped<HistoricoCambiosBancariosRepository>();
+builder.Services.AddScoped<Configuracion>();
+builder.Services.AddScoped<TipoCambioRepository>();
+builder.Services.AddScoped<IndicadorEconomicoRepository>();
 
 var app = builder.Build();
 

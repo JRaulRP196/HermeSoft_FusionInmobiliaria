@@ -1,6 +1,7 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Repository;
+using HermeSoft_Fusion.Repository.Servicios;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -16,10 +17,12 @@ namespace HermeSoft_Fusion.Business
         private TipoAsalariadoRepository _tipoAsalariadoRepository;
         private HistoricoCambiosBancariosRepository _historicoCambiosBancariosRepository;
         private AppDbContext _context;
+        private readonly TipoCambioRepository _tipoCambioRepository;
 
         public BancoBusiness(BancoRepository bancoRepository, EscenarioTasaInteresRepository escenarioTasaInteresRepository, 
             PlazosEscenariosRepository plazosEscenariosRepository, SeguroRepository seguroRepository, 
-            TipoAsalariadoRepository tipoAsalariadoRepository, HistoricoCambiosBancariosRepository historicoCambiosBancariosRepository,AppDbContext context)
+            TipoAsalariadoRepository tipoAsalariadoRepository, HistoricoCambiosBancariosRepository historicoCambiosBancariosRepository,
+            AppDbContext context, TipoCambioRepository tipoCambioRepository, IndicadorEconomicoRepository indicadorRepository)
         {
             _bancoRepository = bancoRepository;
             _escenarioTasaInteresRepository = escenarioTasaInteresRepository;
@@ -28,6 +31,7 @@ namespace HermeSoft_Fusion.Business
             _tipoAsalariadoRepository = tipoAsalariadoRepository;
             _historicoCambiosBancariosRepository = historicoCambiosBancariosRepository;
             _context = context;
+            _tipoCambioRepository = tipoCambioRepository;
         }
 
         public async Task<Banco> Agregar(Banco banco, IFormFile LogoFile)
