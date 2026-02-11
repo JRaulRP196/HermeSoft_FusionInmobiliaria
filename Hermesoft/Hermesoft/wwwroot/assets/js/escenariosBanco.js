@@ -56,8 +56,8 @@
             .slideUp(250, function () {
                 card.remove();
                 reindexarEscenarios();
+                reindexarTodo();
             });
-        reindexarTodo();
     });
 
     function reindexarEscenarios() {

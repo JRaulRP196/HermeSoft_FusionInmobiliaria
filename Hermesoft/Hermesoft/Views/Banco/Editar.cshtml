@@ -292,12 +292,15 @@
                     <input type="text" class="form-control"
                            name="EscenariosTasaInteres[0].Nombre" required>
                     <input type="hidden" name="EscenariosTasaInteres[0].IdBanco" value="@Model.IdBanco"/>
+                    <input type="hidden" name="EscenariosTasaInteres[0].IdEscenario" />
                 </div>
             </div>
 
             <br />
 
             <div class="row inputsEscenario">
+                <input type="hidden" name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdPlazoEscenario" />
+
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Plazo de Duración</label>
