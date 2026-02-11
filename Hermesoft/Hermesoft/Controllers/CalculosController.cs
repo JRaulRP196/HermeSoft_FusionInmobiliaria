@@ -19,6 +19,7 @@ namespace HermeSoft_Fusion.Controllers
         {
             try
             {
+                _calculosBusiness.ObtenerTimbreFiscal(); //Esta función es solo para verificar que se trae bien el timbre fiscal del appsettings
                 var desglose = await _calculosBusiness.CalcularPrima(codigoLote, porcentajePrima, fechaFinal);
 
                 TempData["DesglosePrima"] = JsonConvert.SerializeObject(desglose);

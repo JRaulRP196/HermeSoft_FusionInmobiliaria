@@ -1,6 +1,7 @@
 ﻿using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Servicios;
 using HermeSoft_Fusion.Repository;
+using HermeSoft_Fusion.Repository.Servicios;
 using ZstdSharp;
 
 namespace HermeSoft_Fusion.Business
@@ -9,10 +10,13 @@ namespace HermeSoft_Fusion.Business
     {
 
         private LoteRepository _loteRepository;
+        private readonly Configuracion _configuracion;
 
-        public CalculosBusiness(LoteRepository loteRepository)
+
+        public CalculosBusiness(LoteRepository loteRepository, Configuracion configuracion)
         {
             _loteRepository = loteRepository;
+            _configuracion = configuracion;
         }
 
 
@@ -59,6 +63,12 @@ namespace HermeSoft_Fusion.Business
             }
 
             return desglosePrima;
+        }
+
+        public void ObtenerTimbreFiscal()
+        {
+            var timbre = _configuracion.ObtenerValor("TimbreFiscal");
+            return;
         }
 
         #endregion
