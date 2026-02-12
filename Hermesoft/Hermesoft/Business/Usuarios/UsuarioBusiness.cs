@@ -46,6 +46,11 @@ namespace HermeSoft_Fusion.Business.Usuarios
             }
         }
 
+        public async Task<Usuario> Obtener(string correo)
+        {
+            return await _usuarioRepository.Obtener(correo);
+        }
+
         private async Task<bool> VerificarExistenciaUsuario(Usuario usuario)
         {
             Usuario user = await _usuarioRepository.Obtener(usuario.Correo);
