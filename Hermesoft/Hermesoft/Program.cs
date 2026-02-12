@@ -1,11 +1,15 @@
 using HermeSoft_Fusion.Business;
+using HermeSoft_Fusion.Business.Usuarios;
 using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Repository;
 using HermeSoft_Fusion.Repository.Servicios;
+using HermeSoft_Fusion.Repository.Usuarios;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Net.Http.Headers;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +23,21 @@ builder.Services.AddHttpClient("BCCR", (sp, client) =>
     client.DefaultRequestHeaders.Authorization =
         new AuthenticationHeaderValue("Bearer", token);
 });
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JWT"])
+            )
+        };
+    });
+builder.Services.AddAuthorization();
 builder.Services.AddDbContext<AppDbContext>(
         options => options.UseMySQL(builder.Configuration.GetConnectionString("MySqlConnection"))
     );
@@ -48,6 +67,9 @@ builder.Services.AddScoped<IndicadoresBancariosRepository>();
 builder.Services.AddScoped<IndicadoresBancariosBusiness>();
 builder.Services.AddScoped<TipoCambioRepository>();
 builder.Services.AddScoped<TipoCambioBusiness>();
+builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<UsuarioBusiness>();
+builder.Services.AddScoped<PasswordService>();
 
 var app = builder.Build();
 

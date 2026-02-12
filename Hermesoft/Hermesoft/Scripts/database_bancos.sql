@@ -18,16 +18,23 @@ idTipoCambio int not null,
 constraint FK_idTipoCambio_Banco foreign key (idTipoCambio) references TIPO_CAMBIO(idTipoCambio) 
 );
 
+CREATE TABLE ROLES(
+idRol int not null auto_increment primary key,
+nombre varchar(30) not null
+);
+
 CREATE TABLE USUARIOS(
-idusuario int not null primary key auto_increment,
+idUsuario int not null primary key auto_increment,
 nombre varchar(50) not null,
 apellido1 varchar(50) not null,
 apellido2 varchar(50) not null,
 correo varchar(70) not null,
 password varchar(300) not null,
 estado bool not null,
-rol varchar(50) not null
+idRol int not null,
+constraint FK_idRol_Banco foreign key (idRol) references ROLES(idRol) 
 );
+
 
 CREATE TABLE PRIMAS(
 idPrima int not null primary key auto_increment,

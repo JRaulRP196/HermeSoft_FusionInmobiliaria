@@ -1,5 +1,6 @@
 ﻿using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Banco;
+using HermeSoft_Fusion.Models.Usuarios;
 using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Data
@@ -26,6 +27,8 @@ namespace HermeSoft_Fusion.Data
         public DbSet<PlazosEscenarios> PLAZOS_ESCENARIOS { get; set; }
         public DbSet<HistoricoCambiosBancarios> HISTORICO_CAMBIOS_BANCARIOS { get; set; }
         public DbSet<TipoCambio> TIPO_CAMBIO {  get; set; }
+        public DbSet<Rol> ROLES { get; set; }
+        public DbSet<Usuario> USUARIOS { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -105,6 +108,16 @@ namespace HermeSoft_Fusion.Data
                 .HasForeignKey(b => b.IdTipoCambio)
                 .OnDelete(DeleteBehavior.Restrict);
   
+            });
+
+            modelBuilder.Entity<Rol>(entity =>
+            {
+                entity.HasKey(e => e.IdRol);
+
+                entity.HasMany(e => e.Usuarios)
+                .WithOne(u => u.Rol)
+                .HasForeignKey(u => u.IdRol)
+                .OnDelete(DeleteBehavior.Restrict);
             });
 
         }
