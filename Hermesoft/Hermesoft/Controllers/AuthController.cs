@@ -45,6 +45,12 @@ namespace Tocly.Controllers
                 return View();
             }
 
+            if(user.Estado == false)
+            {
+                TempData["MensajeError"] = "Este usuario no tiene acceso al sistema";
+                return View();
+            }
+
             if (!_passwordService.VerifyPassword(user, usuario.Password, user.Password))
             {
                 TempData["MensajeError"] = "Credenciales inválidas";
