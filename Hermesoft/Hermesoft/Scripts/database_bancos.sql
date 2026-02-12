@@ -168,4 +168,8 @@ INSERT IGNORE INTO SEGUROS (idSeguro, nombre) VALUES
 (1, 'Desempleo'),
 (2, 'Vida');
 
+INSERT IGNORE INTO ROLES (nombre) VALUES
+('Ventas'),
+('Administrador');
+
 select * from fusion.historico_cambios_bancarios;

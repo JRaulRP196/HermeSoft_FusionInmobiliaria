@@ -1,7 +1,9 @@
-﻿@{
+﻿@using HermeSoft_Fusion.Models.Usuarios
+@{
     ViewData["Title"] = "Usuarios";
     Layout = "~/Views/Shared/_Layout.cshtml"; 
 }
+@model HermeSoft_Fusion.Models.Usuarios.Usuario
 
 <div class="container-fluid py-4">
 
@@ -22,6 +24,15 @@
 
     <!-- Filtros (solo diseño, sin lógica) -->
     <div class="card shadow-sm mb-4 border-0">
+        @if (TempData["MensajeError"] != null)
+        {
+            <div class="alert alert-danger">@TempData["MensajeError"]</div>
+        }
+
+        @if (TempData["MensajeExito"] != null)
+        {
+            <div class="alert alert-success">@TempData["MensajeExito"]</div>
+        }
         <div class="card-body">
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
@@ -223,51 +234,56 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                <!-- Por ahora solo diseño, sin lógica -->
-                <form>
+
+                <form asp-action="Agregar" method="post" class="needs-validation" novalidate>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Nombre completo</label>
-                            <input type="text" class="form-control" placeholder="Nombre y apellidos">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" asp-for="Nombre" placeholder="Nombre" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Primer Apellido</label>
+                            <input type="text" class="form-control" asp-for="Apellido1" placeholder="Primero Apellido" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Segundo Apellido</label>
+                            <input type="text" class="form-control" asp-for="Apellido2" placeholder="Segundo Apellido" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" placeholder="correo@ejemplo.com">
+                            <input type="email" class="form-control" asp-for="Correo" placeholder="correo@ejemplo.com" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Rol</label>
-                            <select class="form-select">
-                                <option value="Administrador">Administrador</option>
-                                <option value="Ventas" selected>Ventas</option>
+                            <select class="form-select" asp-for="IdRol" required>
+                                @foreach (Rol rol in ViewBag.Roles){
+                                    <option value="@rol.IdRol">@rol.Nombre</option>
+                                }
+
                             </select>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Estado</label>
-                            <select class="form-select">
-                                <option value="Activo" selected>Activo</option>
-                                <option value="Inactivo">Inactivo</option>
+                            <select class="form-select" asp-for="Estado" required>
+                                <option value="true" selected>Activo</option>
+                                <option value="false">Inactivo</option>
                             </select>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" placeholder="Contraseña temporal">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Confirmar contraseña</label>
-                            <input type="password" class="form-control" placeholder="Repetir contraseña">
+                            <input type="password" class="form-control" asp-for="Password" placeholder="Contraseña temporal" required>
                         </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            Guardar usuario
+                        </button>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">
-                    Guardar usuario
-                </button>
             </div>
         </div>
     </div>
@@ -319,37 +335,9 @@
 </div>
 
 
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            var modalEditar = document.getElementById('modalEditarUsuario');
-            if (modalEditar) {
-                modalEditar.addEventListener('show.bs.modal', function (event) {
-                    var button = event.relatedTarget;
-
-                    // Tomar los valores de los data-*
-                    var nombre = button.getAttribute('data-nombre');
-                    var correo = button.getAttribute('data-correo');
-                    var rol = button.getAttribute('data-rol');
-                    var estado = button.getAttribute('data-estado');
-
-                    // Buscar los campos dentro del modal
-                    var inputNombre = modalEditar.querySelector('#editNombre');
-                    var inputCorreo = modalEditar.querySelector('#editCorreo');
-                    var selectRol = modalEditar.querySelector('#editRol');
-                    var selectEstado = modalEditar.querySelector('#editEstado');
-                    var titulo = modalEditar.querySelector('#modalEditarUsuarioLabel');
-
-                    if (inputNombre) inputNombre.value = nombre || '';
-                    if (inputCorreo) inputCorreo.value = correo || '';
-                    if (selectRol) selectRol.value = rol || 'Ventas';
-                    if (selectEstado) selectEstado.value = estado || 'Activo';
-                    if (titulo) titulo.textContent = 'Editar usuario - ' + (nombre || '');
-                });
-            }
-        });
-    </script>
+@section scripts {
+    <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
+    <script src="~/assets/js/pages/form-validation.init.js"></script>
 }
 
 
