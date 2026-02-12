@@ -94,12 +94,37 @@
         const registrarVentaBtn = document.getElementById("registrarVentaBtn");
 
         // on lote change update precio display and validations
-        function obtenerPrecioLote() {
-            const selected = lote.options[lote.selectedIndex];
-            if (!selected) return null;
-            const precioAttr = selected.getAttribute("data-precio");
-            return precioAttr ? Number(precioAttr) : null;
+        async function obtenerPrecioLote() {
+            const codigo = lote?.value;
+            if (!codigo) return null;
+
+            const resp = await fetch(`/Ventas/ObtenerLoteJson?lote=${encodeURIComponent(codigo)}`);
+            if (!resp.ok) return null;
+
+            const json = await resp.json();
+            const obj = Array.isArray(json) ? (json[0] || null) : json;
+
+            const precio = Number(obj?.PrecioVenta ?? obj?.precioVenta ?? 0);
+            return precio > 0 ? precio : null;
         }
+
+
+        // Historia: no mostrar botón si no hay banco o lote
+        function toggleBtnFormalizacion() {
+            const tieneLote = !!(lote?.value);
+            const tieneBanco = !!(banco?.value);
+
+            if (!calcGastoBtn) return;
+
+            calcGastoBtn.style.display = (tieneLote && tieneBanco) ? "block" : "none";
+        }
+
+        // Ejecutar al cargar
+        toggleBtnFormalizacion();
+
+        // Ejecutar cuando cambie banco o lote
+        banco?.addEventListener("change", toggleBtnFormalizacion);
+        lote?.addEventListener("input", toggleBtnFormalizacion);
 
         function actualizarPrimaYCuota() {
             const precio = obtenerPrecioLote();
@@ -135,17 +160,68 @@
         tasaInteres.addEventListener("input", actualizarPrimaYCuota);
         plazoMeses.addEventListener("input", actualizarPrimaYCuota);
 
-        calcGastoBtn.addEventListener("click", () => {
-            const precio = obtenerPrecioLote();
-            if (!precio) { showMessage('formMessages', 'Seleccione un lote válido para calcular gastos.', 'danger'); return; }
-            const gasto = calcularGastoFormal(precio,
-                Number(porcSeguros.value || 0),
-                Number(porcAbogados.value || 0),
-                Number(porcComision.value || 0),
-                Number(porcTimbre.value || 0));
-            gastoFormalizacion.value = `${new Intl.NumberFormat().format(gasto)}`;
-            showMessage('formMessages', 'Gasto de formalización calculado.', 'success');
+        calcGastoBtn.addEventListener("click", async () => {
+
+            const precio = await obtenerPrecioLote();
+            if (!precio) {
+                showMessage('formMessages', 'No se pudo obtener el precio del lote.', 'danger');
+                return;
+            }
+
+            const segurosInputs = document.querySelectorAll("#porcSeguros");
+            const porcVida = segurosInputs.length > 0 ? Number(segurosInputs[0].value || 0) : 0;
+            const porcDesempleo = segurosInputs.length > 1 ? Number(segurosInputs[1].value || 0) : 0;
+
+            const porcCom = Number(porcComision?.value || 0);
+            const porcTim = Number(porcTimbre?.value || 0);
+            const porcAbg = Number(porcAbogados?.value || 0);
+
+            // MONTOS
+            const montoSeguros = precio * ((porcVida + porcDesempleo) / 100);
+            const montoComision = precio * (porcCom / 100);
+            const montoTimbre = precio * (porcTim / 100);
+
+            const montoAbogados = precio * (porcAbg / 100);
+            const ivaAbogados = montoAbogados * 0.13;
+            const totalAbogadosConIva = montoAbogados + ivaAbogados;
+
+            const gastoTotal = montoSeguros + montoComision + montoTimbre + totalAbogadosConIva;
+
+            gastoFormalizacion.value = new Intl.NumberFormat().format(Math.round(gastoTotal));
+
+            showMessage('formMessages', 'Gasto de formalización calculado con IVA incluido en honorarios.', 'success');
         });
+
+        async function cargarTimbreFiscal() {
+            try {
+                const resp = await fetch("/Calculos/ObtenerTimbre");
+                const timbre = await resp.json();
+
+                if (Number(timbre) === -1) {
+                    // Caso: no encontrado
+                    porcTimbre.value = -1;
+                    porcTimbre.readOnly = false;
+                    porcTimbre.style.border = "2px solid red";
+                    porcTimbre.style.backgroundColor = "#ffe5e5";
+                } else {
+                    // Caso: encontrado
+                    porcTimbre.value = timbre;
+                    porcTimbre.readOnly = true;
+                    porcTimbre.style.border = "";
+                    porcTimbre.style.backgroundColor = "";
+                }
+            } catch {
+                // Si falla la llamada, mismo comportamiento que no encontrado
+                porcTimbre.value = -1;
+                porcTimbre.readOnly = false;
+                porcTimbre.style.border = "2px solid red";
+                porcTimbre.style.backgroundColor = "#ffe5e5";
+            }
+        }
+
+        // Ejecutar al cargar la vista Registro
+        cargarTimbreFiscal();
+
 
         // PDF generation helper (uses jsPDF)
         async function generarPdf(venta) {

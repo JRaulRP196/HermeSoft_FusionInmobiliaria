@@ -2,6 +2,7 @@
 using HermeSoft_Fusion.Models.Servicios;
 using HermeSoft_Fusion.Repository;
 using HermeSoft_Fusion.Repository.Servicios;
+using System.Globalization;
 using ZstdSharp;
 
 namespace HermeSoft_Fusion.Business
@@ -65,17 +66,46 @@ namespace HermeSoft_Fusion.Business
             return desglosePrima;
         }
 
-        public void ObtenerTimbreFiscal()
+        
+
+public decimal ObtenerTimbreFiscal()
+    {
+        try
         {
-            var timbre = _configuracion.ObtenerValor("TimbreFiscal");
-            return;
+            string? valor = _configuracion.ObtenerValor("TimbreFiscal");
+
+            if (string.IsNullOrWhiteSpace(valor))
+                return -1;
+
+            // 1) Intento normal con cultura actual
+            if (decimal.TryParse(valor, NumberStyles.Any, CultureInfo.CurrentCulture, out var timbreLocal))
+                return timbreLocal;
+
+            // 2) Intento con cultura invariante (usa punto)
+            if (decimal.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, out var timbreInv))
+                return timbreInv;
+
+            // 3) Último intento: normalizar (por si viene "2,5" o "2.5")
+            var normalizado = valor.Replace(",", ".");
+            if (decimal.TryParse(normalizado, NumberStyles.Any, CultureInfo.InvariantCulture, out var timbreNorm))
+                return timbreNorm;
+
+            return -1;
         }
+        catch
+        {
+            return -1;
+        }
+    }
 
-        #endregion
 
-        #region Helpers
 
-        public void VerificarDatosPrima(Lote lote, decimal porcentajePrima, DateTime fechaFinal)
+
+    #endregion
+
+    #region Helpers
+
+    public void VerificarDatosPrima(Lote lote, decimal porcentajePrima, DateTime fechaFinal)
         {
             if (lote == null)
                 throw new Exception("Lote inválido");

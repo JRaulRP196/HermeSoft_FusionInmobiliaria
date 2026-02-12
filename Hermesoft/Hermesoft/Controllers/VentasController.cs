@@ -25,6 +25,30 @@ namespace HermeSoft_Fusion.Controllers
         public IActionResult Editar() => View();
 
         #region Utilidades
+        [HttpPost]
+        public IActionResult CalcularGastoFormalizacion(
+                    decimal valorLote,
+                    decimal porcVida,
+                    decimal porcDesempleo,
+                    decimal porcAbogados,
+                    decimal porcComision,
+                    decimal porcTimbre
+             )
+            {
+                if (porcTimbre < 0) porcTimbre = 0;
+
+                decimal totalPorcentaje = porcVida + porcDesempleo + porcAbogados + porcComision + porcTimbre;
+                decimal gastoFormalizacion = valorLote * (totalPorcentaje / 100m);
+
+                return Json(new
+                {
+                    ok = true,
+                    totalPorcentaje,
+                    gastoFormalizacion
+                });
+            }
+
+
         [HttpGet]
         public async Task<Lote> ObtenerLote(string lote)
         {

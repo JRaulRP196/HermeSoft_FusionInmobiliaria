@@ -32,6 +32,13 @@ namespace HermeSoft_Fusion.Controllers
                 return RedirectToAction("Registro", "Ventas");
             }
         }
+        [HttpGet]
+        public IActionResult ObtenerTimbre()
+        {
+            var timbre = _calculosBusiness.ObtenerTimbreFiscal();
+            return Json(timbre);
+        }
+
 
     }
 }
