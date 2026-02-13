@@ -75,29 +75,32 @@
                     </a>
                 </li>
 
-                <li>
-                    <a asp-controller="Estadistica" asp-action="Index" class="has-arrow waves-effect">
-                        <i class="ri-pie-chart-2-line"></i>
-                        <span>Estadisticas</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a asp-controller="Estadistica" asp-action="Primas">Listado de Primas</a></li>
-                    </ul>
-                </li>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <li>
+                        <a asp-controller="Estadistica" asp-action="Index" class="has-arrow waves-effect">
+                            <i class="ri-pie-chart-2-line"></i>
+                            <span>Estadisticas</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a asp-controller="Estadistica" asp-action="Primas">Listado de Primas</a></li>
+                        </ul>
+                    </li>
 
-                <li>
-                    <a asp-controller="Reporte" asp-action="Index" class="has-arrow waves-effect">
-                        <i class="ri-file-list-2-line"></i>
-                        <span>Reportes</span>
-                    </a>
-                </li>
+                    <li>
+                        <a asp-controller="Reporte" asp-action="Index" class="has-arrow waves-effect">
+                            <i class="ri-file-list-2-line"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
 
-                <li>
-                    <a asp-controller="Usuarios" asp-action="Index" class="has-arrow waves-effect">
-                        <i class="ri-team-fill"></i>
-                        <span>Usuarios</span>
-                    </a>                   
-                </li>
+                    <li>
+                        <a asp-controller="Usuarios" asp-action="Index" class="has-arrow waves-effect">
+                            <i class="ri-team-fill"></i>
+                            <span>Usuarios</span>
+                        </a>
+                    </li>
+                }
             </ul>
         </div>
         <!-- Sidebar -->
@@ -107,7 +110,7 @@
         <button type="button" class="btn w-100 px-0 border-0" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="d-flex align-items-center">
                 <div class="flex-shrink-0">
-                    <img src="~/assets/images/users/avatar-2.jpg" class="img-fluid header-profile-user rounded-circle" alt="">
+                    <img src="~/assets/images/users/User_Icon.png" class="img-fluid header-profile-user rounded-circle" alt="">
                 </div>
 
                 <div class="flex-grow-1 ms-2 text-start">

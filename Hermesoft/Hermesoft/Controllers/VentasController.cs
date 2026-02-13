@@ -1,9 +1,11 @@
 ﻿using HermeSoft_Fusion.Models.Servicios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace HermeSoft_Fusion.Controllers
 {
+    [Authorize(Roles = "Ventas, Administrador")]
     public class VentasController : Controller
     {
 

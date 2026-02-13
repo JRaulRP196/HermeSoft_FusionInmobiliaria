@@ -1,8 +1,10 @@
 ﻿using HermeSoft_Fusion.Business;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HermeSoft_Fusion.Controllers
 {
+    [Authorize(Roles = "Ventas, Administrador")]
     public class CondominioController : Controller
     {
 

@@ -50,6 +50,30 @@ namespace HermeSoft_Fusion.Business.Usuarios
             }
         }
 
+        public async Task<Usuario> Editar(Usuario usuario)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                if (!await VerificarExistenciaUsuario(usuario))
+                    return null;
+                Usuario user = await Obtener(usuario.Correo);
+                user.Apellido1 = usuario.Apellido1;
+                user.Apellido2 = usuario.Apellido2;
+                user.IdRol = usuario.IdRol;
+                user.Estado = usuario.Estado;
+                user.Nombre = usuario.Nombre;
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return user;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
         public async Task<Usuario> SolicitudCambio(Usuario usuario, string correoCookie)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -108,6 +132,16 @@ namespace HermeSoft_Fusion.Business.Usuarios
         public async Task<Usuario> Obtener(string correo)
         {
             return await _usuarioRepository.Obtener(correo);
+        }
+
+        public async Task<Usuario> Obtener(int id)
+        {
+            return await _usuarioRepository.Obtener(id);
+        }
+
+        public async Task<IEnumerable<Usuario>> Obtener()
+        {
+            return await _usuarioRepository.Obtener();
         }
 
         private async Task<bool> VerificarExistenciaUsuario(Usuario usuario)

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
-using HermeSoft_Fusion.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Controllers
 {
+    [Authorize(Roles = "Ventas, Administrador")]
     public class MapaController : Controller
     {
 

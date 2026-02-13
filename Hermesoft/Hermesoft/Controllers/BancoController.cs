@@ -1,9 +1,11 @@
 ﻿using HermeSoft_Fusion.Business;
 using HermeSoft_Fusion.Models.Banco;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HermeSoft_Fusion.Controllers
 {
+    [Authorize(Roles = "Ventas, Administrador")]
     public class BancoController : Controller
     {
         private readonly BancoBusiness _bancoBusiness;

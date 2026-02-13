@@ -1,7 +1,7 @@
 ﻿@using HermeSoft_Fusion.Models.Usuarios
 @{
     ViewData["Title"] = "Usuarios";
-    Layout = "~/Views/Shared/_Layout.cshtml"; 
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @model HermeSoft_Fusion.Models.Usuarios.Usuario
 
@@ -33,50 +33,8 @@
         {
             <div class="alert alert-success">@TempData["MensajeExito"]</div>
         }
-        <div class="card-body">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Buscar</label>
-                    <div class="input-group">
-                        <span class="input-group-text border-end-0 bg-white">
-                            <i class="ri-search-line"></i>
-
-                        </span>
-                        <input type="text" class="form-control border-start-0" placeholder="Nombre o correo">
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">Rol</label>
-                    <select class="form-select">
-                        <option>– Todos los roles –</option>
-                        <option>Administrador</option>
-                        <option>Ventas</option>                        
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">Estado</label>
-                    <select class="form-select">
-                        <option>– Todos –</option>
-                        <option>Activo</option>
-                        <option>Inactivo</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2 text-md-end">
-                    <button class="btn btn-outline-primary w-100 mb-2">
-                        Aplicar filtros
-                    </button>
-                    <button class="btn btn-link w-100 text-decoration-none">
-                        Limpiar filtros
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Tabla de usuarios (3 quemados) -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -86,137 +44,33 @@
                             <th class="ps-4">Usuario</th>
                             <th>Rol</th>
                             <th>Estado</th>
-                            <th>Último acceso</th>
-                            <th class="text-end pe-4">Acciones</th>
+                            <th>Correo</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- 1) Administrador -->
-                        <tr>
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <img src="~/assets/images/users/avatar-2.jpg"
-                                             class="avatar-img rounded-circle"
-                                             alt="Admin">
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">Ana Rodríguez</div>
-                                        <div class="text-muted small">admin@fusion.com</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>                               
-                                <span class="badge badge-soft-primary font-size-12">Administrador</span>
-                            </td>
-                            <td>
-                                <span class="badge badge-soft-success font-size-12">Activo</span>
-                            </td>
-                            <td class="text-muted">30/11/2024</td>
-                            <td class="text-end pe-4">
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <!-- Editar -->
-                                    <button class="btn btn-light border-0"
-                                            title="Editar"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalEditarUsuario"
-                                            data-nombre="Ana Rodríguez"
-                                            data-correo="admin@fusion.com"
-                                            data-rol="Administrador"
-                                            data-estado="Activo">
+                        @foreach (Usuario user in ViewBag.Usuarios)
+                        {
+                            <tr>
+                                <td>@user.Nombre @user.Apellido1 @user.Apellido2</td>
+                                <td>@user.Rol.Nombre</td>
+                                @if (@user.Estado)
+                                {
+                                    <td>Activo</td>
+                                }
+                                else
+                                {
+                                    <td>Inactivo</td>
+                                }
+                                <td>@user.Correo</td>
+                                <td>
+                                    <button class="btn btn-light border-0 btn-editar"
+                                            data-id="@user.IdUsuario">
                                         <i class="ri-pencil-line"></i>
                                     </button>
-                                </div>
-                            </td>
-
-                        </tr>
-
-                        <!-- 2) Vendedor activo -->
-                        <tr>
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <img src="~/assets/images/users/avatar-3.jpg"
-                                             class="avatar-img rounded-circle"
-                                             alt="Vendedor activo">
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">Carlos Vega</div>
-                                        <div class="text-muted small">cvega@fusion.com</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge badge-soft-primary font-size-12">Ventas</span>
-                            </td>
-                            <td>
-
-                                <span class="badge badge-soft-success font-size-12">Activo</span>
-                             
-                            </td>
-                            <td class="text-muted">28/11/2024</td>
-                            <td class="text-end pe-4">
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <!-- Editar -->
-                                    <button class="btn btn-light border-0"
-                                            title="Editar"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalEditarUsuario"
-                                            data-nombre="Carlos Vega"
-                                            data-correo="cvega@fusion.com"
-                                            data-rol="Ventas"
-                                            data-estado="Activo">
-                                        <i class="ri-pencil-line"></i>
-                                    </button>
-
-                                </div>
-                            </td>
-
-
-
-                        </tr>
-
-                        <!-- 3) Vendedor inactivo -->
-                        <tr>
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <img src="~/assets/images/users/avatar-1.jpg"
-                                             class="avatar-img rounded-circle"
-                                             alt="Vendedor inactivo">
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">María López</div>
-                                        <div class="text-muted small">mlopez@fusion.com</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge badge-soft-primary font-size-12">Ventas</span>
-                            </td>
-                            <td>                                                             
-                                <span class="badge badge-soft-danger font-size-12">Inactivo</span>                                
-                            </td>
-                            <td class="text-muted">15/10/2024</td>
-                            <td class="text-end pe-4">
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <!-- Editar -->
-                                    <button class="btn btn-light border-0"
-                                            title="Editar"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalEditarUsuario"
-                                            data-nombre="María López"
-                                            data-correo="mlopez@fusion.com"
-                                            data-rol="Ventas"
-                                            data-estado="Inactivo">
-                                        <i class="ri-pencil-line"></i>
-                                    </button>
-
-                                </div>
-                            </td>
-
-                        </tr>
-
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -237,6 +91,7 @@
 
                 <form asp-action="Agregar" method="post" class="needs-validation" novalidate>
                     <div class="row g-3">
+                        
                         <div class="col-md-6">
                             <label class="form-label">Nombre</label>
                             <input type="text" class="form-control" asp-for="Nombre" placeholder="Nombre" required>
@@ -257,7 +112,8 @@
                         <div class="col-md-6">
                             <label class="form-label">Rol</label>
                             <select class="form-select" asp-for="IdRol" required>
-                                @foreach (Rol rol in ViewBag.Roles){
+                                @foreach (Rol rol in ViewBag.Roles)
+                                {
                                     <option value="@rol.IdRol">@rol.Nombre</option>
                                 }
 
@@ -298,37 +154,48 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form asp-action="Editar" method="post" class="needs-validation" novalidate>
+                    <input type="hidden" id="IdUsuario" asp-for="IdUsuario" />
+                    <input type="hidden" id="Correo" asp-for="Correo" />
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Nombre completo</label>
-                            <input type="text" class="form-control" id="editNombre">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="Nombre" asp-for="Nombre" placeholder="Nombre" required>
                         </div>
-
+                        <div class="col-md-6">
+                            <label class="form-label">Primer Apellido</label>
+                            <input type="text" class="form-control" id="Apellido1" asp-for="Apellido1" placeholder="Primero Apellido" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Segundo Apellido</label>
+                            <input type="text" class="form-control" id="Apellido2" asp-for="Apellido2" placeholder="Segundo Apellido" required>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label">Rol</label>
-                            <select class="form-select" id="editRol">
-                                <option value="Administrador">Administrador</option>
-                                <option value="Ventas">Ventas</option>
+                            <select class="form-select" asp-for="IdRol" id="IdRol" required>
+                                @foreach (Rol rol in ViewBag.Roles)
+                                {
+                                    <option value="@rol.IdRol">@rol.Nombre</option>
+                                }
+
                             </select>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Estado</label>
-                            <select class="form-select" id="editEstado">
-                                <option value="Activo">Activo</option>
-                                <option value="Inactivo">Inactivo</option>
+                            <select class="form-select" asp-for="Estado" id="Estado" required>
+                                <option value="true" selected>Activo</option>
+                                <option value="false">Inactivo</option>
                             </select>
                         </div>
-
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            Guardar usuario
+                        </button>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">
-                    Guardar cambios
-                </button>
             </div>
         </div>
     </div>
@@ -338,6 +205,7 @@
 @section scripts {
     <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
     <script src="~/assets/js/pages/form-validation.init.js"></script>
+    <script src="~/assets/js/editarUsuario.js"></script>
 }
 
 

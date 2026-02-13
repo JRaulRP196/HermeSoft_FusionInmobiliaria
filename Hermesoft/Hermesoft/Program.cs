@@ -23,8 +23,8 @@ builder.Services.AddHttpClient("BCCR", (sp, client) =>
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", options =>
     {
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Pages/Error404";
     });
 
 builder.Services.AddAuthorization();
