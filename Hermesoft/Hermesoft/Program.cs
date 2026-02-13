@@ -63,6 +63,9 @@ builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<RolRepository>();
 builder.Services.AddScoped<RolBusiness>();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<RecuperacionPasswordRepository>();
+
 
 var app = builder.Build();
 

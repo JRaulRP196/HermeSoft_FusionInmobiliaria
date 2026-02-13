@@ -29,6 +29,7 @@ namespace HermeSoft_Fusion.Data
         public DbSet<TipoCambio> TIPO_CAMBIO {  get; set; }
         public DbSet<Rol> ROLES { get; set; }
         public DbSet<Usuario> USUARIOS { get; set; }
+        public DbSet<RecuperacionPassword> RECUPERACIONES_PASSWORD { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -117,6 +118,16 @@ namespace HermeSoft_Fusion.Data
                 entity.HasMany(e => e.Usuarios)
                 .WithOne(u => u.Rol)
                 .HasForeignKey(u => u.IdRol)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<RecuperacionPassword>(entity =>
+            {
+                entity.HasKey(e => e.IdRecuperacion);
+
+                entity.HasOne(e => e.Usuario)
+                .WithMany(u => u.Recuperaciones)
+                .HasForeignKey(u => u.IdUsuario)
                 .OnDelete(DeleteBehavior.Restrict);
             });
 

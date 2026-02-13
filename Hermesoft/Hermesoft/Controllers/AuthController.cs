@@ -4,6 +4,7 @@ using HermeSoft_Fusion.Models.Usuarios;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Tocly.Controllers
 {
@@ -74,10 +75,60 @@ namespace Tocly.Controllers
             return RedirectToAction("Index", "Dashboard");
         }
 
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("Cookies");
+            return RedirectToAction("Login");
+        }
+
+        public IActionResult NuevoPassword([FromQuery] string token)
+        {
+            ViewBag.Token = token;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> NuevoPassword(Usuario usuario, string token)
+        {
+            if (await _usuarioBusiness.CambiarPassword(usuario, token) == null)
+            {
+                TempData["MensajeError"] = "Enlace expirado o modificado, solicita uno nuevo";
+                return View();
+            }
+            TempData["MensajeExito"] = "Contraseña nueva, inicia sesión con tus nuevas credenciales";
+            return RedirectToAction("Login");
+        }
+
         public IActionResult Recoverpw()
         {
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Recoverpw(Usuario usuario)
+        {
+            Usuario user = await _usuarioBusiness.Obtener(usuario.Correo);
+            if (user == null)
+            {
+                TempData["MensajeError"] = "Credenciales inválidas";
+                return View();
+            }
+
+            if (user.Estado == false)
+            {
+                TempData["MensajeError"] = "Este usuario no tiene acceso al sistema";
+                return View();
+            }
+            var userCorreo = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (await _usuarioBusiness.SolicitudCambio(usuario, userCorreo) == null)
+            {
+                TempData["MensajeError"] = "Digita tu correo válido";
+                return View();
+            }
+            TempData["MensajeExito"] = "Revisa tu correo";
+            return View();
+        }
+
         public IActionResult Register()
         {
             return View();

@@ -154,6 +154,15 @@ CREATE TABLE HISTORICO_CAMBIOS_BANCARIOS (
     informacionNueva LONGTEXT NOT NULL
 );
 
+CREATE TABLE RECUPERACIONES_PASSWORD (
+    idRecuperacion INT AUTO_INCREMENT PRIMARY KEY,
+    idUsuario INT NOT NULL,
+    token VARCHAR(200) NOT NULL,
+    fechaExpiracion DATETIME NOT NULL,
+    usado BIT DEFAULT 0,
+    FOREIGN KEY (idUsuario) REFERENCES USUARIOS(idUsuario)
+);
+
 INSERT IGNORE INTO TIPOS_ASALARIADOS (idTipoAsalariado, nombre) VALUES
 (1, 'Publico'),
 (2, 'Privado'),

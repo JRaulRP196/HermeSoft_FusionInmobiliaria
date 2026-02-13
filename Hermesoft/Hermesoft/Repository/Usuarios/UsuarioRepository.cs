@@ -26,6 +26,13 @@ namespace HermeSoft_Fusion.Repository.Usuarios
                 .ToListAsync();
         }
 
+        public async Task<Usuario> Obtener(int id)
+        {
+            return await _context.USUARIOS
+                .Include(r => r.Rol)
+                .FirstOrDefaultAsync(u => u.IdUsuario == id);
+        }
+
         public async Task<Usuario> Obtener(string correo)
         {
             return await _context.USUARIOS
