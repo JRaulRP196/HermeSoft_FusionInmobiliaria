@@ -3,29 +3,29 @@ using HermeSoft_Fusion.Models.Servicios;
 using HermeSoft_Fusion.Repository;
 using HermeSoft_Fusion.Repository.Servicios;
 using System.Globalization;
-using ZstdSharp;
 
 namespace HermeSoft_Fusion.Business
 {
     public class CalculosBusiness
     {
-
-        private LoteRepository _loteRepository;
+        private readonly LoteRepository _loteRepository;
         private readonly Configuracion _configuracion;
+        private readonly BancoRepository _bancoRepository;
 
-
-        public CalculosBusiness(LoteRepository loteRepository, Configuracion configuracion)
+        public CalculosBusiness(
+            LoteRepository loteRepository,
+            Configuracion configuracion,
+            BancoRepository bancoRepository)
         {
             _loteRepository = loteRepository;
             _configuracion = configuracion;
+            _bancoRepository = bancoRepository;
         }
-
 
         #region Utilidades
 
         public async Task<IEnumerable<DesglosesPrimas>> CalcularPrima(string codigoLote, decimal porcentajePrima, DateTime fechaFinal)
         {
-
             var lote = await _loteRepository.Obtener(codigoLote);
             VerificarDatosPrima(lote, porcentajePrima, fechaFinal);
 
@@ -66,46 +66,96 @@ namespace HermeSoft_Fusion.Business
             return desglosePrima;
         }
 
-        
-
-public decimal ObtenerTimbreFiscal()
-    {
-        try
+        public decimal ObtenerTimbreFiscal()
         {
-            string? valor = _configuracion.ObtenerValor("TimbreFiscal");
+            try
+            {
+                string? valor = _configuracion.ObtenerValor("TimbreFiscal");
 
-            if (string.IsNullOrWhiteSpace(valor))
+                if (string.IsNullOrWhiteSpace(valor))
+                    return -1;
+
+                // 1) Cultura actual
+                if (decimal.TryParse(valor, NumberStyles.Any, CultureInfo.CurrentCulture, out var timbreLocal))
+                    return timbreLocal;
+
+                // 2) Invariante (punto decimal)
+                if (decimal.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, out var timbreInv))
+                    return timbreInv;
+
+                // 3) Normalizar coma/punto
+                var normalizado = valor.Replace(",", ".");
+                if (decimal.TryParse(normalizado, NumberStyles.Any, CultureInfo.InvariantCulture, out var timbreNorm))
+                    return timbreNorm;
+
                 return -1;
-
-            // 1) Intento normal con cultura actual
-            if (decimal.TryParse(valor, NumberStyles.Any, CultureInfo.CurrentCulture, out var timbreLocal))
-                return timbreLocal;
-
-            // 2) Intento con cultura invariante (usa punto)
-            if (decimal.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, out var timbreInv))
-                return timbreInv;
-
-            // 3) Último intento: normalizar (por si viene "2,5" o "2.5")
-            var normalizado = valor.Replace(",", ".");
-            if (decimal.TryParse(normalizado, NumberStyles.Any, CultureInfo.InvariantCulture, out var timbreNorm))
-                return timbreNorm;
-
-            return -1;
+            }
+            catch
+            {
+                return -1;
+            }
         }
-        catch
+
+        public async Task<object> CalcularGastoFormalizacionDesdeBD(string codigoLote, int idBanco)
         {
-            return -1;
+            var lote = await _loteRepository.Obtener(codigoLote);
+            if (lote == null) throw new Exception("Lote inválido");
+
+            var banco = await _bancoRepository.ObtenerPorId(idBanco);
+            if (banco == null) throw new Exception("Banco inválido");
+
+            // % desde BD
+            decimal porcComision = banco.Comision;
+            decimal porcAbogadosBase = banco.HonorarioAbogado;
+
+            // Honorarios + IVA 13%
+            decimal porcAbogadosConIva = porcAbogadosBase * 1.13m;
+
+            // Seguros desde BD (SEGUROS_BANCOS + SEGUROS)
+            decimal porcVida = 0m;
+            decimal porcDesempleo = 0m;
+
+            if (banco.SeguroBancos != null)
+            {
+                foreach (var sb in banco.SeguroBancos)
+                {
+                    var nombre = (sb?.Seguro?.Nombre ?? "").ToLower();
+
+                    if (nombre.Contains("vida"))
+                        porcVida = sb.PorcSeguro;
+
+                    if (nombre.Contains("desempleo"))
+                        porcDesempleo = sb.PorcSeguro;
+                }
+            }
+
+            // Timbre fiscal: si -1 => para cálculo usar 0 (pero se devuelve -1 para vista)
+            decimal timbre = ObtenerTimbreFiscal();
+            decimal timbreParaCalculo = timbre < 0 ? 0 : timbre;
+
+            decimal totalPorcentaje = porcVida + porcDesempleo + porcAbogadosConIva + porcComision + timbreParaCalculo;
+
+            // monto con PrecioVenta del lote
+            decimal gastoFormalizacion = lote.PrecioVenta * (totalPorcentaje / 100m);
+
+            return new
+            {
+                porcVida,
+                porcDesempleo,
+                porcAbogados = Math.Round(porcAbogadosConIva, 4),
+                porcComision,
+                timbreFiscal = timbre, // puede venir -1
+                totalPorcentaje = Math.Round(totalPorcentaje, 4),
+                gastoFormalizacion = Math.Round(gastoFormalizacion, 2),
+                precioLote = lote.PrecioVenta
+            };
         }
-    }
 
+        #endregion
 
+        #region Helpers
 
-
-    #endregion
-
-    #region Helpers
-
-    public void VerificarDatosPrima(Lote lote, decimal porcentajePrima, DateTime fechaFinal)
+        public void VerificarDatosPrima(Lote lote, decimal porcentajePrima, DateTime fechaFinal)
         {
             if (lote == null)
                 throw new Exception("Lote inválido");
@@ -126,6 +176,5 @@ public decimal ObtenerTimbreFiscal()
         }
 
         #endregion
-
     }
 }

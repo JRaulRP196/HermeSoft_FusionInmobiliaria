@@ -49,6 +49,8 @@ builder.Services.AddScoped<IndicadoresBancariosBusiness>();
 builder.Services.AddScoped<TipoCambioRepository>();
 builder.Services.AddScoped<TipoCambioBusiness>();
 
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
