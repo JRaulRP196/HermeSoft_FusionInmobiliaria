@@ -9,8 +9,12 @@ namespace HermeSoft_Fusion.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdTipoCambio { get; set; }
+        
         [Required]
+        [Column("tipoCambio")] //estaba teniendo problemas con el nombre en BD asi que lo cambie aca
         public double? Cambio { get; set; }
+
+
         public List<HermeSoft_Fusion.Models.Banco.Banco> Bancos { get; set; } = new();
 
     }
