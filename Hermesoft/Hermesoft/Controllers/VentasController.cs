@@ -10,12 +10,15 @@ namespace HermeSoft_Fusion.Controllers
         private readonly BancoBusiness _bancoBusiness;
         private readonly LoteRepository _loteRepository;
         private readonly CalculosBusiness _calculosBusiness;
+        private readonly TipoCambioBusiness _tipoCambioBusiness;
 
-        public VentasController(BancoBusiness bancoBusiness, LoteRepository loteRepository, CalculosBusiness calculosBusiness)
+
+        public VentasController(BancoBusiness bancoBusiness, LoteRepository loteRepository, CalculosBusiness calculosBusiness, TipoCambioBusiness tipoCambioBusiness)
         {
             _bancoBusiness = bancoBusiness;
             _loteRepository = loteRepository;
             _calculosBusiness = calculosBusiness;
+            _tipoCambioBusiness = tipoCambioBusiness;
         }
 
         public IActionResult Index() => View();
@@ -231,6 +234,17 @@ namespace HermeSoft_Fusion.Controllers
                     cuotaMensual = cuota
                 }
             });
+        }
+        //////////////////////
+        [HttpGet]
+        public async Task<IActionResult> TipoCambioActual()
+        {
+            var tc = await _tipoCambioBusiness.Obtener(); // esto ya existe en tu Business
+
+            if (tc == null || tc.Cambio <= 0) // (o la propiedad equivalente)
+                return Json(new { ok = false });
+
+            return Json(new { ok = true, tipoCambio = tc.Cambio });
         }
     }
 }

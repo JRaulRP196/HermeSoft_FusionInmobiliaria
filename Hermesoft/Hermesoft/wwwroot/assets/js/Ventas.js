@@ -133,6 +133,11 @@
 
                 if (gastoFormalizacion) gastoFormalizacion.value = fmt(d.gastoFormalizacion);
 
+                baseCRC.gasto = Number(d.gastoFormalizacion);
+                
+                aplicarMoneda(document.getElementById("monedaSelect")?.value || "CRC");
+
+
                 showMessage("formMessages", "Gasto de formalización calculado.", "success");
             } catch (e) {
                 console.error(e);
@@ -336,6 +341,19 @@
                 if (cuotaMensual) cuotaMensual.value = fmt(d.cuotaMensual);
                 if (ingresoNeto) ingresoNeto.value = fmt(Number(d.cuotaMensual || 0) * 3);
 
+                baseCRC.cuota = Number(d.cuotaMensual);
+                baseCRC.ingreso = Number(d.cuotaMensual || 0) * 3;
+
+                aplicarMoneda(document.getElementById("monedaSelect")?.value || "CRC");
+
+               
+                baseCRC.cuota = Number(d.cuotaMensual);
+                baseCRC.ingreso = Number(d.cuotaMensual || 0) * 3;
+
+               
+                aplicarMoneda(document.getElementById("monedaSelect")?.value || "CRC");
+
+
                 showMessage("formMessages", "Cuota calculada con sistema francés.", "success");
             } catch (e) {
                 console.error(e);
@@ -465,5 +483,81 @@
         initLotes();
         setupRegistro();
     });
+    /////////////////
+    let tipoCambio = null;
 
+    const baseCRC = {
+        gasto: null,
+        cuota: null,
+        ingreso: null
+    };
+
+    function parseMoney(val) {
+        if (!val) return null;
+        return Number(val.toString().replace(/[₡$\s,]/g, ""));
+    }
+
+    function formatCRC(n) {
+        if (n == null) return "";
+        return "₡" + n.toLocaleString("es-CR", { maximumFractionDigits: 0 });
+    }
+
+    function formatUSD(n) {
+        if (n == null) return "";
+        return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+
+    async function cargarTipoCambio() {
+        if (tipoCambio) return tipoCambio;
+
+        const res = await fetch("/Ventas/TipoCambioActual");
+        if (!res.ok) return null;
+
+        const data = await res.json();
+        if (!data.ok) return null;
+
+        tipoCambio = Number(data.tipoCambio);
+        document.getElementById("tipoCambioInput").value =
+            tipoCambio.toLocaleString("es-CR", { minimumFractionDigits: 2 });
+
+        return tipoCambio;
+    }
+
+    function aplicarMoneda(moneda) {
+
+        const gastoInput = document.getElementById("gastoFormalizacion");
+        const cuotaInput = document.getElementById("cuotaMensual");
+        const ingresoInput = document.getElementById("ingresoNeto");
+
+        if (moneda === "CRC") {
+            if (baseCRC.gasto != null) gastoInput.value = formatCRC(baseCRC.gasto);
+            if (baseCRC.cuota != null) cuotaInput.value = formatCRC(baseCRC.cuota);
+            if (baseCRC.ingreso != null) ingresoInput.value = formatCRC(baseCRC.ingreso);
+            return;
+        }
+
+        if (!tipoCambio || tipoCambio <= 0) {
+            alert("No hay tipo de cambio disponible.");
+            document.getElementById("monedaSelect").value = "CRC";
+            aplicarMoneda("CRC");
+            return;
+        }
+
+        if (baseCRC.gasto != null) gastoInput.value = formatUSD(baseCRC.gasto / tipoCambio);
+        if (baseCRC.cuota != null) cuotaInput.value = formatUSD(baseCRC.cuota / tipoCambio);
+        if (baseCRC.ingreso != null) ingresoInput.value = formatUSD(baseCRC.ingreso / tipoCambio);
+    }
+
+    document.getElementById("monedaSelect")?.addEventListener("change", async function () {
+        if (this.value === "USD") {
+            const tc = await cargarTipoCambio();
+            if (!tc) {
+                this.value = "CRC";
+                aplicarMoneda("CRC");
+                return;
+            }
+        }
+        aplicarMoneda(this.value);
+    });
 })();
