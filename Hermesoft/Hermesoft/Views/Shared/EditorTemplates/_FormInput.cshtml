@@ -1,0 +1,13 @@
+﻿@model string
+
+<div class="col-md-6">
+    <div class="mb-3">
+        <label class="form-label">@ViewData["Label"]</label>
+        <input type="@ViewData["type"]" class="form-control" name="@ViewData["name"]"
+               placeholder="@ViewData["Placeholder"]" required asp-for="@Model" accept="@ViewData["accept"]">
+
+        <div class="invalid-feedback">
+            Ingrese un valor valido.
+        </div>
+    </div>
+</div>
