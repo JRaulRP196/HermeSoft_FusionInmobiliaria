@@ -15,7 +15,7 @@
 
     function datosCompletosParaPrima() {
         if (!idLote.val()) return false;
-        if (!fechaVencimientoPrima.val()) return false;
+        if (!new Date(fechaVencimientoPrima.val())) return false;
         if (!porcentajePrima.val()) return false;
 
         const hoy = new Date();

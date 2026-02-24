@@ -1,7 +1,9 @@
 ﻿using HermeSoft_Fusion.Business;
+using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Banco;
 using HermeSoft_Fusion.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace HermeSoft_Fusion.Controllers
 {
@@ -30,9 +32,22 @@ namespace HermeSoft_Fusion.Controllers
             return View();
         }
 
-        
+        public IActionResult Prima(string lote)
+        {
+            TempData["lote"] = lote;
+            var json = TempData["DesglosePrima"] as string;
+
+            var desgloses = json != null
+                ? JsonConvert.DeserializeObject<List<DesglosesPrimas>>(json)
+                : new List<DesglosesPrimas>();
+
+            ViewBag.Desgloses = desgloses;
+            return View();
+        }
+
+
         // HU TASA - Escenario 1/2: al seleccionar escenario, traer tasa
-        
+
         [HttpGet]
         public async Task<IActionResult> ObtenerEscenariosPorBanco(int idBanco)
         {

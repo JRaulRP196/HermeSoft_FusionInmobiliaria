@@ -15,7 +15,7 @@
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold">Registro de Venta</h4>
-                <a href="/Ventas/Index" class="btn btn-light border">
+                <a asp-controller="Lote" asp-action="Index" class="btn btn-light border">
                     <i class="fas fa-arrow-left me-2"></i> Volver
                 </a>
             </div>
@@ -111,25 +111,8 @@
                
                 <div class="row g-4 mb-4">
 
-                    <!-- PRIMA -->
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
-                            <h5>Prima</h5>
-
-                            <div class="mb-3">
-                                <label>% Prima *</label>
-                                <input type="number" id="porcPrima" class="form-control" value="10" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label>Fecha vencimiento *</label>
-                                <input type="date" id="fechaPrima" class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- GASTOS -->
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
                             <h5 class="mb-2">Gastos de Formalización</h5>
 
@@ -190,7 +173,7 @@
 
 
                     <!-- CUOTA -->
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
                             <h5 class="mb-2">Cuota Bancaria</h5>
 
@@ -271,5 +254,4 @@
 
 @section scripts {
     <script src="~/assets/js/ventas.js"></script>
-    <script src="~/assets/js/calculos.js"></script>
 }

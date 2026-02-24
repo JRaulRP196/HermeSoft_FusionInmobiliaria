@@ -11,7 +11,6 @@ namespace HermeSoft_Fusion.Models
         public int IdTipoCambio { get; set; }
         
         [Required]
-        [Column("tipoCambio")] //estaba teniendo problemas con el nombre en BD asi que lo cambie aca
         public double? Cambio { get; set; }
 
 
