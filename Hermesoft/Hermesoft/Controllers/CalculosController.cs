@@ -21,19 +21,23 @@ namespace HermeSoft_Fusion.Controllers
         {
             try
             {
-                _calculosBusiness.ObtenerTimbreFiscal(); //Esta función es solo para verificar que se trae bien el timbre fiscal del appsettings
                 var desglose = await _calculosBusiness.CalcularPrima(codigoLote, porcentajePrima, fechaFinal);
-
                 TempData["DesglosePrima"] = JsonConvert.SerializeObject(desglose);
-                TempData["lote"] = codigoLote;
-                return RedirectToAction("Registro", "Ventas");
+                return RedirectToAction("Prima", "Ventas", new {lote = codigoLote});
 
             }catch (Exception ex)
             {
                 TempData["ErrorPrima"] = ex.ToString();
-                return RedirectToAction("Registro", "Ventas");
+                return RedirectToAction("Prima", "Ventas");
             }
         }
+        [HttpGet]
+        public IActionResult ObtenerTimbre()
+        {
+            var timbre = _calculosBusiness.ObtenerTimbreFiscal();
+            return Json(timbre);
+        }
+
 
     }
 }

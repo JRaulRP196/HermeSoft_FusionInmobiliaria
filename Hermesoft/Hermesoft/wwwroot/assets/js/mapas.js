@@ -61,6 +61,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 <a class="btn btn-primary waves-effect waves-light" href="/Ventas/Registro?lote=${encodeURIComponent(lote.codigo)}">
                     <i class="ri-wallet-3-line align-middle me-2"></i> Iniciar Proceso de Venta
                 </a>
+                <a class="btn btn-primary waves-effect waves-light" href="/Ventas/Prima?lote=${encodeURIComponent(lote.codigo)}">
+                    <i class="ri-wallet-3-line align-middle me-2"></i> Calcular Prima
+                </a>
             ` : ``}
         `;
 

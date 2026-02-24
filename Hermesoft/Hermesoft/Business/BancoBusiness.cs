@@ -5,6 +5,8 @@ using HermeSoft_Fusion.Repository;
 using HermeSoft_Fusion.Repository.Servicios;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using HermeSoft_Fusion.Business;
+
 
 namespace HermeSoft_Fusion.Business
 {

@@ -3,9 +3,7 @@
     const idLote = $("#lote");
     const porcentajePrima = $("#porcPrima");
     const fechaVencimientoPrima = $("#fechaPrima");
-    const resultadoPrima = $("#desglosePrima");
 
-    //Para el calculo de prima automatico
     function calcularPrima() {
         const lote = idLote.val();
         const fin = fechaVencimientoPrima.val();
@@ -16,20 +14,17 @@
     }
 
     function datosCompletosParaPrima() {
-
         if (!idLote.val()) return false;
-        if (!fechaVencimientoPrima.val()) return false;
+        if (!new Date(fechaVencimientoPrima.val())) return false;
         if (!porcentajePrima.val()) return false;
 
         const hoy = new Date();
         const fin = new Date(fechaVencimientoPrima.val());
 
-        if (fin <= hoy) {
+        if (fin <= hoy) return false;
+
+        if (fin.getMonth() === hoy.getMonth() && fin.getFullYear() === hoy.getFullYear()) {
             return false;
-        } else if (fin.getMonth() == hoy.getMonth()) {
-            if (fin.getFullYear() == hoy.getFullYear()) {
-                return false;
-            }
         }
 
         return true;
@@ -50,4 +45,6 @@
         calcularPrima();
     });
 
+    // inicial
+    actualizarBotonPrima();
 });

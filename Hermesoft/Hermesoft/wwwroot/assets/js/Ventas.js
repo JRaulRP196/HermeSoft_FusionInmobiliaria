@@ -1,26 +1,19 @@
-
 (function () {
-    // Mock: rol de usuario (para anulación). Cambiar según caso real.
-    const isAdmin = false; // cambiar a true para probar anulación como admin
 
-    // Helpers localStorage
+    const isAdmin = false;
+
     const KEY_VENTAS = "hermes_ventas";
     const KEY_BITACORA = "hermes_bitacora";
     const KEY_LOTES = "hermes_lotes_state";
 
-    function readVentas() {
-        return JSON.parse(localStorage.getItem(KEY_VENTAS) || "[]");
-    }
-    function writeVentas(arr) {
-        localStorage.setItem(KEY_VENTAS, JSON.stringify(arr));
-    }
+    function readVentas() { return JSON.parse(localStorage.getItem(KEY_VENTAS) || "[]"); }
+    function writeVentas(arr) { localStorage.setItem(KEY_VENTAS, JSON.stringify(arr)); }
     function addBitacora(entry) {
         const b = JSON.parse(localStorage.getItem(KEY_BITACORA) || "[]");
         b.push(entry);
         localStorage.setItem(KEY_BITACORA, JSON.stringify(b));
     }
 
-    // Init: ensure lotes persisted and sample
     function initLotes() {
         if (!localStorage.getItem(KEY_LOTES)) {
             const sample = {
@@ -34,30 +27,12 @@
     function readLotes() { return JSON.parse(localStorage.getItem(KEY_LOTES) || "{}"); }
     function writeLotes(obj) { localStorage.setItem(KEY_LOTES, JSON.stringify(obj)); }
 
-    // Util: generar contrato único (timestamp + random)
     function generarContrato() {
         const ts = Date.now().toString(36);
         const rnd = Math.floor(Math.random() * 9000) + 1000;
         return `CTR-${ts}-${rnd}`;
     }
 
-    // Cálculos: prima, gasto formalización, cuota mensual (sistema simple: amortización fija)
-    function calcularPrima(precio, porcPrima) {
-        return Math.round(precio * (porcPrima / 100));
-    }
-    function calcularGastoFormal(precio, seg = 0, abogados = 0, comision = 0, timbre = 0) {
-        const total = precio * ((seg + abogados + comision + timbre) / 100);
-        return Math.round(total);
-    }
-    function calcularCuotaMensual(precio, entrada = 0, tasaAnual = 7, plazoMeses = 360) {
-        const monto = precio - (entrada || 0);
-        const r = (tasaAnual / 100) / 12;
-        if (r === 0) return Math.round(monto / plazoMeses);
-        const cuota = monto * (r * Math.pow(1 + r, plazoMeses)) / (Math.pow(1 + r, plazoMeses) - 1);
-        return Math.round(cuota);
-    }
-
-    // Mensajes visuales
     function showMessage(elId, html, type = "success") {
         const el = document.getElementById(elId);
         if (!el) return;
@@ -65,8 +40,12 @@
         setTimeout(() => { el.innerHTML = ""; }, 6000);
     }
 
-    // ---------- Registro view logic ----------
-    function setupRegistro() {
+    function fmt(n) {
+        try { return new Intl.NumberFormat("es-CR").format(n); }
+        catch { return n; }
+    }
+
+    async function setupRegistro() {
         const form = document.getElementById("ventaForm");
         if (!form) return;
 
@@ -74,16 +53,25 @@
         const lote = document.getElementById("lote");
         const porcPrima = document.getElementById("porcPrima");
         const fechaPrima = document.getElementById("fechaPrima");
-        const desglosePrima = document.getElementById("desglosePrima");
+
         const calcGastoBtn = document.getElementById("calcGastoFormal");
         const gastoFormalizacion = document.getElementById("gastoFormalizacion");
-        const porcSeguros = document.getElementById("porcSeguros");
+
         const porcAbogados = document.getElementById("porcAbogados");
         const porcComision = document.getElementById("porcComision");
         const porcTimbre = document.getElementById("porcTimbre");
+        const msgTimbre = document.getElementById("msgTimbre");
+
+       
         const plazoMeses = document.getElementById("plazoMeses");
+
+       
+        const plazoSelect = document.getElementById("plazoSelect");
+
         const tasaInteres = document.getElementById("tasaInteres");
         const cuotaMensual = document.getElementById("cuotaMensual");
+        const ingresoNeto = document.getElementById("ingresoNeto");
+
         const moneda = document.getElementById("moneda");
         const banco = document.getElementById("banco");
         const tipoAsalariado = document.getElementById("tipoAsalariado");
@@ -91,386 +79,485 @@
         const asesor = document.getElementById("asesor");
         const generarPdfBtn = document.getElementById("generarPdfBtn");
         const enviarCorreoBtn = document.getElementById("enviarCorreoBtn");
-        const registrarVentaBtn = document.getElementById("registrarVentaBtn");
 
-        // on lote change update precio display and validations
-        function obtenerPrecioLote() {
-            const selected = lote.options[lote.selectedIndex];
-            if (!selected) return null;
-            const precioAttr = selected.getAttribute("data-precio");
-            return precioAttr ? Number(precioAttr) : null;
+        const escenario = document.getElementById("escenario");
+        const btnCuota = document.getElementById("calcCuotaBancaria");
+        const tablaBody = document.querySelector("#tablaCuotas tbody");
+
+        
+        const plazoMesesDisplay = document.getElementById("plazoMesesDisplay");
+
+        calcGastoBtn?.addEventListener("click", async () => {
+            try {
+                const codigoLote = lote?.value;
+                const idBanco = parseInt(banco?.value || "0");
+
+                if (!codigoLote || !idBanco) {
+                    showMessage("formMessages", "Debe seleccionar lote y banco.", "danger");
+                    return;
+                }
+
+                const url = `/Ventas/ObtenerGastoFormalizacion?codigoLote=${encodeURIComponent(codigoLote)}&idBanco=${idBanco}`;
+                const resp = await fetch(url);
+                const result = await resp.json().catch(() => null);
+
+                if (!resp.ok || !result?.ok) {
+                    showMessage("formMessages", result?.message || "No se pudo calcular el gasto de formalización.", "danger");
+                    return;
+                }
+
+                const d = result.data;
+
+                const segurosInputs = document.querySelectorAll("#porcSeguros");
+                if (segurosInputs.length > 0) segurosInputs[0].value = d.porcVida ?? 0;
+                if (segurosInputs.length > 1) segurosInputs[1].value = d.porcDesempleo ?? 0;
+
+                if (porcAbogados) porcAbogados.value = d.porcAbogados ?? 0;
+                if (porcComision) porcComision.value = d.porcComision ?? 0;
+
+                if (porcTimbre) {
+                    porcTimbre.value = d.timbreFiscal ?? 0;
+
+                    if (Number(d.timbreFiscal) === -1) {
+                        porcTimbre.readOnly = false;
+                        porcTimbre.style.border = "2px solid red";
+                        porcTimbre.style.backgroundColor = "#ffe5e5";
+                        msgTimbre?.classList.remove("d-none");
+                    } else {
+                        porcTimbre.readOnly = true;
+                        porcTimbre.style.border = "";
+                        porcTimbre.style.backgroundColor = "";
+                        msgTimbre?.classList.add("d-none");
+                    }
+                }
+
+                if (gastoFormalizacion) gastoFormalizacion.value = fmt(d.gastoFormalizacion);
+
+                baseCRC.gasto = Number(d.gastoFormalizacion);
+                
+                aplicarMoneda(document.getElementById("monedaSelect")?.value || "CRC");
+
+
+                showMessage("formMessages", "Gasto de formalización calculado.", "success");
+            } catch (e) {
+                console.error(e);
+                showMessage("formMessages", "Error calculando gasto de formalización.", "danger");
+            }
+        });
+
+        function toggleBtnCuota() {
+            if (!btnCuota) return;
+
+            const tieneBanco = !!(banco?.value);
+            const tieneEscenario = !!(escenario?.value);
+            const tieneMeses = Number(plazoMeses?.value || 0) > 0;
+
+            btnCuota.style.display = (tieneBanco && tieneEscenario && tieneMeses) ? "inline-block" : "none";
         }
 
-        function actualizarPrimaYCuota() {
-            const precio = obtenerPrecioLote();
-            if (!precio) {
-                desglosePrima.value = "";
-                cuotaMensual.value = "";
+        async function cargarEscenariosBanco() {
+            if (!escenario) return;
+
+            escenario.innerHTML = `<option value="">Seleccione escenario</option>`;
+            escenario.disabled = true;
+
+            // reset plazos
+            if (plazoSelect) {
+                plazoSelect.innerHTML = `<option value="">Seleccione plazo</option>`;
+                plazoSelect.disabled = true;
+            }
+            if (plazoMeses) plazoMeses.value = "";
+            if (plazoMesesDisplay) plazoMesesDisplay.value = "";
+
+            const idBanco = parseInt(banco?.value || "0");
+            if (!idBanco) {
+                toggleBtnCuota();
                 return;
             }
-            const primaVal = Number(porcPrima.value || 0);
-            const montoPrima = calcularPrima(precio, primaVal);
-            desglosePrima.value = `${new Intl.NumberFormat().format(montoPrima)} (${primaVal}%)`;
 
-            const entrada = montoPrima;
-            const cuota = calcularCuotaMensual(precio, entrada, Number(tasaInteres.value || 0), Number(plazoMeses.value || 1));
-            cuotaMensual.value = `${new Intl.NumberFormat().format(cuota)}`;
+            try {
+                const resp = await fetch(`/Ventas/ObtenerEscenariosPorBanco?idBanco=${idBanco}`);
+                const json = await resp.json().catch(() => null);
 
-            // ingreso neto simple: cuota * 3 (ejemplo de requerimiento)
-            document.getElementById("ingresoNeto").value = `${new Intl.NumberFormat().format(cuota * 3)}`;
+                if (!resp.ok || !json?.ok) {
+                    showMessage("formMessages", json?.message || "No se pudieron cargar escenarios.", "danger");
+                    toggleBtnCuota();
+                    return;
+                }
+
+                const lista = json.data || [];
+                if (!lista.length) {
+                    showMessage("formMessages", "El banco no tiene escenarios configurados.", "warning");
+                    toggleBtnCuota();
+                    return;
+                }
+
+                escenario.innerHTML =
+                    `<option value="">Seleccione escenario</option>` +
+                    lista.map(e => `<option value="${e.idEscenario}">${e.nombre}</option>`).join("");
+
+                escenario.disabled = false;
+                toggleBtnCuota();
+            } catch (e) {
+                console.error(e);
+                showMessage("formMessages", "Error cargando escenarios del banco.", "danger");
+                toggleBtnCuota();
+            }
         }
 
-        lote.addEventListener("change", () => {
-            const selected = lote.options[lote.selectedIndex];
-            const estado = selected ? selected.getAttribute("data-estado") : null;
-            if (estado !== "Disponible") {
-                lote.classList.add("is-invalid");
-            } else {
-                lote.classList.remove("is-invalid");
-            }
-            actualizarPrimaYCuota();
-        });
+        async function cargarPlazosEscenario() {
+            if (!plazoSelect) return;
 
-        porcPrima.addEventListener("input", actualizarPrimaYCuota);
-        tasaInteres.addEventListener("input", actualizarPrimaYCuota);
-        plazoMeses.addEventListener("input", actualizarPrimaYCuota);
+            plazoSelect.innerHTML = `<option value="">Seleccione plazo</option>`;
+            plazoSelect.disabled = true;
+            if (plazoMeses) plazoMeses.value = "";
+            if (plazoMesesDisplay) plazoMesesDisplay.value = "";
 
-        calcGastoBtn.addEventListener("click", () => {
-            const precio = obtenerPrecioLote();
-            if (!precio) { showMessage('formMessages', 'Seleccione un lote válido para calcular gastos.', 'danger'); return; }
-            const gasto = calcularGastoFormal(precio,
-                Number(porcSeguros.value || 0),
-                Number(porcAbogados.value || 0),
-                Number(porcComision.value || 0),
-                Number(porcTimbre.value || 0));
-            gastoFormalizacion.value = `${new Intl.NumberFormat().format(gasto)}`;
-            showMessage('formMessages', 'Gasto de formalización calculado.', 'success');
-        });
-
-        // PDF generation helper (uses jsPDF)
-        async function generarPdf(venta) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ unit: "pt", format: "a4" });
-
-            doc.setFontSize(14);
-            doc.text("Comprobante de Venta", 40, 50);
-            doc.setFontSize(10);
-            doc.text(`Contrato: ${venta.contrato}`, 40, 75);
-            doc.text(`Fecha: ${venta.fecha}`, 40, 90);
-
-            doc.text("Cliente:", 40, 120);
-            doc.text(`${venta.cliente}`, 120, 120);
-
-            doc.text("Lote:", 40, 135);
-            doc.text(`${venta.lote} (${venta.condominio || ""})`, 120, 135);
-
-            doc.text("Monto Total:", 40, 155);
-            doc.text(`${venta.moneda === 'USD' ? '$' : '₡'} ${new Intl.NumberFormat().format(venta.monto)}`, 140, 155);
-
-            doc.autoTable({
-                startY: 185,
-                head: [["Concepto", "Detalle"]],
-                body: [
-                    ["Prima %", `${venta.porcPrima}%`],
-                    ["Prima monto", `${new Intl.NumberFormat().format(venta.prima)}`],
-                    ["Gasto formalización", `${new Intl.NumberFormat().format(venta.gastoFormal)}`],
-                    ["Cuota mensual", `${new Intl.NumberFormat().format(venta.cuotaMensual)}`],
-                    ["Banco", venta.banco || ""],
-                    ["Asesor", venta.asesor || ""]
-                ]
-            });
-
-            return doc;
-        }
-
-        generarPdfBtn?.addEventListener("click", async () => {
-            const datos = construyeVentaTemporal();
-            if (!datos) return;
-            const doc = await generarPdf(datos);
-            // preview in new window
-            const blob = doc.output("blob");
-            const url = URL.createObjectURL(blob);
-            window.open(url, "_blank");
-        });
-
-        enviarCorreoBtn?.addEventListener("click", async () => {
-            const datos = construyeVentaTemporal();
-            if (!datos) return;
-            const doc = await generarPdf(datos);
-            // descargar temporal para adjuntar manualmente o simular envío
-            const blob = doc.output("blob");
-            // Simulación: abrir cliente de correo con mailto + mensaje (no puede adjuntar PDF desde frontend sin backend)
-            const mailto = `mailto:${datos.cliente}?subject=Comprobante%20de%20Venta%20${encodeURIComponent(datos.contrato)}&body=Adjuntamos%20su%20comprobante%20de%20venta.%0AContrato:%20${encodeURIComponent(datos.contrato)}`;
-            window.location.href = mailto;
-            showMessage('formMessages', 'Se ha abierto el cliente de correo con la dirección del cliente. (Adjunte el PDF manualmente si lo desea)', 'info');
-        });
-
-        // Construye objeto venta temporal para preview o registro
-        function construyeVentaTemporal() {
-            // Validaciones front
-            if (!cliente.value) { showMessage('formMessages', 'Cliente es obligatorio', 'danger'); cliente.focus(); return null; }
-            const selectedLote = lote.options[lote.selectedIndex];
-            if (!selectedLote) { showMessage('formMessages', 'Lote obligatorio', 'danger'); return null; }
-            if (selectedLote.getAttribute('data-estado') !== 'Disponible') { showMessage('formMessages', 'El lote seleccionado no está disponible', 'danger'); return null; }
-            if (!fechaVenta.value) { showMessage('formMessages', 'Fecha de venta es obligatoria', 'danger'); return null; }
-            if (!banco.value) { showMessage('formMessages', 'Banco es obligatorio', 'danger'); return null; }
-            const bancoOpt = banco.options[banco.selectedIndex];
-            if (bancoOpt && bancoOpt.getAttribute('data-plan-vigente') === 'false') {
-                showMessage('formMessages', 'El plan de pago del banco seleccionado no está vigente.', 'danger');
-                return null;
-            }
-            // Prepara objeto
-            const precio = obtenerPrecioLote();
-            const porcPrimaVal = Number(porcPrima.value || 0);
-            const prima = calcularPrima(precio, porcPrimaVal);
-            const gastoFormal = calcularGastoFormal(precio, Number(porcSeguros.value || 0), Number(porcAbogados.value || 0), Number(porcComision.value || 0), Number(porcTimbre.value || 0));
-            const cuota = calcularCuotaMensual(precio, prima, Number(tasaInteres.value || 0), Number(plazoMeses.value || 1));
-            const ventaTemp = {
-                id: Date.now(),
-                contrato: generarContrato(),
-                cliente: cliente.value,
-                lote: selectedLote.value,
-                condominio: selectedLote.getAttribute('data-condominio') || "",
-                fecha: fechaVenta.value,
-                monto: precio,
-                moneda: moneda.value,
-                banco: banco.value,
-                tipoAsalariado: tipoAsalariado.value,
-                porcPrima: porcPrimaVal,
-                prima: prima,
-                gastoFormal: gastoFormal,
-                cuotaMensual: cuota,
-                tasaInteres: Number(tasaInteres.value || 0),
-                plazoMeses: Number(plazoMeses.value || 0),
-                asesor: asesor.value,
-                estado: "En proceso"
-            };
-            return ventaTemp;
-        }
-
-        // Submit: registra la venta en localStorage y actualiza estado del lote
-        form.addEventListener("submit", (ev) => {
-            ev.preventDefault();
-            const venta = construyeVentaTemporal();
-            if (!venta) return;
-
-            // Guardar venta
-            const ventas = readVentas();
-            ventas.push(venta);
-            writeVentas(ventas);
-
-            // Actualizar lote
-            const lotes = readLotes();
-            if (lotes[venta.lote]) {
-                lotes[venta.lote].estado = "Vendido";
-            } else {
-                lotes[venta.lote] = { estado: "Vendido", precio: venta.monto, condominio: venta.condominio };
-            }
-            writeLotes(lotes);
-
-            // Bitácora
-            addBitacora({ accion: "Registro Venta", usuario: venta.asesor, fecha: new Date().toISOString(), detalles: `Contrato ${venta.contrato}` });
-
-            showMessage('formMessages', 'Venta registrada correctamente. Contrato: ' + venta.contrato, 'success');
-
-            // Reset del formulario (opcional)
-            setTimeout(() => { window.location.href = '/Ventas/Detalle?contrato=' + encodeURIComponent(venta.contrato); }, 800);
-        });
-
-        // inicializar valores
-        initLotes();
-        actualizarPrimaYCuota();
-    }
-
-    // ---------- Historial view logic ----------
-    function setupHistorial() {
-        const tablaBody = document.querySelector("#tablaVentas tbody");
-        const btnFiltrar = document.getElementById("btnFiltrar");
-        const btnLimpiar = document.getElementById("btnLimpiar");
-        const filterDesde = document.getElementById("filterDesde");
-        const filterHasta = document.getElementById("filterHasta");
-        const filterCondominio = document.getElementById("filterCondominio");
-        const historialMessages = document.getElementById("historialMessages");
-
-        if (!tablaBody) return;
-
-        function renderTabla(ventas) {
-            tablaBody.innerHTML = "";
-            if (!ventas.length) {
-                historialMessages.innerHTML = `<div class="alert alert-danger">No se encontraron resultados</div>`;
+            const idBanco = parseInt(banco?.value || "0");
+            const idEscenario = parseInt(escenario?.value || "0");
+            if (!idBanco || !idEscenario) {
+                toggleBtnCuota();
                 return;
             }
-            historialMessages.innerHTML = "";
-            ventas.forEach(v => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-          <td>${v.id}</td>
-          <td>${v.contrato}</td>
-          <td>${v.cliente}</td>
-          <td>${v.lote}</td>
-          <td>${v.fecha}</td>
-          <td>${v.moneda === 'USD' ? '$' : '₡'} ${new Intl.NumberFormat().format(v.monto)}</td>
-          <td>${v.estado || ''}</td>
-          <td>
-            <a class="btn btn-sm btn-info me-1" href="/Ventas/Detalle?contrato=${encodeURIComponent(v.contrato)}">Detalle</a>
-            <button class="btn btn-sm btn-danger btn-anular" data-contrato="${v.contrato}">Anular</button>
-          </td>
-        `;
-                tablaBody.appendChild(tr);
-            });
 
-            // bind botones anular
-            document.querySelectorAll(".btn-anular").forEach(btn => {
-                btn.addEventListener("click", (e) => {
-                    const contrato = e.currentTarget.getAttribute("data-contrato");
-                    anularVenta(contrato);
-                });
-            });
-        }
+            try {
+                const resp = await fetch(`/Ventas/ObtenerPlazosPorEscenario?idBanco=${idBanco}&idEscenario=${idEscenario}`);
+                const json = await resp.json().catch(() => null);
 
-        function obtenerVentasFiltradas() {
-            const ventas = readVentas();
-            let res = ventas.slice();
-            const desde = filterDesde.value;
-            const hasta = filterHasta.value;
-            const condo = filterCondominio.value;
+                if (!resp.ok || !json?.ok) {
+                    showMessage("formMessages", json?.message || "No se pudieron cargar plazos del escenario.", "danger");
+                    toggleBtnCuota();
+                    return;
+                }
 
-            if (desde) res = res.filter(v => v.fecha >= desde);
-            if (hasta) res = res.filter(v => v.fecha <= hasta);
-            if (condo) res = res.filter(v => (v.condominio || "").includes(condo));
-            return res;
-        }
+                const plazos = json.data || [];
+                if (!plazos.length) {
+                    showMessage("formMessages", "El escenario no tiene plazos configurados.", "warning");
+                    toggleBtnCuota();
+                    return;
+                }
 
-        btnFiltrar?.addEventListener("click", () => {
-            const filtradas = obtenerVentasFiltradas();
-            renderTabla(filtradas);
-        });
+                plazoSelect.innerHTML =
+                    `<option value="">Seleccione plazo</option>` +
+                    plazos.map(p => `<option value="${p}">${p}</option>`).join("");
 
-        btnLimpiar?.addEventListener("click", () => {
-            filterDesde.value = "";
-            filterHasta.value = "";
-            filterCondominio.value = "";
-            renderTabla(readVentas());
-        });
+                plazoSelect.disabled = false;
 
-        // Anulación (frontend): solo admin
-        function anularVenta(contrato) {
-            const ventas = readVentas();
-            const idx = ventas.findIndex(v => v.contrato === contrato);
-            if (idx === -1) { showMessage('historialMessages', 'Venta no encontrada', 'danger'); return; }
-            if (!isAdmin) {
-                showMessage('historialMessages', 'No posee permisos para anular ventas.', 'danger');
-                return;
+               
+                plazoSelect.value = plazos[0];
+                if (plazoMeses) plazoMeses.value = plazos[0];
+                if (plazoMesesDisplay) plazoMesesDisplay.value = plazos[0];
+
+                toggleBtnCuota();
+                await cargarTasaEscenario();
+            } catch (e) {
+                console.error(e);
+                showMessage("formMessages", "Error cargando plazos del escenario.", "danger");
+                toggleBtnCuota();
             }
-            const motivo = prompt("Ingrese motivo de anulación:");
-            if (!motivo) { showMessage('historialMessages', 'Anulación cancelada (no se ingresó motivo).', 'warning'); return; }
-            ventas[idx].estado = "Anulada";
-            ventas[idx].motivoAnulacion = motivo;
-            writeVentas(ventas);
-
-            // liberar lote
-            const lotes = readLotes();
-            if (lotes[ventas[idx].lote]) lotes[ventas[idx].lote].estado = "Disponible";
-            writeLotes(lotes);
-
-            addBitacora({ accion: "Anulación", usuario: "usuario_actual@example.com", fecha: new Date().toISOString(), detalles: `Contrato ${contrato} - Motivo: ${motivo}` });
-
-            showMessage('historialMessages', `Venta ${contrato} anulada.`, 'success');
-            renderTabla(obtenerVentasFiltradas());
         }
 
-        // render inicial
-        renderTabla(readVentas());
-    }
+        async function cargarTasaEscenario() {
+            try {
+                const idBanco = parseInt(banco?.value || "0");
+                const idEscenario = parseInt(escenario?.value || "0");
+                const meses = parseInt(plazoMeses?.value || "0");
 
-    // ---------- Detalle view logic ----------
-    function setupDetalle() {
-        const cont = document.getElementById("detalleVentaContent");
-        if (!cont) return;
-        // Leer query string contrato
-        const params = new URLSearchParams(location.search);
-        const contrato = params.get("contrato");
-        if (!contrato) {
-            cont.innerHTML = `<div class="alert alert-warning">No se especificó contrato.</div>`;
-            return;
+                if (!idBanco || !idEscenario || !meses) return;
+
+                const resp = await fetch(`/Ventas/ObtenerTasaInteresEscenario?idBanco=${idBanco}&idEscenario=${idEscenario}&plazoMeses=${meses}`);
+
+                if (!resp.ok) {
+                    const err = await resp.json().catch(() => null);
+                    showMessage("formMessages", err?.message || "No existen datos suficientes para calcular la tasa de interés.", "danger");
+                    if (tasaInteres) tasaInteres.value = "";
+                    return;
+                }
+
+                const json = await resp.json();
+                if (!json.ok) {
+                    showMessage("formMessages", json.message || "No existen datos suficientes para calcular la tasa de interés.", "danger");
+                    if (tasaInteres) tasaInteres.value = "";
+                    return;
+                }
+
+                if (tasaInteres) {
+                    tasaInteres.value = json.data.tasaFinal;
+                    tasaInteres.readOnly = true;
+                }
+            } catch (e) {
+                console.error(e);
+                showMessage("formMessages", "Error consultando tasa de interés.", "danger");
+            }
         }
-        const ventas = readVentas();
-        const venta = ventas.find(v => v.contrato === contrato);
-        if (!venta) {
-            cont.innerHTML = `<div class="alert alert-warning">Venta no encontrada.</div>`;
-            return;
+
+        async function calcularCuotaBancaria() {
+            try {
+                const codigoLote = lote?.value;
+                const idBanco = parseInt(banco?.value || "0");
+                const idEscenario = parseInt(escenario?.value || "0");
+                const meses = parseInt(plazoMeses?.value || "0");
+                const primaPct = Number(porcPrima?.value || 0);
+
+                if (!codigoLote || !idBanco || !idEscenario || !meses) return;
+
+                const resp = await fetch(
+                    `/Ventas/CalcularCuotaMensualBancaria?codigoLote=${encodeURIComponent(codigoLote)}&idBanco=${idBanco}&idEscenario=${idEscenario}&plazoMeses=${meses}&porcPrima=${primaPct}`
+                );
+
+                if (!resp.ok) {
+                    const err = await resp.json().catch(() => null);
+                    showMessage("formMessages", err?.message || "No se pudo calcular la cuota.", "danger");
+                    return;
+                }
+
+                const json = await resp.json();
+                if (!json.ok) {
+                    showMessage("formMessages", json.message || "No se pudo calcular la cuota.", "danger");
+                    return;
+                }
+
+                const d = json.data;
+
+                if (tablaBody) {
+                    tablaBody.innerHTML = `
+                        <tr>
+                            <td>${d.plazoMeses}</td>
+                            <td>${d.escenario}</td>
+                            <td>${d.indicador}</td>
+                            <td>${d.tasaFinal}</td>
+                            <td>${fmt(d.cuotaMensual)}</td>
+                        </tr>
+                    `;
+                }
+
+                if (plazoMesesDisplay) plazoMesesDisplay.value = d.plazoMeses;
+
+                if (tasaInteres) {
+                    tasaInteres.value = d.tasaFinal;
+                    tasaInteres.readOnly = true;
+                }
+
+                if (cuotaMensual) cuotaMensual.value = fmt(d.cuotaMensual);
+                if (ingresoNeto) ingresoNeto.value = fmt(Number(d.cuotaMensual || 0) * 3);
+
+                baseCRC.cuota = Number(d.cuotaMensual);
+                baseCRC.ingreso = Number(d.cuotaMensual || 0) * 3;
+
+                aplicarMoneda(document.getElementById("monedaSelect")?.value || "CRC");
+
+               
+                baseCRC.cuota = Number(d.cuotaMensual);
+                baseCRC.ingreso = Number(d.cuotaMensual || 0) * 3;
+
+               
+                aplicarMoneda(document.getElementById("monedaSelect")?.value || "CRC");
+
+
+                showMessage("formMessages", "Cuota calculada con sistema francés.", "success");
+            } catch (e) {
+                console.error(e);
+                showMessage("formMessages", "Error calculando cuota mensual bancaria.", "danger");
+            }
         }
 
-        cont.innerHTML = `
-      <div class="row">
-        <div class="col-md-6">
-          <label class="form-label">Contrato</label>
-          <input class="form-control" value="${venta.contrato}" disabled />
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Fecha</label>
-          <input class="form-control" value="${venta.fecha}" disabled />
-        </div>
-        <div class="col-md-6 mt-3">
-          <label class="form-label">Cliente</label>
-          <input class="form-control" value="${venta.cliente}" disabled />
-        </div>
-        <div class="col-md-6 mt-3">
-          <label class="form-label">Lote</label>
-          <input class="form-control" value="${venta.lote}" disabled />
-        </div>
-        <div class="col-md-6 mt-3">
-          <label class="form-label">Monto</label>
-          <input class="form-control" value="${new Intl.NumberFormat().format(venta.monto)} ${venta.moneda === 'USD' ? '$' : '₡'}" disabled />
-        </div>
-        <div class="col-md-6 mt-3">
-          <label class="form-label">Estado</label>
-          <input class="form-control" value="${venta.estado || ''}" disabled />
-        </div>
+        function toggleBtnFormalizacion() {
+            const tieneLote = !!(lote?.value);
+            const tieneBanco = !!(banco?.value);
+            if (!calcGastoBtn) return;
+            calcGastoBtn.style.display = (tieneLote && tieneBanco) ? "block" : "none";
+        }
 
-        <div class="col-12 mt-4">
-          <h6>Desglose</h6>
-          <ul>
-            <li>Prima: ${new Intl.NumberFormat().format(venta.prima)}</li>
-            <li>Gasto de Formalización: ${new Intl.NumberFormat().format(venta.gastoFormal)}</li>
-            <li>Cuota mensual estimada: ${new Intl.NumberFormat().format(venta.cuotaMensual)}</li>
-            <li>Banco: ${venta.banco}</li>
-            <li>Asesor: ${venta.asesor}</li>
-          </ul>
-        </div>
-      </div>
-    `;
+        async function cargarDatosBancoDesdeBD() {
+            try {
+                const idBanco = parseInt(banco?.value || "0");
+                if (!idBanco) return;
 
-        // Botón generar PDF
-        const btnGen = document.getElementById("detalleGenerarPdf");
-        btnGen?.addEventListener("click", async () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ unit: "pt", format: "a4" });
-            doc.setFontSize(14); doc.text("Comprobante de Venta", 40, 50);
-            doc.setFontSize(10); doc.text(`Contrato: ${venta.contrato}`, 40, 75);
-            doc.autoTable({
-                startY: 100,
-                head: [["Campo", "Valor"]],
-                body: [
-                    ["Cliente", venta.cliente],
-                    ["Lote", venta.lote],
-                    ["Monto", `${venta.moneda === 'USD' ? '$' : '₡'} ${new Intl.NumberFormat().format(venta.monto)}`],
-                    ["Prima", new Intl.NumberFormat().format(venta.prima)],
-                    ["Gasto Formalización", new Intl.NumberFormat().format(venta.gastoFormal)]
-                ]
-            });
-            const blob = doc.output("blob");
-            const url = URL.createObjectURL(blob);
-            window.open(url, "_blank");
+                const resp = await fetch(`/Ventas/ObtenerDatosBanco?idBanco=${idBanco}`);
+                const json = await resp.json().catch(() => null);
+
+                if (!resp.ok || !json?.ok) {
+                    showMessage("formMessages", json?.message || "No se pudo cargar banco.", "danger");
+                    return;
+                }
+
+                const d = json.data;
+
+                const segurosInputs = document.querySelectorAll("#porcSeguros");
+                if (segurosInputs.length > 0) {
+                    segurosInputs[0].value = d.porcVida ?? 0;
+                    segurosInputs[0].readOnly = true;
+                }
+                if (segurosInputs.length > 1) {
+                    segurosInputs[1].value = d.porcDesempleo ?? 0;
+                    segurosInputs[1].readOnly = true;
+                }
+
+                if (porcComision) {
+                    porcComision.value = d.comision ?? 0;
+                    porcComision.readOnly = true;
+                }
+
+                if (porcAbogados) {
+                    porcAbogados.value = d.honorarioAbogado ?? 0;
+                    porcAbogados.readOnly = true;
+                }
+            } catch (e) {
+                console.error(e);
+                showMessage("formMessages", "Error cargando datos del banco.", "danger");
+            }
+        }
+
+        async function cargarTimbreFiscal() {
+            try {
+                const resp = await fetch("/Calculos/ObtenerTimbre");
+                const timbre = await resp.json();
+
+                if (Number(timbre) === -1) {
+                    porcTimbre.value = -1;
+                    porcTimbre.readOnly = false;
+                    porcTimbre.style.border = "2px solid red";
+                    porcTimbre.style.backgroundColor = "#ffe5e5";
+                    if (msgTimbre) msgTimbre.classList.remove("d-none");
+                } else {
+                    porcTimbre.value = timbre;
+                    porcTimbre.readOnly = true;
+                    porcTimbre.style.border = "";
+                    porcTimbre.style.backgroundColor = "";
+                    if (msgTimbre) msgTimbre.classList.add("d-none");
+                }
+            } catch {
+                porcTimbre.value = -1;
+                porcTimbre.readOnly = false;
+                porcTimbre.style.border = "2px solid red";
+                porcTimbre.style.backgroundColor = "#ffe5e5";
+                if (msgTimbre) msgTimbre.classList.remove("d-none");
+            }
+        }
+
+        banco?.addEventListener("change", async () => {
+            toggleBtnFormalizacion();
+
+            await cargarEscenariosBanco();
+            await cargarDatosBancoDesdeBD();
+
+            if (tasaInteres) tasaInteres.value = "";
+            if (plazoMesesDisplay) plazoMesesDisplay.value = "";
+            if (tablaBody) tablaBody.innerHTML = "";
+            if (cuotaMensual) cuotaMensual.value = "";
+            if (ingresoNeto) ingresoNeto.value = "";
+
+            toggleBtnCuota();
         });
+
+        
+        escenario?.addEventListener("change", async () => {
+            await cargarPlazosEscenario();
+        });
+
+        
+        plazoSelect?.addEventListener("change", async () => {
+            const v = parseInt(plazoSelect.value || "0");
+            if (plazoMeses) plazoMeses.value = v ? v : "";
+            if (plazoMesesDisplay) plazoMesesDisplay.value = v ? v : "";
+            toggleBtnCuota();
+            await cargarTasaEscenario();
+        });
+
+        btnCuota?.addEventListener("click", calcularCuotaBancaria);
+
+        // init
+        toggleBtnFormalizacion();
+        toggleBtnCuota();
+        cargarTimbreFiscal();
+
+        // si ya hay banco seleccionado al cargar
+        if (banco?.value) {
+            await cargarEscenariosBanco();
+            await cargarDatosBancoDesdeBD();
+            toggleBtnCuota();
+        }
     }
 
-    // INIT global (mount appropriate depending on page)
     document.addEventListener("DOMContentLoaded", function () {
         initLotes();
         setupRegistro();
-        setupHistorial();
-        setupDetalle();
     });
+    /////////////////
+    let tipoCambio = null;
 
+    const baseCRC = {
+        gasto: null,
+        cuota: null,
+        ingreso: null
+    };
+
+    function parseMoney(val) {
+        if (!val) return null;
+        return Number(val.toString().replace(/[₡$\s,]/g, ""));
+    }
+
+    function formatCRC(n) {
+        if (n == null) return "";
+        return "₡" + n.toLocaleString("es-CR", { maximumFractionDigits: 0 });
+    }
+
+    function formatUSD(n) {
+        if (n == null) return "";
+        return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+
+    async function cargarTipoCambio() {
+        if (tipoCambio) return tipoCambio;
+
+        const res = await fetch("/Ventas/TipoCambioActual");
+        if (!res.ok) return null;
+
+        const data = await res.json();
+        if (!data.ok) return null;
+
+        tipoCambio = Number(data.tipoCambio);
+        document.getElementById("tipoCambioInput").value =
+            tipoCambio.toLocaleString("es-CR", { minimumFractionDigits: 2 });
+
+        return tipoCambio;
+    }
+
+    function aplicarMoneda(moneda) {
+
+        const gastoInput = document.getElementById("gastoFormalizacion");
+        const cuotaInput = document.getElementById("cuotaMensual");
+        const ingresoInput = document.getElementById("ingresoNeto");
+
+        if (moneda === "CRC") {
+            if (baseCRC.gasto != null) gastoInput.value = formatCRC(baseCRC.gasto);
+            if (baseCRC.cuota != null) cuotaInput.value = formatCRC(baseCRC.cuota);
+            if (baseCRC.ingreso != null) ingresoInput.value = formatCRC(baseCRC.ingreso);
+            return;
+        }
+
+        if (!tipoCambio || tipoCambio <= 0) {
+            alert("No hay tipo de cambio disponible.");
+            document.getElementById("monedaSelect").value = "CRC";
+            aplicarMoneda("CRC");
+            return;
+        }
+
+        if (baseCRC.gasto != null) gastoInput.value = formatUSD(baseCRC.gasto / tipoCambio);
+        if (baseCRC.cuota != null) cuotaInput.value = formatUSD(baseCRC.cuota / tipoCambio);
+        if (baseCRC.ingreso != null) ingresoInput.value = formatUSD(baseCRC.ingreso / tipoCambio);
+    }
+
+    document.getElementById("monedaSelect")?.addEventListener("change", async function () {
+        if (this.value === "USD") {
+            const tc = await cargarTipoCambio();
+            if (!tc) {
+                this.value = "CRC";
+                aplicarMoneda("CRC");
+                return;
+            }
+        }
+        aplicarMoneda(this.value);
+    });
 })();
