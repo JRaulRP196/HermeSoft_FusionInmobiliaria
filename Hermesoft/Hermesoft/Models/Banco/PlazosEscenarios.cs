@@ -10,7 +10,7 @@ namespace HermeSoft_Fusion.Models.Banco
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdPlazoEscenario { get; set; }
         [Required]
-        public double PorcAdicional { get; set; }
+        public double? PorcAdicional { get; set; }
         [Required]
         public int Plazo { get; set; }
         [Required]

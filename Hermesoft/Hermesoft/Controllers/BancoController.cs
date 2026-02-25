@@ -1,7 +1,9 @@
 ﻿using HermeSoft_Fusion.Business;
 using HermeSoft_Fusion.Models.Banco;
+using HermeSoft_Fusion.Repository.Servicios;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace HermeSoft_Fusion.Controllers
 {
@@ -12,14 +14,16 @@ namespace HermeSoft_Fusion.Controllers
         private readonly TasaInteresBusiness _tasaInteresBusiness;
         private readonly IndicadoresBancariosBusiness _indicadoresBancariosBusiness;
         private readonly TipoCambioBusiness _tipoCambioBusiness;
+        private readonly Configuracion _configuracion;
 
         public BancoController(BancoBusiness bancoBusiness, TasaInteresBusiness tasaInteresBusiness,
-            IndicadoresBancariosBusiness indicadoresBancariosBusiness, TipoCambioBusiness tipoCambioBusiness)
+            IndicadoresBancariosBusiness indicadoresBancariosBusiness, TipoCambioBusiness tipoCambioBusiness, Configuracion configuracion)
         {
             _bancoBusiness = bancoBusiness;
             _tasaInteresBusiness = tasaInteresBusiness;
             _indicadoresBancariosBusiness = indicadoresBancariosBusiness;
             _tipoCambioBusiness = tipoCambioBusiness;
+            _configuracion = configuracion;
         }
 
         public async Task<IActionResult> Index()
@@ -103,6 +107,50 @@ namespace HermeSoft_Fusion.Controllers
                 TempData["MensajeError"] = "Ocurrio un error interno a la hora de editar el banco";
                 return RedirectToAction("Index");
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerEscenariosJS(int idBanco)
+        {
+            var banco = await _bancoBusiness.ObtenerPorId(idBanco);
+
+            var escenarios = banco.EscenariosTasaInteres.Select(e => new
+            {
+                idEscenario = e.IdEscenario,
+                nombre = e.Nombre
+            });
+
+            return Json(escenarios);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerInfoGeneralJS(int idBanco)
+        {
+            var banco = await _bancoBusiness.ObtenerPorId(idBanco);
+            if (banco == null) return NotFound("Banco no existe");
+            var bancoJson = new
+            {
+                seguroVida = banco.SeguroBancos.FirstOrDefault(s => s.Seguro.Nombre == "Vida").PorcSeguro,
+                seguroDesempleo = banco.SeguroBancos.FirstOrDefault(s => s.Seguro.Nombre == "Desempleo").PorcSeguro,
+                honorarioAbogados = banco.HonorarioAbogado,
+                comisionBancaria = banco.Comision,
+                timbreFiscal = double.Parse(_configuracion.ObtenerValor("TimbreFiscal"), CultureInfo.InvariantCulture)
+            };
+
+            return Json(bancoJson);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerEndeudamientosJS(int idBanco)
+        {
+            var banco = await _bancoBusiness.ObtenerPorId(idBanco);
+            if (banco == null) return NotFound("Banco no existe");
+            var endeudamientosJson = banco.EndeudamientoMaximos.Select(e => new
+            {
+                idEndeudamiento = e.IdEndeudamiento,
+                nombre = e.TipoAsalariado.Nombre
+            });
+            return Json(endeudamientosJson);
         }
 
     }

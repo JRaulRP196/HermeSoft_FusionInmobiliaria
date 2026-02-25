@@ -1,12 +1,15 @@
 ﻿using HermeSoft_Fusion.Business;
 using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Banco;
+using HermeSoft_Fusion.Models.Servicios;
 using HermeSoft_Fusion.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace HermeSoft_Fusion.Controllers
 {
+    [Authorize(Roles = "Ventas, Administrador")]
     public class VentasController : Controller
     {
         private readonly BancoBusiness _bancoBusiness;
@@ -24,7 +27,12 @@ namespace HermeSoft_Fusion.Controllers
         }
 
         public IActionResult Index() => View();
-
+        public async Task<IActionResult> StepperRegistro(string lote)
+        {
+            ViewBag.lote = lote;
+            ViewBag.Bancos = await _bancoBusiness.ObtenerTodos();
+            return View();
+        }
         public async Task<IActionResult> Registro(string lote)
         {
             ViewBag.lote = lote;

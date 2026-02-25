@@ -1,4 +1,5 @@
 ﻿using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Banco;
 using HermeSoft_Fusion.Models.Servicios;
 using HermeSoft_Fusion.Repository;
 using HermeSoft_Fusion.Repository.Servicios;
@@ -11,15 +12,21 @@ namespace HermeSoft_Fusion.Business
         private readonly LoteRepository _loteRepository;
         private readonly Configuracion _configuracion;
         private readonly BancoRepository _bancoRepository;
+        private readonly EscenarioTasaInteresRepository _escenarioTasaInteresRepository;
+        private readonly TipoCambioRepository _tipoCambioRepository;
 
         public CalculosBusiness(
             LoteRepository loteRepository,
             Configuracion configuracion,
-            BancoRepository bancoRepository)
+            BancoRepository bancoRepository,
+            EscenarioTasaInteresRepository escenarioTasaInteresRepository,
+            TipoCambioRepository tipoCambioRepository)
         {
             _loteRepository = loteRepository;
             _configuracion = configuracion;
             _bancoRepository = bancoRepository;
+            _escenarioTasaInteresRepository = escenarioTasaInteresRepository;
+            _tipoCambioRepository = tipoCambioRepository;
         }
 
         #region Utilidades
@@ -64,6 +71,69 @@ namespace HermeSoft_Fusion.Business
             }
 
             return desglosePrima;
+        }
+
+        public async Task<List<CuotaBancaria>> CalcularCuotasBancaria(int idEscenario, string codigoLote)
+        {
+            EscenarioTasaInteres escenario = await _escenarioTasaInteresRepository.Obtener(idEscenario);
+            if (escenario == null) throw new Exception("Escenario invalido");
+
+            Lote lote = await _loteRepository.Obtener(codigoLote);
+            if (lote == null) throw new Exception("Lote no válido");
+
+            List<CuotaBancaria> cuotas = new List<CuotaBancaria>();
+            foreach(PlazosEscenarios plazo in escenario.PlazosEscenarios)
+            {
+                double tasaAnual = (plazo.Indicador.PorcSeguro ?? 0)
+                     + (plazo.PorcAdicional ?? 0);
+                double tasaMensual = (tasaAnual / 100) / 12;
+                double P = (double)lote.PrecioVenta;
+
+                double cuotaMensual = P * (tasaMensual * Math.Pow(1 + tasaMensual, plazo.Plazo))
+                                        / (Math.Pow(1 + tasaMensual, plazo.Plazo) - 1);
+
+                CuotaBancaria cuota = new CuotaBancaria
+                {
+                    Plazo = plazo.Plazo,
+                    TasaInteres = tasaAnual,
+                    MontoMensual = cuotaMensual
+                };
+                cuotas.Add(cuota);
+            }
+            return cuotas;
+        }
+
+        public async Task<decimal> CalcularGastoFormalizacion(decimal seguroVida, decimal seguroDesempleo, decimal honorarioAbogados, 
+            decimal comisionBancaria, string codLote)
+        {
+
+            if (seguroVida < 0 || seguroDesempleo < 0 || honorarioAbogados < 0 || comisionBancaria < 0 || codLote == null) 
+                throw new Exception("Se necesitan datos correctos");
+
+            var lote = await _loteRepository.Obtener(codLote);
+            var montoHonorarioAbogados = lote.PrecioVenta * (honorarioAbogados * 0.01m);
+            montoHonorarioAbogados = montoHonorarioAbogados + (montoHonorarioAbogados * (decimal.Parse(_configuracion.ObtenerValor("IVA")) * 0.01m));
+            var porcentajeExtra = seguroVida + seguroDesempleo + comisionBancaria + decimal.Parse(_configuracion.ObtenerValor("TimbreFiscal"));
+            var montoExtra = lote.PrecioVenta * (porcentajeExtra * 0.01m);
+            return montoHonorarioAbogados + montoExtra;
+        }
+
+        public async Task<decimal> CalcularIngresoNetoFamiliar(int idBanco, int idEndeudamiento, decimal cuotaMensual)
+        {
+            var banco = await _bancoRepository.ObtenerPorId(idBanco);
+            if (banco == null) throw new Exception("Banco inválido");
+            var endeudamientoMaximo = banco.EndeudamientoMaximos.FirstOrDefault(e => e.IdEndeudamiento == idEndeudamiento);
+            if (endeudamientoMaximo == null) throw new Exception("Endeudamiento máximo inválido");
+            if (cuotaMensual <= 0) throw new Exception("Cuota mensual no calculada");
+
+            return cuotaMensual / (endeudamientoMaximo.PorcEndeudamiento * 0.01m);
+        }
+
+        public async Task<double?> ObtenerCambioDelDolar()
+        {
+            var cambio = await _tipoCambioRepository.Obtener();
+            if (cambio == null || cambio.Cambio == null) throw new Exception("Ocurrio un error al obtener el cambio del dolar");
+            return cambio.Cambio;
         }
 
         public decimal ObtenerTimbreFiscal()

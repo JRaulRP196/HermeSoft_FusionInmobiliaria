@@ -16,5 +16,7 @@ namespace HermeSoft_Fusion.Models.Banco
         public double? PorcSeguro { get; set; }
 
         public DateTime? FechaVigente { get; set; }
+
+        public IEnumerable<PlazosEscenarios> PlazosEscenarios { get; set; } 
     }
 }

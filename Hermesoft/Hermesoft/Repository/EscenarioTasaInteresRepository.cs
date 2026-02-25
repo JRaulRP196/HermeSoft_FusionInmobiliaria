@@ -30,5 +30,13 @@ namespace HermeSoft_Fusion.Repository
             _context.ESCENARIOS_TASAS_INTERES.Remove(escenarioTasa);
         }
 
+        public async Task<EscenarioTasaInteres> Obtener(int id)
+        {
+            return await _context.ESCENARIOS_TASAS_INTERES
+                .Include(e => e.PlazosEscenarios)
+                    .ThenInclude(ip => ip.Indicador)
+                .FirstOrDefaultAsync(e => e.IdEscenario == id);
+        }
+
     }
 }

@@ -111,6 +111,16 @@ namespace HermeSoft_Fusion.Data
   
             });
 
+            modelBuilder.Entity<PlazosEscenarios>(entity =>
+            {
+                entity.HasKey(p => p.IdPlazoEscenario);
+
+                entity.HasOne(p => p.Indicador)
+                .WithMany(i => i.PlazosEscenarios)
+                .HasForeignKey(p => p.IdIndicador)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+
             modelBuilder.Entity<Rol>(entity =>
             {
                 entity.HasKey(e => e.IdRol);

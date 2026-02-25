@@ -25,20 +25,19 @@ File: Main Css File
 }
 
 
-
 .navbar-header {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: justify;
-  -webkit-box-pack: justify;
-          justify-content: space-between;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  margin: 0 auto;
-  height: 70px;
-  padding: 0 calc(24px / 2) 0 calc(24px / 2);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: justify;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin: 0 auto;
+    height: 70px;
+    padding: 0 calc(24px / 2) 0 calc(24px / 2);
 }
 .navbar-header .dropdown .show.header-item {
   background-color: var(--bs-gray-100);
