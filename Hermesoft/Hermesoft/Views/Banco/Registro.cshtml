@@ -158,7 +158,18 @@
 
                                         <div class="col-md-3">
                                             <div class="mb-3">
-                                                <label class="form-label">Indicador Bancario</label>
+                                                <label class="form-label d-flex align-items-center gap-1">
+                                                    <span>Indicador Bancario</span>
+                                                    <button type="button"
+                                                            class="btn btn-link p-0 text-info indicador-popover-trigger"
+                                                            data-bs-toggle="popover"
+                                                            data-bs-trigger="focus"
+                                                            data-bs-placement="top"
+                                                            title="Informaci&oacute;n"
+                                                            data-bs-content="Si desea m&aacute;s informaci&oacute;n de los indicadores bancarios puede ir a la p&aacute;gina del banco. Link del banco de momento.">
+                                                        <i class="ri-information-line"></i>
+                                                    </button>
+                                                </label>
                                                 <select class="form-select"
                                                         name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
                                                     @foreach (IndicadoresBancarios indicador in ViewBag.IndicadoresBancarios)
@@ -238,7 +249,18 @@
 
                 <div class="col-md-3">
                     <div class="mb-3">
-                        <label class="form-label">Indicador Bancario</label>
+                        <label class="form-label d-flex align-items-center gap-1">
+                            <span>Indicador Bancario</span>
+                            <button type="button"
+                                    class="btn btn-link p-0 text-info indicador-popover-trigger"
+                                    data-bs-toggle="popover"
+                                    data-bs-trigger="focus"
+                                    data-bs-placement="top"
+                                    title="Informaci&oacute;n"
+                                    data-bs-content="Si desea m&aacute;s informaci&oacute;n de los indicadores bancarios puede ir a la p&aacute;gina del banco. Link del banco de momento.">
+                                <i class="ri-information-line"></i>
+                            </button>
+                        </label>
                         <select class="form-select"
                                 name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
                             @foreach (IndicadoresBancarios indicador in ViewBag.IndicadoresBancarios)
