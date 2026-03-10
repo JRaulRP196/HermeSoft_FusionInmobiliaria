@@ -1,4 +1,5 @@
 ﻿using HermeSoft_Fusion.Business;
+using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Banco;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -19,18 +20,40 @@ namespace HermeSoft_Fusion.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CalcularPrima(string codigoLote, decimal porcentajePrima, DateTime fechaFinal)
+        public async Task<IActionResult> CalcularPrima(
+    string codigoLote,
+    decimal porcentajePrima,
+    DateTime fechaFinal,
+    decimal? porcentajeDescuento = null)
         {
             try
             {
-                var desglose = await _calculosBusiness.CalcularPrima(codigoLote, porcentajePrima, fechaFinal);
-                TempData["DesglosePrima"] = JsonConvert.SerializeObject(desglose);
-                return RedirectToAction("Prima", "Ventas", new {lote = codigoLote});
+                var desgloseSinDescuento = await _calculosBusiness.CalcularPrima(
+                    codigoLote,
+                    porcentajePrima,
+                    fechaFinal);
 
-            }catch (Exception ex)
+                IEnumerable<DesglosesPrimas> desgloseConDescuento = new List<DesglosesPrimas>();
+
+                if (porcentajeDescuento.HasValue && porcentajeDescuento.Value > 0)
+                {
+                    desgloseConDescuento = await _calculosBusiness.CalcularPrima(
+                        codigoLote,
+                        porcentajePrima,
+                        fechaFinal,
+                        porcentajeDescuento);
+                }
+
+                TempData["DesglosePrimaSinDescuento"] = JsonConvert.SerializeObject(desgloseSinDescuento);
+                TempData["DesglosePrimaConDescuento"] = JsonConvert.SerializeObject(desgloseConDescuento);
+                TempData["PorcentajeDescuento"] = (porcentajeDescuento ?? 0m).ToString();
+
+                return RedirectToAction("Prima", "Ventas", new { lote = codigoLote });
+            }
+            catch (Exception ex)
             {
                 TempData["ErrorPrima"] = ex.ToString();
-                return RedirectToAction("Prima", "Ventas");
+                return RedirectToAction("Prima", "Ventas", new { lote = codigoLote });
             }
         }
 

@@ -1,28 +1,62 @@
-﻿@{
+﻿@using HermeSoft_Fusion.Models
+
+@{
     ViewBag.Title = "Detalle de Prima";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 @{
-    List<DesglosesPrimas> desgloses = ViewBag.Desgloses;
+    List<DesglosesPrimas> desglosesSinDescuento = ViewBag.DesglosesSinDescuento ?? new List<DesglosesPrimas>();
+    List<DesglosesPrimas> desglosesConDescuento = ViewBag.DesglosesConDescuento ?? new List<DesglosesPrimas>();
+    decimal porcentajeDescuento = ViewBag.PorcentajeDescuento ?? 0m;
+    bool aplicarDescuento = porcentajeDescuento > 0;
 }
+
 <div class="row mb-2">
     <div class="col">
         <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5>Datos Necesarios para Prima</h5>
-                <a asp-controller="Lote" asp-action="Index" class="btn btn-light border"><i class="fas fa-arrow-left me-2"></i> Volver</a>
+                <a asp-controller="Lote" asp-action="Index" class="btn btn-light border">
+                    <i class="fas fa-arrow-left me-2"></i> Volver
+                </a>
             </div>
 
             <input id="lote" type="hidden" value="@TempData["lote"]" />
+
             <div class="mb-3">
                 <label>% Prima</label>
                 <input type="number" id="porcPrima" class="form-control" placeholder="%" />
             </div>
 
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="aplicaDescuentoPrima" @(aplicarDescuento ? "checked" : "") />
+                <label class="form-check-label" for="aplicaDescuentoPrima">
+                    Aplicar descuento
+                </label>
+            </div>
+
+            <div class="mb-3 @(aplicarDescuento ? "" : "d-none")" id="contenedorDescuentoPrima">
+                <label>% Descuento</label>
+                <input type="number"
+                       id="descuentoPrima"
+                       class="form-control"
+                       placeholder="%"
+                       min="0"
+                       max="100"
+                       value="@porcentajeDescuento"
+                       @(aplicarDescuento ? "" : "disabled") />
+            </div>
+
             <div class="mb-3">
                 <label>Fecha vencimiento *</label>
-                <input type="date" id="fechaPrima" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                <input type="date"
+                       id="fechaPrima"
+                       class="form-control"
+                       value="@DateTime.Now.ToString("yyyy-MM-dd")"
+                       min="@DateTime.Now.ToString("yyyy-MM-dd")" />
             </div>
+
             <div class="col-12">
                 <button type="button" id="calcPrima" class="btn btn-outline-primary w-100 d-none">
                     Calcular prima
@@ -31,16 +65,47 @@
         </div>
     </div>
 </div>
-@if (desgloses.Any())
+
+@if (desglosesSinDescuento.Any() || desglosesConDescuento.Any())
 {
-    <div class="row" id="detallePrima">
-        <div class="col">
-            <div class="card border-0 shadow-sm rounded-4 p-4">
+    <div class="row g-4" id="detallePrima">
+
+        <div class="col-md-@(desglosesConDescuento.Any() ? "6" : "12")">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="fw-bold">Detalle de Prima</h4>
+                    <h4 class="fw-bold">Prima sin descuento</h4>
                 </div>
 
-                <div>
+                <table class="table align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Fecha de Pago</th>
+                            <th>Monto a Pagar</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (DesglosesPrimas desglose in desglosesSinDescuento)
+                        {
+                            <tr>
+                                <td>@desglose.FechaCobro.ToString("dd/MM/yyyy")</td>
+                                <td>₡@desglose.Monto.ToString("N2")</td>
+                                <td>@desglose.Estado</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (desglosesConDescuento.Any())
+        {
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold">Prima con descuento</h4>
+                    </div>
+
                     <table class="table align-middle">
                         <thead class="bg-light">
                             <tr>
@@ -50,20 +115,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (DesglosesPrimas desglose in desgloses)
+                            @foreach (DesglosesPrimas desglose in desglosesSinDescuento)
                             {
                                 <tr>
                                     <td>@desglose.FechaCobro.ToString("dd/MM/yyyy")</td>
-                                    <td>@desglose.Monto</td>
+                                    <td>₡@desglose.Monto.ToString("N2")</td>
                                     <td>@desglose.Estado</td>
                                 </tr>
                             }
-
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
+        }
+
     </div>
 }
 

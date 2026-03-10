@@ -43,13 +43,29 @@ namespace HermeSoft_Fusion.Controllers
         public IActionResult Prima(string lote)
         {
             TempData["lote"] = lote;
-            var json = TempData["DesglosePrima"] as string;
 
-            var desgloses = json != null
-                ? JsonConvert.DeserializeObject<List<DesglosesPrimas>>(json)
+            var jsonSinDescuento = TempData["DesglosePrimaSinDescuento"] as string;
+            var jsonConDescuento = TempData["DesglosePrimaConDescuento"] as string;
+
+            var desglosesSinDescuento = jsonSinDescuento != null
+                ? JsonConvert.DeserializeObject<List<DesglosesPrimas>>(jsonSinDescuento)
                 : new List<DesglosesPrimas>();
 
-            ViewBag.Desgloses = desgloses;
+            var desglosesConDescuento = jsonConDescuento != null
+                ? JsonConvert.DeserializeObject<List<DesglosesPrimas>>(jsonConDescuento)
+                : new List<DesglosesPrimas>();
+
+            decimal porcentajeDescuento = 0m;
+
+            if (TempData["PorcentajeDescuento"] != null)
+            {
+                decimal.TryParse(TempData["PorcentajeDescuento"].ToString(), out porcentajeDescuento);
+            }
+
+            ViewBag.DesglosesSinDescuento = desglosesSinDescuento;
+            ViewBag.DesglosesConDescuento = desglosesConDescuento;
+            ViewBag.PorcentajeDescuento = porcentajeDescuento;
+
             return View();
         }
 

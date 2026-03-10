@@ -33,17 +33,32 @@ namespace HermeSoft_Fusion.Business
 
         public async Task<IEnumerable<DesglosesPrimas>> CalcularPrima(string codigoLote, decimal porcentajePrima, DateTime fechaFinal)
         {
+            return await CalcularPrima(codigoLote, porcentajePrima, fechaFinal, null);
+        }
+
+        public async Task<IEnumerable<DesglosesPrimas>> CalcularPrima(string codigoLote, decimal porcentajePrima, DateTime fechaFinal, decimal? porcentajeDescuento)
+        {
             var lote = await _loteRepository.Obtener(codigoLote);
             VerificarDatosPrima(lote, porcentajePrima, fechaFinal);
 
             DateTime inicio = DateTime.Today;
+
+            decimal precioParaCalculo = lote.PrecioVenta;
+
+            if (porcentajeDescuento.HasValue && porcentajeDescuento.Value > 0)
+            {
+                if (porcentajeDescuento.Value > 100)
+                    throw new Exception("El porcentaje de descuento no puede ser mayor a 100.");
+
+                precioParaCalculo = lote.PrecioVenta * (1 - (porcentajeDescuento.Value / 100m));
+            }
 
             var prima = new Primas
             {
                 Porcentaje = porcentajePrima,
                 FechaInicio = inicio,
                 FechaCierre = fechaFinal,
-                Total = lote.PrecioVenta * (porcentajePrima / 100m)
+                Total = precioParaCalculo * (porcentajePrima / 100m)
             };
 
             int meses = (prima.FechaCierre.Year - prima.FechaInicio.Year) * 12
