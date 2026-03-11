@@ -21,10 +21,10 @@ namespace HermeSoft_Fusion.Controllers
 
         [HttpGet]
         public async Task<IActionResult> CalcularPrima(
-    string codigoLote,
-    decimal porcentajePrima,
-    DateTime fechaFinal,
-    decimal? porcentajeDescuento = null)
+                                        string codigoLote,
+                                        decimal porcentajePrima,
+                                        DateTime fechaFinal,
+                                        decimal? porcentajeDescuento )
         {
             try
             {

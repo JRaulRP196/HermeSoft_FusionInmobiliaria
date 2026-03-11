@@ -35,10 +35,15 @@
             $("#porcAbogados").val(data.honorarioAbogados);
             $("#porcComision").val(data.comisionBancaria);
             $("#porcTimbre").val(data.timbreFiscal);
+            calcularGastoFormalizacion();
         });
     });
 
     $("#calcGastoFormal").on("click", function () {
+        calcularGastoFormalizacion();
+    });
+
+    function calcularGastoFormalizacion() {
         let seguroVida = $("#porcSeguroVida").val();
         let seguroDesempleo = $("#porcSeguroDesempleo").val();
         let honorarioAbogados = $("#porcAbogados").val();
@@ -52,7 +57,7 @@
             gastoFormalizacionOriginal = data;
             renderFormalizacion();
         });
-    });
+    }
 
     let cuotaAlta = 0;
 
@@ -61,25 +66,29 @@
         var codigoLote = $("#lote").val();
         var selectTipoAsalariado = $("#tipoAsalariado");
         $.get('/Calculos/CalcularCuotasBancariaJS', { idEscenario: idEscenario, codigoLote: codigoLote }, function (data) {
+            cuotaAlta = 0; 
             cuotasOriginales = data;
             renderCuotas();
+            calcularIngresoNeto();
 
         });
         selectTipoAsalariado.prop("disabled", false);
     });
 
     $("#tipoAsalariado").on("change", function () {
+        calcularIngresoNeto();
+    });
 
+    function calcularIngresoNeto() {
         var idBanco = $("#banco").val();
-        var idEndeudamiento = this.value;
+        var idEndeudamiento = $("#tipoAsalariado").val();
         $.get('/Calculos/CalcularIngresoNetoFamiliarJS', { idBanco: idBanco, idEndeudamiento: idEndeudamiento, cuotaMensual: cuotaAlta }, function (data) {
 
             ingresoNetoOriginal = data;
             renderIngreso();
 
         });
-
-    });
+    }
 
     function renderCuotas() {
 

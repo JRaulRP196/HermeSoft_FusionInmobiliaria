@@ -1,4 +1,5 @@
 ﻿@using HermeSoft_Fusion.Models
+@using System.Text.Json
 
 @{
     ViewBag.Title = "Detalle de Prima";
@@ -6,9 +7,16 @@
 }
 
 @{
-    List<DesglosesPrimas> desglosesSinDescuento = ViewBag.DesglosesSinDescuento ?? new List<DesglosesPrimas>();
-    List<DesglosesPrimas> desglosesConDescuento = ViewBag.DesglosesConDescuento ?? new List<DesglosesPrimas>();
-    decimal porcentajeDescuento = ViewBag.PorcentajeDescuento ?? 0m;
+    var desglosesSinDescuento = TempData["DesglosePrimaSinDescuento"] != null
+        ? JsonSerializer.Deserialize<List<DesglosesPrimas>>(TempData["DesglosePrimaSinDescuento"].ToString())
+        : new List<DesglosesPrimas>();
+
+    var desglosesConDescuento = TempData["DesglosePrimaConDescuento"] != null
+        ? JsonSerializer.Deserialize<List<DesglosesPrimas>>(TempData["DesglosePrimaConDescuento"].ToString())
+        : new List<DesglosesPrimas>();
+    decimal porcentajeDescuento = TempData["PorcentajeDescuento"] != null
+        ? Convert.ToDecimal(TempData["PorcentajeDescuento"].ToString())
+        : 0;
     bool aplicarDescuento = porcentajeDescuento > 0;
 }
 
@@ -115,7 +123,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (DesglosesPrimas desglose in desglosesSinDescuento)
+                            @foreach (DesglosesPrimas desglose in desglosesConDescuento)
                             {
                                 <tr>
                                     <td>@desglose.FechaCobro.ToString("dd/MM/yyyy")</td>
