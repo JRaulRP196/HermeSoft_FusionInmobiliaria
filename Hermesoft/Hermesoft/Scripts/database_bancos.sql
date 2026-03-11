@@ -1,9 +1,10 @@
+drop database fusion;
 CREATE DATABASE FUSION;
 USE FUSION;
 
 CREATE TABLE TIPO_CAMBIO(
 idTipoCambio int not null primary key auto_increment,
-tipoCambio double not null
+cambio double not null
 );
 
 CREATE TABLE BANCOS(
@@ -34,7 +35,6 @@ estado bool not null,
 idRol int not null,
 constraint FK_idRol_Banco foreign key (idRol) references ROLES(idRol) 
 );
-
 
 CREATE TABLE PRIMAS(
 idPrima int not null primary key auto_increment,
@@ -180,5 +180,3 @@ INSERT IGNORE INTO SEGUROS (idSeguro, nombre) VALUES
 INSERT IGNORE INTO ROLES (nombre) VALUES
 ('Ventas'),
 ('Administrador');
-
-select * from fusion.historico_cambios_bancarios;
