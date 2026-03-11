@@ -37,6 +37,11 @@ namespace HermeSoft_Fusion.Business
             return await _repository.ObtenerLotesMapa(idMapa);
         }
 
+        public async Task<Lote> Editar(Lote lote)
+        {
+            return await _repository.Editar(lote);
+        }
+
         #endregion
 
     }

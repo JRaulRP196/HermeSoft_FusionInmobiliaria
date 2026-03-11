@@ -47,6 +47,8 @@ namespace HermeSoft_Fusion.Controllers
                 TempData["DesglosePrimaSinDescuento"] = JsonConvert.SerializeObject(desgloseSinDescuento);
                 TempData["DesglosePrimaConDescuento"] = JsonConvert.SerializeObject(desgloseConDescuento);
                 TempData["PorcentajeDescuento"] = (porcentajeDescuento ?? 0m).ToString();
+                TempData["Porcentaje"] = porcentajePrima.ToString();
+                TempData["FechaFinal"] = fechaFinal.ToString("yyyy-MM-dd");
 
                 return RedirectToAction("Prima", "Ventas", new { lote = codigoLote });
             }

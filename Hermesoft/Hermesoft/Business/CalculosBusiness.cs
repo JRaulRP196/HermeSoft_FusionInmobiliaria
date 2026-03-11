@@ -181,6 +181,16 @@ namespace HermeSoft_Fusion.Business
             }
         }
 
+        public decimal CalcularTotalPrima(IEnumerable<DesglosesPrimas> desgloses)
+        {
+            decimal total = 0;
+            foreach(var desglose in desgloses)
+            {
+                total += desglose.Monto;
+            }
+            return total;
+        }
+
         #endregion
 
         #region Helpers

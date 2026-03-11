@@ -24,6 +24,18 @@
     </div>
 </div>
 
+<div class="card shadow-sm mb-4 border-0">
+    @if (TempData["MensajeErrorVenta"] != null)
+    {
+        <div class="alert alert-danger">@TempData["MensajeErrorVenta"]</div>
+    }
+
+    @if (TempData["MensajeExitoVenta"] != null)
+    {
+        <div class="alert alert-success">@TempData["MensajeExitoVenta"]</div>
+    }
+</div>
+
 
 <!-- Selector de Condominios -->
 <div class="card border-0 shadow-sm rounded-4 mb-4 p-3">

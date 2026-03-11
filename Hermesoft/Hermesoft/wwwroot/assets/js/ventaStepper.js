@@ -39,10 +39,6 @@
         });
     });
 
-    $("#calcGastoFormal").on("click", function () {
-        calcularGastoFormalizacion();
-    });
-
     function calcularGastoFormalizacion() {
         let seguroVida = $("#porcSeguroVida").val();
         let seguroDesempleo = $("#porcSeguroDesempleo").val();

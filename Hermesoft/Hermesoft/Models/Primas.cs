@@ -7,11 +7,12 @@ namespace HermeSoft_Fusion.Models
 
         [Key]
         public int IdPrima { get; set; }
+        public string CorreoCliente { get; set; }
         public DateTime FechaInicio { get; set; }
         public DateTime FechaCierre { get; set; }
         public decimal Porcentaje { get; set; }
         public decimal Total {  get; set; }
-        public IEnumerable<DesglosesPrimas>? DesglosesPrimas { get; set; }
+        public List<DesglosesPrimas>? DesglosesPrimas { get; set; }
 
     }
 }

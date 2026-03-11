@@ -1,6 +1,6 @@
 ﻿@using HermeSoft_Fusion.Models
 @using System.Text.Json
-
+@model Primas
 @{
     ViewBag.Title = "Detalle de Prima";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -17,8 +17,31 @@
     decimal porcentajeDescuento = TempData["PorcentajeDescuento"] != null
         ? Convert.ToDecimal(TempData["PorcentajeDescuento"].ToString())
         : 0;
+    decimal porcentaje = TempData["Porcentaje"] != null
+    ? Convert.ToDecimal(TempData["Porcentaje"].ToString())
+    : 0;
+    DateTime fechaCierre = TempData["FechaFinal"] != null
+        ? Convert.ToDateTime(TempData["FechaFinal"].ToString())
+        : DateTime.Now;
     bool aplicarDescuento = porcentajeDescuento > 0;
 }
+
+<div class="card shadow-sm mb-4 border-0">
+    @if (TempData["MensajeErrorPrima"] != null)
+    {
+        <div class="alert alert-danger">@TempData["MensajeErrorPrima"]</div>
+    }
+
+    @if (TempData["MensajeExitoPrima"] != null)
+    {
+        <div class="alert alert-success">
+            <p>@TempData["MensajeExitoPrima"]</p>
+            <a class="btn btn-primary" asp-action="StepperRegistro" asp-route-lote="@TempData["lote"]"
+               asp-route-cliente="@TempData["Cliente"]">
+                Continuar Venta</a>
+        </div>
+    }
+</div>
 
 <div class="row mb-2">
     <div class="col">
@@ -30,12 +53,14 @@
                 </a>
             </div>
 
-            <input id="lote" type="hidden" value="@TempData["lote"]" />
+            <input id="lote" type="hidden" name="lote" form="formAgregarPrima" value="@TempData["lote"]" />
+
 
             <div class="mb-3">
                 <label>% Prima</label>
-                <input type="number" id="porcPrima" class="form-control" placeholder="%" />
+                <input type="number" id="porcPrima" asp-for="Porcentaje" form="formAgregarPrima" class="form-control" placeholder="%" value="@porcentaje" />
             </div>
+
 
             <div class="form-check form-switch mb-3">
                 <input class="form-check-input" type="checkbox" id="aplicaDescuentoPrima" @(aplicarDescuento ? "checked" : "") />
@@ -61,15 +86,27 @@
                 <input type="date"
                        id="fechaPrima"
                        class="form-control"
-                       value="@DateTime.Now.ToString("yyyy-MM-dd")"
-                       min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                       value="@fechaCierre.ToString("yyyy-MM-dd")"
+                       min="@DateTime.Now.ToString("yyyy-MM-dd")"
+                       asp-for="FechaCierre"
+                       form="formAgregarPrima" />
             </div>
 
-            <div class="col-12">
+            <div class="col-12 mb-3">
                 <button type="button" id="calcPrima" class="btn btn-outline-primary w-100 d-none">
                     Calcular prima
                 </button>
             </div>
+            @if (desglosesSinDescuento.Any() || desglosesConDescuento.Any())
+            {
+                <div class="col-12">
+                    <button type="button" id="almacenarPrima" class="btn btn-primary w-100"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalNuevaPrima">
+                        Registrar Prima Para Venta
+                    </button>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -140,6 +177,47 @@
     </div>
 }
 
+<div class="modal fade" id="modalNuevaPrima" tabindex="-1" aria-labelledby="modalNuevaPrimaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNuevaPrimaLabel">Registro de prima</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+
+                <form id="formAgregarPrima" asp-action="AgregarPrima" method="post" class="needs-validation" novalidate>
+                    <div class="row g-3">
+
+                        <div class="col-md-12">
+                            <label class="form-label">Correo del Cliente</label>
+                            <input type="email" class="form-control" asp-for="CorreoCliente" placeholder="Correo Cliente" required>
+                        </div>
+                    </div>
+                    @if (desglosesConDescuento.Any())
+                    {
+                        <input type="hidden" name="desgloseConDescuentoJson"
+                                value='@JsonSerializer.Serialize(desglosesConDescuento)' />
+                    }
+                    else
+                    {
+                        <input type="hidden" name="desgloseSinDescuentoJson"
+                               value='@JsonSerializer.Serialize(desglosesSinDescuento)' />
+                    }
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            Guardar usuario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
+    <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
+    <script src="~/assets/js/pages/form-validation.init.js"></script>
     <script src="~/assets/js/calculos.js"></script>
 }
