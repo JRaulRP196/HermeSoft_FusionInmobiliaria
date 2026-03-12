@@ -22,7 +22,7 @@
       "precioLista": 8710000,
       "precioVenta": 8274500,
       "condominio": "CO-01",
-      "estado": "Disponible"
+      "estado": "En Venta"
     },
     {
       "id": "LOT-03",
@@ -178,7 +178,7 @@
       "precioLista": 7800000,
       "precioVenta": 7410000,
       "condominio": "CO-02",
-      "estado": "Disponible"
+      "estado": "En Venta"
     },
     {
       "id": "LOT-16",

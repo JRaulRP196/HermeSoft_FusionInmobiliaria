@@ -27,7 +27,7 @@ namespace HermeSoft_Fusion.Models
         public string Estado { get; set; }
 
         [StringLength(300)]
-        public string MotivoNulidad { get; set; }
+        public string? MotivoNulidad { get; set; }
 
         [Required]
         public DateTime FechaDeRegistro { get; set; }

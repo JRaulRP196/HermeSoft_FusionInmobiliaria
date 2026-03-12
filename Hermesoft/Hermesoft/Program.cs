@@ -69,6 +69,7 @@ builder.Services.AddScoped<PrimaRepository>();
 builder.Services.AddScoped<PrimaBusiness>();
 builder.Services.AddScoped<VentaRepository>();
 builder.Services.AddScoped<VentaBusiness>();
+builder.Services.AddScoped<EstadisticaBusiness>();
 
 var app = builder.Build();
 

@@ -70,6 +70,11 @@ namespace HermeSoft_Fusion.Business
             return ventasFiltradas;
         }
 
+        public async Task<List<Venta>> Obtener()
+        {
+            return await _ventaRepository.Obtener();
+        }
+
         #endregion
 
     }

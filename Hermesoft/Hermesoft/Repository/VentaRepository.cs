@@ -1,5 +1,6 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Repository
 {
@@ -20,9 +21,12 @@ namespace HermeSoft_Fusion.Repository
             _context.VENTAS.Add(venta);
         }
 
-        public async Task<IEnumerable<Venta>> Obtener()
+        public async Task<List<Venta>> Obtener()
         {
-            return _context.VENTAS.ToList();
+            return await _context.VENTAS
+                    .Include(v => v.Prima)
+                        .ThenInclude(p => p.DesglosesPrimas)
+                    .ToListAsync();
         }
 
         #endregion
