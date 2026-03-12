@@ -1,5 +1,6 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Usuarios;
 using HermeSoft_Fusion.Repository;
 
 namespace HermeSoft_Fusion.Business
@@ -48,6 +49,25 @@ namespace HermeSoft_Fusion.Business
             {
                 throw new Exception(e.Message);
             }
+        }
+
+        public async Task<List<Venta>> Filtro(List<Venta> ventas, DateTime fechaInicio, DateTime fechaCierre, string condominio)
+        {
+            List<Venta> ventasFiltradas = new List<Venta>();
+            if (condominio != null)
+            {
+                var loteCondominio = await _loteBusiness.ObtenerPorCondominio(condominio);
+                ventasFiltradas = ventas.Where(v => loteCondominio.Any(l => l.Codigo == v.CodLote)).ToList();
+            }
+
+            if (fechaCierre != DateTime.MinValue && fechaInicio != DateTime.MinValue && ventasFiltradas.Any())
+            {
+                ventasFiltradas = ventasFiltradas.Where(v => v.FechaDeRegistro >= fechaInicio && v.FechaDeRegistro <= fechaCierre).ToList();
+            }else if (fechaCierre != DateTime.MinValue && fechaInicio != DateTime.MinValue)
+            {
+                ventasFiltradas = ventas.Where(v => v.FechaDeRegistro >= fechaInicio && v.FechaDeRegistro <= fechaCierre).ToList();
+            }
+            return ventasFiltradas;
         }
 
         #endregion

@@ -2,30 +2,42 @@
     ViewBag.Title = "Historial de Ventas";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@model List<HermeSoft_Fusion.Models.Venta>
 
+@{
+    var condominios = ViewBag.Condominios as List<HermeSoft_Fusion.Models.Servicios.Condominio>;
+}
 <div class="row">
     <div class="col">
         <div class="card border-0 shadow-sm rounded-4 p-4">
-            <div class="row g-3 mb-3">
-                <div class="col-md-3">
-                    <input type="date" id="filterDesde" class="form-control" />
+            <form asp-action="Index" method="post">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3 d-flex align-items-center gap-2">
+                        <label for="filterDesde" class="form-label mb-0">Desde:</label>
+                        <input type="date" id="filterDesde" name="filterDesde" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 d-flex align-items-center gap-2">
+                        <label for="filterHasta" class="form-label mb-0">Hasta:</label>
+                        <input type="date" id="filterHasta" name="filterHasta" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <select id="filterCondominio" name="filterCondominio" class="form-select">
+                            <option value="" default hidden>Todos los condominios</option>
+                            @foreach (var condominio in condominios)
+                            {
+                                <option value="@condominio.Id">@condominio.Nombre</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 d-flex gap-2">
+                        <button id="btnFiltrar" class="btn btn-outline-primary">Buscar</button>
+                        <a asp-action="Index" class="btn btn-outline-warning">Reiniciar</a>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <input type="date" id="filterHasta" class="form-control" />
-                </div>
-                <div class="col-md-3">
-                    <select id="filterCondominio" class="form-select">
-                        <option value="">Todos los condominios</option>
-                        <option value="Vista Real">Vista Real</option>
-                        <option value="Sol">Sol</option>
-                        <option value="Lago">Lago</option>
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex gap-2">
-                    <button id="btnFiltrar" class="btn btn-outline-primary">Buscar</button>
-                    <button id="btnLimpiar" class="btn btn-outline-secondary">Limpiar</button>
-                </div>
-            </div>
+            </form>
 
             <div id="historialMessages" class="mb-3"></div>
 
@@ -33,17 +45,35 @@
                 <table class="table table-hover table-bordered" id="tablaVentas">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
                             <th>Contrato</th>
                             <th>Cliente</th>
                             <th>Lote</th>
                             <th>Fecha</th>
-                            <th>Monto</th>
                             <th>Estado</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                        @if(Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center">No se encontraron ventas</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var venta in Model)
+                            {
+                                <tr>
+                                    <td>@venta.NumContrato</td>
+                                    <td>@venta.CorreoCliente</td>
+                                    <td>@venta.CodLote</td>
+                                    <td>@venta.FechaDeRegistro.ToString("dd/MM/yyyy")</td>
+                                    <td>@venta.Estado</td>
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
                 </table>
             </div>
 
@@ -51,6 +81,3 @@
     </div>
 </div>
 
-@section scripts {
-    <script src="~/assets/js/ventas.js"></script>
-}

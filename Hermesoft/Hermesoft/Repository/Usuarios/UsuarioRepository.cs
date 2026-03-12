@@ -37,6 +37,7 @@ namespace HermeSoft_Fusion.Repository.Usuarios
         {
             return await _context.USUARIOS
                 .Include(r => r.Rol)
+                .Include(v => v.Ventas)
                 .FirstOrDefaultAsync(u => u.Correo == correo);
         }
 

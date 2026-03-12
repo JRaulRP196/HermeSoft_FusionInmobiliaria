@@ -1,9 +1,13 @@
 ﻿using HermeSoft_Fusion.Business;
+using HermeSoft_Fusion.Business.Usuarios;
 using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Servicios;
+using HermeSoft_Fusion.Models.Usuarios;
 using HermeSoft_Fusion.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace HermeSoft_Fusion.Controllers
 {
@@ -16,9 +20,11 @@ namespace HermeSoft_Fusion.Controllers
         private readonly TipoCambioBusiness _tipoCambioBusiness;
         private readonly PrimaBusiness _primaBusiness;
         private readonly VentaBusiness _ventaBusiness;
+        private readonly UsuarioBusiness _usuarioBusiness;
+        private readonly CondominioBusiness _condominioBusiness;
 
         public VentasController(BancoBusiness bancoBusiness, LoteRepository loteRepository, CalculosBusiness calculosBusiness, 
-            TipoCambioBusiness tipoCambioBusiness, PrimaBusiness primaBusiness, VentaBusiness ventaBusiness)
+            TipoCambioBusiness tipoCambioBusiness, PrimaBusiness primaBusiness, VentaBusiness ventaBusiness, UsuarioBusiness usuarioBusiness, CondominioBusiness condominioBusiness)
         {
             _bancoBusiness = bancoBusiness;
             _loteRepository = loteRepository;
@@ -26,9 +32,25 @@ namespace HermeSoft_Fusion.Controllers
             _tipoCambioBusiness = tipoCambioBusiness;
             _primaBusiness = primaBusiness;
             _ventaBusiness = ventaBusiness;
+            _usuarioBusiness = usuarioBusiness;
+            _condominioBusiness = condominioBusiness;
         }
 
-        public IActionResult Index() => View();
+        public async Task<IActionResult> Index()
+        {
+            Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
+            ViewBag.Condominios = await _condominioBusiness.Obtener();
+            return View(usuario.Ventas);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Index(DateTime filterDesde, DateTime filterHasta, string filterCondominio)
+        {
+            Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
+            ViewBag.Condominios = await _condominioBusiness.Obtener();
+            return View(await _ventaBusiness.Filtro(usuario.Ventas, filterDesde, filterHasta, filterCondominio));
+        }
+
         public async Task<IActionResult> StepperRegistro(string lote, string cliente)
         {
             ViewBag.lote = lote;
