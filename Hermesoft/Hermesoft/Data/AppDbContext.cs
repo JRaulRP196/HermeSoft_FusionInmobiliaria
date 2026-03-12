@@ -30,6 +30,7 @@ namespace HermeSoft_Fusion.Data
         public DbSet<Rol> ROLES { get; set; }
         public DbSet<Usuario> USUARIOS { get; set; }
         public DbSet<RecuperacionPassword> RECUPERACIONES_PASSWORD { get; set; }
+        public DbSet<Venta> VENTAS { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -139,6 +140,34 @@ namespace HermeSoft_Fusion.Data
                 .WithMany(u => u.Recuperaciones)
                 .HasForeignKey(u => u.IdUsuario)
                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Primas>(entity =>
+            {
+                entity.HasKey(e => e.IdPrima);
+
+                entity.HasMany(p => p.DesglosesPrimas)
+                      .WithOne(d => d.Prima)
+                      .HasForeignKey(d => d.IdPrima)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Venta>(entity =>
+            {
+                entity.HasKey(e => e.NumContrato);
+
+                entity.HasOne(v => v.Prima)
+                      .WithMany()
+                      .HasForeignKey(v => v.IdPrima)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(v => v.Banco)
+                      .WithMany()
+                      .HasForeignKey(v => v.IdBanco)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(v => v.Usuario)
+                    .WithMany(u => u.Ventas)
+                    .HasForeignKey(v => v.IdUsuario)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
         }

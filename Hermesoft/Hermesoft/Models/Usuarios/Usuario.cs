@@ -32,5 +32,6 @@ namespace HermeSoft_Fusion.Models.Usuarios
         [ForeignKey("IdRol")]
         public Rol Rol { get; set; }
         public List<RecuperacionPassword> Recuperaciones { get; set; } = new ();
+        public List<Venta> Ventas { get; set; } = new ();
     }
 }

@@ -1,7 +1,7 @@
 ﻿@using HermeSoft_Fusion.Models
 @using HermeSoft_Fusion.Models.Banco
 @using Newtonsoft.Json
-
+@model Venta
 @{
     ViewBag.Title = "Registrar Venta";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -20,7 +20,7 @@
                 </a>
             </div>
 
-            <form id="ventaForm" class="needs-validation" novalidate>
+            <form asp-action="AgregarVenta" id="ventaForm" class="needs-validation" novalidate>
 
                 <!-- STEPPER -->
                 <div class="stepper-wrapper mb-5">
@@ -49,6 +49,7 @@
 
                 <div class="step-content" data-step="1">
                     <!-- ================= DATOS GENERALES ================= -->
+                    <input type="hidden" asp-for="IdUsuario" value="@int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)" />
                     <div class="card border-0 shadow-sm rounded-3 p-3 mb-4">
                         <h5 class="mb-3">Datos Generales</h5>
 
@@ -56,12 +57,19 @@
 
                             <div class="col-md-4">
                                 <label class="form-label">Cliente *</label>
-                                <input type="email" id="cliente" class="form-control" placeholder="Correo del cliente" required />
+                                @if(ViewBag.Cliente != null)
+                                {
+                                    <input type="email" id="cliente" asp-for="CorreoCliente" class="form-control" placeholder="Correo del cliente" value="@ViewBag.Cliente" readonly required />
+                                }
+                                else
+                                {
+                                    <input type="email" id="cliente" asp-for="CorreoCliente" class="form-control" placeholder="Correo del cliente" required />
+                                }
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label">Lote *</label>
-                                <input id="lote" class="form-control" value="@ViewBag.lote" readonly required />
+                                <input id="lote" asp-for="CodLote" class="form-control" value="@ViewBag.lote" readonly required />
                             </div>
 
                             <div class="col-md-4">
@@ -69,14 +77,9 @@
                                 <input type="email" id="asesor" readonly class="form-control" value="@User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value" required />
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">% Descuento *</label>
-                                <input type="number" id="descuento" class="form-control" value="0" required placeholder="%" />
-                            </div>
-
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Banco *</label>
-                                <select id="banco" class="form-select" required>
+                                <select id="banco" asp-for="IdBanco" class="form-select" required>
                                     <option value="" selected hidden>Seleccione banco</option>
                                     @foreach (var b in ViewBag.Bancos as IEnumerable<HermeSoft_Fusion.Models.Banco.Banco>)
                                     {
@@ -85,7 +88,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Escenario *</label>
                                 <select id="escenario" class="form-select" required disabled>
                                     <option value="" selected hidden>Seleccione escenario</option>
@@ -161,11 +164,7 @@
                                 </table>
                             </div>
 
-                            <button type="button" id="calcGastoFormal" class="btn btn-outline-primary w-100">
-                                Calcular gasto de formalización
-                            </button>
-
-                            <input type="text" id="gastoFormalizacion" class="form-control mt-2" readonly
+                            <input type="number" id="gastoFormalizacion" asp-for="GastoFormalizacion" class="form-control mt-2" readonly
                                    placeholder="Resultado gasto de formalización" />
                         </div>
                     </div>

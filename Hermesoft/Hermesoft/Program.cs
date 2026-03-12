@@ -65,9 +65,11 @@ builder.Services.AddScoped<RolBusiness>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<RecuperacionPasswordRepository>();
-
-
-
+builder.Services.AddScoped<PrimaRepository>();
+builder.Services.AddScoped<PrimaBusiness>();
+builder.Services.AddScoped<VentaRepository>();
+builder.Services.AddScoped<VentaBusiness>();
+builder.Services.AddScoped<EstadisticaBusiness>();
 
 var app = builder.Build();
 

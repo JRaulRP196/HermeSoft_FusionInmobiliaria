@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using HermeSoft_Fusion.Business;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HermeSoft_Fusion.Controllers
@@ -6,6 +7,14 @@ namespace HermeSoft_Fusion.Controllers
     [Authorize(Roles = "Administrador")]
     public class EstadisticaController : Controller
     {
+
+        private readonly EstadisticaBusiness _estadisticaBusiness;
+
+        public EstadisticaController(EstadisticaBusiness estadisticaBusiness)
+        {
+            _estadisticaBusiness = estadisticaBusiness;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -15,6 +24,28 @@ namespace HermeSoft_Fusion.Controllers
         {
             return View();
         }
+
+        #region js
+
+        [HttpGet]
+        public async Task<IActionResult> PagosPorCondominio(string condominio, DateTime fechaInicio, DateTime fechaFinal)
+        {
+            try
+            {
+                var resultado = await _estadisticaBusiness.PagosPorCondominio(condominio, fechaInicio, fechaFinal);
+                return Json(resultado);
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = e.Message
+                });
+            }
+        }
+
+        #endregion
 
     }
 }

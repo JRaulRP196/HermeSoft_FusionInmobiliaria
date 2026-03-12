@@ -38,6 +38,7 @@ constraint FK_idRol_Banco foreign key (idRol) references ROLES(idRol)
 
 CREATE TABLE PRIMAS(
 idPrima int not null primary key auto_increment,
+correoCliente varchar(70) not null,
 fechaInicio date not null,
 fechaCierre date not null,
 porcentaje decimal not null,

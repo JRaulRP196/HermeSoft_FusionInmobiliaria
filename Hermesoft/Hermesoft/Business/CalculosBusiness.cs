@@ -33,17 +33,32 @@ namespace HermeSoft_Fusion.Business
 
         public async Task<IEnumerable<DesglosesPrimas>> CalcularPrima(string codigoLote, decimal porcentajePrima, DateTime fechaFinal)
         {
+            return await CalcularPrima(codigoLote, porcentajePrima, fechaFinal, null);
+        }
+
+        public async Task<IEnumerable<DesglosesPrimas>> CalcularPrima(string codigoLote, decimal porcentajePrima, DateTime fechaFinal, decimal? porcentajeDescuento)
+        {
             var lote = await _loteRepository.Obtener(codigoLote);
             VerificarDatosPrima(lote, porcentajePrima, fechaFinal);
 
             DateTime inicio = DateTime.Today;
+
+            decimal precioParaCalculo = lote.PrecioVenta;
+
+            if (porcentajeDescuento.HasValue && porcentajeDescuento.Value > 0)
+            {
+                if (porcentajeDescuento.Value > 100)
+                    throw new Exception("El porcentaje de descuento no puede ser mayor a 100.");
+
+                precioParaCalculo = lote.PrecioVenta * (1 - (porcentajeDescuento.Value / 100m));
+            }
 
             var prima = new Primas
             {
                 Porcentaje = porcentajePrima,
                 FechaInicio = inicio,
                 FechaCierre = fechaFinal,
-                Total = lote.PrecioVenta * (porcentajePrima / 100m)
+                Total = precioParaCalculo * (porcentajePrima / 100m)
             };
 
             int meses = (prima.FechaCierre.Year - prima.FechaInicio.Year) * 12
@@ -166,59 +181,14 @@ namespace HermeSoft_Fusion.Business
             }
         }
 
-        public async Task<object> CalcularGastoFormalizacionDesdeBD(string codigoLote, int idBanco)
+        public decimal CalcularTotalPrima(IEnumerable<DesglosesPrimas> desgloses)
         {
-            var lote = await _loteRepository.Obtener(codigoLote);
-            if (lote == null) throw new Exception("Lote inválido");
-
-            var banco = await _bancoRepository.ObtenerPorId(idBanco);
-            if (banco == null) throw new Exception("Banco inválido");
-
-            // % desde BD
-            decimal porcComision = banco.Comision;
-            decimal porcAbogadosBase = banco.HonorarioAbogado;
-
-            // Honorarios + IVA 13%
-            decimal porcAbogadosConIva = porcAbogadosBase * 1.13m;
-
-            // Seguros desde BD (SEGUROS_BANCOS + SEGUROS)
-            decimal porcVida = 0m;
-            decimal porcDesempleo = 0m;
-
-            if (banco.SeguroBancos != null)
+            decimal total = 0;
+            foreach(var desglose in desgloses)
             {
-                foreach (var sb in banco.SeguroBancos)
-                {
-                    var nombre = (sb?.Seguro?.Nombre ?? "").ToLower();
-
-                    if (nombre.Contains("vida"))
-                        porcVida = sb.PorcSeguro;
-
-                    if (nombre.Contains("desempleo"))
-                        porcDesempleo = sb.PorcSeguro;
-                }
+                total += desglose.Monto;
             }
-
-            // Timbre fiscal: si -1 => para cálculo usar 0 (pero se devuelve -1 para vista)
-            decimal timbre = ObtenerTimbreFiscal();
-            decimal timbreParaCalculo = timbre < 0 ? 0 : timbre;
-
-            decimal totalPorcentaje = porcVida + porcDesempleo + porcAbogadosConIva + porcComision + timbreParaCalculo;
-
-            // monto con PrecioVenta del lote
-            decimal gastoFormalizacion = lote.PrecioVenta * (totalPorcentaje / 100m);
-
-            return new
-            {
-                porcVida,
-                porcDesempleo,
-                porcAbogados = Math.Round(porcAbogadosConIva, 4),
-                porcComision,
-                timbreFiscal = timbre, // puede venir -1
-                totalPorcentaje = Math.Round(totalPorcentaje, 4),
-                gastoFormalizacion = Math.Round(gastoFormalizacion, 2),
-                precioLote = lote.PrecioVenta
-            };
+            return total;
         }
 
         #endregion

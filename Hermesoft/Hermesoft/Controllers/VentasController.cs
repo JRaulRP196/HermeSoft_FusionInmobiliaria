@@ -1,11 +1,13 @@
 ﻿using HermeSoft_Fusion.Business;
+using HermeSoft_Fusion.Business.Usuarios;
 using HermeSoft_Fusion.Models;
-using HermeSoft_Fusion.Models.Banco;
 using HermeSoft_Fusion.Models.Servicios;
+using HermeSoft_Fusion.Models.Usuarios;
 using HermeSoft_Fusion.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace HermeSoft_Fusion.Controllers
 {
@@ -16,249 +18,108 @@ namespace HermeSoft_Fusion.Controllers
         private readonly LoteRepository _loteRepository;
         private readonly CalculosBusiness _calculosBusiness;
         private readonly TipoCambioBusiness _tipoCambioBusiness;
+        private readonly PrimaBusiness _primaBusiness;
+        private readonly VentaBusiness _ventaBusiness;
+        private readonly UsuarioBusiness _usuarioBusiness;
+        private readonly CondominioBusiness _condominioBusiness;
 
-
-        public VentasController(BancoBusiness bancoBusiness, LoteRepository loteRepository, CalculosBusiness calculosBusiness, TipoCambioBusiness tipoCambioBusiness)
+        public VentasController(BancoBusiness bancoBusiness, LoteRepository loteRepository, CalculosBusiness calculosBusiness, 
+            TipoCambioBusiness tipoCambioBusiness, PrimaBusiness primaBusiness, VentaBusiness ventaBusiness, UsuarioBusiness usuarioBusiness, CondominioBusiness condominioBusiness)
         {
             _bancoBusiness = bancoBusiness;
             _loteRepository = loteRepository;
             _calculosBusiness = calculosBusiness;
             _tipoCambioBusiness = tipoCambioBusiness;
+            _primaBusiness = primaBusiness;
+            _ventaBusiness = ventaBusiness;
+            _usuarioBusiness = usuarioBusiness;
+            _condominioBusiness = condominioBusiness;
         }
 
-        public IActionResult Index() => View();
-        public async Task<IActionResult> StepperRegistro(string lote)
+        public async Task<IActionResult> Index()
         {
-            ViewBag.lote = lote;
-            ViewBag.Bancos = await _bancoBusiness.ObtenerTodos();
-            return View();
+            Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
+            ViewBag.Condominios = await _condominioBusiness.Obtener();
+            return View(usuario.Ventas);
         }
-        public async Task<IActionResult> Registro(string lote)
+
+        [HttpPost]
+        public async Task<IActionResult> Index(DateTime filterDesde, DateTime filterHasta, string filterCondominio)
+        {
+            Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
+            ViewBag.Condominios = await _condominioBusiness.Obtener();
+            return View(await _ventaBusiness.Filtro(usuario.Ventas, filterDesde, filterHasta, filterCondominio));
+        }
+
+        public async Task<IActionResult> StepperRegistro(string lote, string cliente)
         {
             ViewBag.lote = lote;
             ViewBag.Bancos = await _bancoBusiness.ObtenerTodos();
+            ViewBag.Cliente = cliente;
             return View();
         }
 
         public IActionResult Prima(string lote)
         {
             TempData["lote"] = lote;
-            var json = TempData["DesglosePrima"] as string;
-
-            var desgloses = json != null
-                ? JsonConvert.DeserializeObject<List<DesglosesPrimas>>(json)
-                : new List<DesglosesPrimas>();
-
-            ViewBag.Desgloses = desgloses;
             return View();
         }
 
-
-        // HU TASA - Escenario 1/2: al seleccionar escenario, traer tasa
-
-        [HttpGet]
-        public async Task<IActionResult> ObtenerEscenariosPorBanco(int idBanco)
+        [HttpPost]
+        public async Task<IActionResult> AgregarPrima(Primas prima, string lote, string desgloseConDescuentoJson, 
+            string desgloseSinDescuentoJson)
         {
-            var banco = await _bancoBusiness.ObtenerPorId(idBanco);
-            if (banco == null) return NotFound(new { ok = false, message = "Banco no encontrado." });
-
-          
-            var escenarios = (banco.EscenariosTasaInteres ?? new List<EscenarioTasaInteres>())
-                .Select(e => new
-                {
-                    idEscenario = e.IdEscenario,
-                    nombre = e.Nombre
-                })
-                .ToList();
-
-            return Json(new { ok = true, data = escenarios });
-        }
-        [HttpGet]
-        public async Task<IActionResult> ObtenerDatosBanco(int idBanco)
-        {
-            if (idBanco <= 0)
-                return BadRequest(new { ok = false, message = "Banco inválido." });
-
-            var banco = await _bancoBusiness.ObtenerPorId(idBanco);
-            if (banco == null)
-                return NotFound(new { ok = false, message = "Banco no encontrado." });
-
-            decimal porcVida = 0m;
-            decimal porcDesempleo = 0m;
-
-            if (banco.SeguroBancos != null)
-            {
-                foreach (var sb in banco.SeguroBancos)
-                {
-                    var nombre = (sb?.Seguro?.Nombre ?? "").ToLower();
-
-                    if (nombre.Contains("vida"))
-                        porcVida = sb.PorcSeguro;
-
-                    if (nombre.Contains("desempleo"))
-                        porcDesempleo = sb.PorcSeguro;
-                }
-            }
-
-            return Json(new
-            {
-                ok = true,
-                data = new
-                {
-                    comision = banco.Comision,
-                    honorarioAbogado = banco.HonorarioAbogado,
-                    porcVida,
-                    porcDesempleo
-                }
-            });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ObtenerGastoFormalizacion(string codigoLote, int idBanco)
-        {
-            if (string.IsNullOrWhiteSpace(codigoLote) || idBanco <= 0)
-                return BadRequest(new { ok = false, message = "Debe seleccionar lote y banco." });
-
             try
             {
-                var data = await _calculosBusiness.CalcularGastoFormalizacionDesdeBD(codigoLote, idBanco);
-                return Json(new { ok = true, data });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { ok = false, message = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ObtenerPlazosPorEscenario(int idBanco, int idEscenario)
-        {
-            var banco = await _bancoBusiness.ObtenerPorId(idBanco);
-            if (banco == null) return NotFound(new { ok = false, message = "Banco no encontrado." });
-
-            var escenario = banco.EscenariosTasaInteres?.FirstOrDefault(e => e.IdEscenario == idEscenario);
-            if (escenario == null)
-                return BadRequest(new { ok = false, message = "Escenario no existe." });
-
-            var plazos = (escenario.PlazosEscenarios ?? new List<PlazosEscenarios>())
-                .Select(p => p.Plazo)
-                .Distinct()
-                .OrderBy(x => x)
-                .ToList();
-
-            if (!plazos.Any())
-                return BadRequest(new { ok = false, message = "El escenario no tiene plazos configurados." });
-
-            return Json(new { ok = true, data = plazos });
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> ObtenerTasaInteresEscenario(int idBanco, int idEscenario, int plazoMeses)
-        {
-            var banco = await _bancoBusiness.ObtenerPorId(idBanco);
-            if (banco == null) return NotFound(new { ok = false, message = "Banco no encontrado." });
-
-            var escenario = banco.EscenariosTasaInteres?.FirstOrDefault(e => e.IdEscenario == idEscenario);
-            if (escenario == null /*|| !escenario.Activo*/) 
-                return BadRequest(new { ok = false, message = "Escenario desactivado o no existe." });
-
-            var plazo = escenario.PlazosEscenarios?.FirstOrDefault(p => p.Plazo == plazoMeses);
-
-            // HU TASA - Escenario 2: sin datos => error y no continuar
-            if (plazo == null || plazo.Indicador == null)
-                return BadRequest(new { ok = false, message = "No existen datos suficientes para calcular la tasa (plazo/indicador)." });
-
-            //  Valor actual del indicador desde BD (ej: TBP/TPR/SOFR)
-            var referencia = Convert.ToDecimal(plazo.Indicador.PorcSeguro);
-            var adicional = Convert.ToDecimal(plazo.PorcAdicional);
-            var tasaFinalAnual = referencia + adicional;
-
-            return Json(new
-            {
-                ok = true,
-                data = new
+                if(desgloseSinDescuentoJson != null)
                 {
-                    indicador = plazo.Indicador.Nombre,
-                    porcentajeReferencia = referencia,
-                    porcentajeAdicional = adicional,
-                    tasaFinal = tasaFinalAnual
+                    prima.DesglosesPrimas = JsonSerializer.Deserialize<List<DesglosesPrimas>>(desgloseSinDescuentoJson);
                 }
-            });
-        }
-
-        
-        // HU CUOTA - Sistema Francés
-      
-        [HttpGet]
-        public async Task<IActionResult> CalcularCuotaMensualBancaria(
-            string codigoLote,
-            int idBanco,
-            int idEscenario,
-            int plazoMeses,
-            decimal porcPrima)
-        {
-            // HU CUOTA - Escenario 2: datos incompletos
-            if (string.IsNullOrWhiteSpace(codigoLote) || idBanco <= 0 || idEscenario <= 0 || plazoMeses <= 0)
-                return BadRequest(new { ok = false, message = "Faltan datos obligatorios." });
-
-            var lote = await _loteRepository.Obtener(codigoLote);
-            if (lote == null)
-                return BadRequest(new { ok = false, message = "Lote no encontrado." });
-
-            var precioVenta = lote.PrecioVenta;
-            if (precioVenta <= 0)
-                return BadRequest(new { ok = false, message = "Precio del lote inválido." });
-
-            var prima = Math.Round(precioVenta * (porcPrima / 100m), 2);
-            var montoFinanciar = precioVenta - prima;
-            if (montoFinanciar <= 0)
-                return BadRequest(new { ok = false, message = "Monto a financiar inválido (precio - prima)." });
-
-            var banco = await _bancoBusiness.ObtenerPorId(idBanco);
-            if (banco == null)
-                return BadRequest(new { ok = false, message = "Banco no encontrado." });
-
-            var escenario = banco.EscenariosTasaInteres?.FirstOrDefault(e => e.IdEscenario == idEscenario);
-            if (escenario == null /*|| !escenario.Activo*/)
-                return BadRequest(new { ok = false, message = "Escenario desactivado o no existe." });
-
-            var p = escenario.PlazosEscenarios?.FirstOrDefault(x => x.Plazo == plazoMeses);
-            if (p?.Indicador == null)
-                return BadRequest(new { ok = false, message = "No existen datos suficientes para calcular tasa/cuota." });
-
-            var referencia = Convert.ToDecimal(p.Indicador.PorcSeguro);
-            var adicional = Convert.ToDecimal(p.PorcAdicional);
-            var tasaAnual = referencia + adicional;
-
-            //  Sistema Francés: a = C0 * i / (1 - (1+i)^-n)
-            // i mensual = (tasa anual / 100) / 12
-            decimal CuotaFrances(decimal principal, decimal tasaAnualPorc, int nMeses)
-            {
-                var i = (tasaAnualPorc / 100m) / 12m;
-                if (i == 0) return Math.Round(principal / nMeses, 2);
-
-                var pow = (decimal)Math.Pow((double)(1m + i), nMeses);
-                var cuota = principal * (i * pow) / (pow - 1m);
-                return Math.Round(cuota, 2);
-            }
-
-            var cuota = CuotaFrances(montoFinanciar, tasaAnual, plazoMeses);
-
-            return Json(new
-            {
-                ok = true,
-                data = new
+                else
                 {
-                    plazoMeses,
-                    escenario = escenario.Nombre,
-                    indicador = p.Indicador.Nombre,
-                    tasaFinal = tasaAnual,
-                    cuotaMensual = cuota
+                    prima.DesglosesPrimas = JsonSerializer.Deserialize<List<DesglosesPrimas>>(desgloseConDescuentoJson);
                 }
-            });
+                prima.FechaInicio = DateTime.Today;
+                
+                foreach(var desglose in prima.DesglosesPrimas)
+                {
+                    desglose.Prima = prima;
+                }
+                prima.Total = _calculosBusiness.CalcularTotalPrima(prima.DesglosesPrimas);
+                Primas primaBD = await _primaBusiness.Agregar(prima);
+                if(primaBD != null)
+                {
+                    TempData["MensajeExitoPrima"] = $"Prima registrada correctamente para el cliente {primaBD.CorreoCliente}, si quiere proceder con la venta selecciona esta opción";
+                    TempData["Cliente"] = primaBD.CorreoCliente;
+                }
+                return RedirectToAction("Prima", new { lote = lote});
+            }
+            catch
+            {
+                TempData["MensajeErrorPrima"] = "Ocurrio un error interno a la hora de registrar una prima";
+                return RedirectToAction("Prima", new { lote = lote});
+            }
         }
-        //////////////////////
+
+        [HttpPost]
+        public async Task<IActionResult> AgregarVenta(Venta venta)
+        {
+            try
+            {
+                Venta ventaBD = await _ventaBusiness.Agregar(venta);
+                if(ventaBD != null)
+                {
+                    TempData["MensajeExitoVenta"] = $"Venta registrada correctamente para el cliente {ventaBD.CorreoCliente}";
+                }
+                return RedirectToAction("Index", "Lote");
+            }
+            catch(Exception ex)
+            {
+                TempData["MensajeErrorVenta"] = ex.Message;
+                return RedirectToAction("Index", "Lote");
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> TipoCambioActual()
         {

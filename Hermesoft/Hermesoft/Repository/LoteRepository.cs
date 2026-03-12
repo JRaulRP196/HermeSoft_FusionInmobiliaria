@@ -85,6 +85,37 @@ namespace HermeSoft_Fusion.Repository
             return resultado.ToList();
         }
 
+        public async Task<Lote> Editar(Lote lote)
+        {
+            var body = new
+            {
+                estado = lote.Estado
+            };
+
+            var json = JsonSerializer.Serialize(body);
+
+            var content = new StringContent(
+                json,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
+            var url = $"http://localhost:3000/lotes/editar/{lote.Codigo}";
+
+            var response = await _httpClient.PatchAsync(
+                url,
+                content
+            );
+
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                return null;
+            }
+            response.EnsureSuccessStatusCode();
+            return lote;
+
+        }
+
         #endregion
 
     }
