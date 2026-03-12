@@ -28,10 +28,21 @@ namespace HermeSoft_Fusion.Controllers
         #region js
 
         [HttpGet]
-        public async Task<IActionResult> PagosPorCondominio(string condominio)
+        public async Task<IActionResult> PagosPorCondominio(string condominio, DateTime fechaInicio, DateTime fechaFinal)
         {
-            var resultado = await _estadisticaBusiness.PagosPorCondominio(condominio);
-            return Json(resultado);
+            try
+            {
+                var resultado = await _estadisticaBusiness.PagosPorCondominio(condominio, fechaInicio, fechaFinal);
+                return Json(resultado);
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = e.Message
+                });
+            }
         }
 
         #endregion

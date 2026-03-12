@@ -1,93 +1,116 @@
-﻿// Stacked Columns Charts
+﻿$(function () {
 
-let categorias = [];
-let pagados = [];
-let pendientes = [];
-let atrasados = [];
-async function cargarDatos() {
+    let categorias = [];
+    let pagados = [];
+    let pendientes = [];
+    let atrasados = [];
 
-    const response = await fetch('/Condominio/Obtener');
-    const data = await response.json();
+    let chart = null; 
 
-    for (let i = 0; i < data.length; i++) {
-        const res = await fetch(`/Estadistica/PagosPorCondominio?condominio=${data[i].id}`);
-        const datos = await res.json();
+    cargarDatos();
 
-        // solo agregar si tiene datos
-        if (datos.pagados > 0 || datos.pendientes > 0 || datos.atrasados > 0) {
-            categorias.push(data[i].nombre);
-            pagados.push(datos.pagados);
-            pendientes.push(datos.pendientes);
-            atrasados.push(datos.atrasados);
+    async function cargarDatos() {
+
+        categorias = [];
+        pagados = [];
+        pendientes = [];
+        atrasados = [];
+
+        let fechaInicio = $("#fechaInicio").val();
+        let fechaFinal = $("#fechaFinal").val();
+
+        const response = await fetch('/Condominio/Obtener');
+        const data = await response.json();
+
+        for (let i = 0; i < data.length; i++) {
+
+            const res = await fetch(`/Estadistica/PagosPorCondominio?condominio=${data[i].id}&fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+            const datos = await res.json();
+
+            if (datos.pagados > 0 || datos.pendientes > 0 || datos.atrasados > 0) {
+                categorias.push(data[i].nombre);
+                pagados.push(datos.pagados);
+                pendientes.push(datos.pendientes);
+                atrasados.push(datos.atrasados);
+            }
         }
+
+        if (categorias.length === 0) {
+            mostrarMensajeSinDatos();
+            return;
+        }
+
+        crearGrafico();
     }
-    if (categorias.length === 0) {
-        mostrarMensajeSinDatos();
-        return;
-    }
-    crearGrafico();
-}
 
-function mostrarMensajeSinDatos() {
+    $("#filtro").on("click", function (e) {
+        e.preventDefault();
+        cargarDatos();
+    });
 
-    const contenedor = document.querySelector("#column_stacked");
+    function mostrarMensajeSinDatos() {
 
-    contenedor.innerHTML = `
+        const contenedor = document.querySelector("#column_stacked");
+
+        if (chart) {
+            chart.destroy();
+            chart = null;
+        }
+
+        contenedor.innerHTML = `
         <div class="text-center p-5">
             <h5 class="text-muted">No hay ventas registradas</h5>
             <p class="text-secondary mb-0">
                 No existen datos suficientes para generar la estadística.
             </p>
         </div>
-    `;
-}
+        `;
+    }
 
+    function crearGrafico() {
 
-function crearGrafico() {
+        const contenedor = document.querySelector("#column_stacked");
 
-    var options = {
-        series: [
-            {
-                name: 'PAGOS AL DÍA',
-                data: pagados
+        if (chart) {
+            chart.destroy();
+        }
+
+        contenedor.innerHTML = "";
+
+        var options = {
+            series: [
+                { name: 'PAGOS AL DÍA', data: pagados },
+                { name: 'PAGOS PENDIENTES', data: pendientes },
+                { name: 'PAGOS ATRASADOS', data: atrasados }
+            ],
+            chart: {
+                type: 'bar',
+                height: 350,
+                stacked: true,
+                toolbar: { show: false }
             },
-            {
-                name: 'PAGOS PENDIENTES',
-                data: pendientes
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    borderRadius: 10
+                }
             },
-            {
-                name: 'PAGOS ATRASADOS',
-                data: atrasados
-            }],
-        chart: {
-            type: 'bar',
-            height: 350,
-            stacked: true,
-            toolbar: { show: false }
-        },
-        plotOptions: {
-            bar: {
-                horizontal: false,
-                borderRadius: 10
-            }
-        },
-        xaxis: {
-            type: 'category',
-            categories: categorias
-        },
-        legend: {
-            position: 'right',
-            offsetY: 40
-        },
-        fill: {
-            opacity: 1
-        },
-        colors: ['#086070', '#ed5e49', '#2651e9']
-    };
+            xaxis: {
+                type: 'category',
+                categories: categorias
+            },
+            legend: {
+                position: 'right',
+                offsetY: 40
+            },
+            fill: {
+                opacity: 1
+            },
+            colors: ['#086070', '#ed5e49', '#2651e9']
+        };
 
-    var chart = new ApexCharts(document.querySelector("#column_stacked"), options);
-    chart.render();
-}
+        chart = new ApexCharts(contenedor, options);
+        chart.render();
+    }
 
-
-document.addEventListener("DOMContentLoaded", cargarDatos);
+});
