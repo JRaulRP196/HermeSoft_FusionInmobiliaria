@@ -1,4 +1,5 @@
-﻿using HermeSoft_Fusion.Models.Usuarios;
+﻿using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Usuarios;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
@@ -55,6 +56,19 @@ namespace HermeSoft_Fusion.Business.Usuarios
             await smtp.DisconnectAsync(true);
         }
 
+        public string GenerarMensajeRecordatorio(Venta venta)
+        {
+            var ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "RecordatorioPago.html");
+            string html = System.IO.File.ReadAllText(ruta);
+            html = html.Replace("{{correoAsesor}}", venta.Usuario.Correo);
+            var desglose = venta.Prima.DesglosesPrimas.Where(d => d.Estado == "Pendiente").FirstOrDefault();
+
+            html = html.Replace("{{fechaCobro}}", desglose.FechaCobro.ToString("dd/MM/yyyy"));
+            html = html.Replace("{{monto}}", desglose.Monto.ToString());
+            var link = _config.GetSection("Url").Value + $"Recordatorio/{desglose.IdDesglosePrima}";
+            html = html.Replace("{{linkConfirmacion}}", link);
+            return html;
+        }
 
         public string GenerarMensajePassword(string password)
         {

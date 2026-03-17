@@ -1,14 +1,11 @@
 ﻿using HermeSoft_Fusion.Business;
 using HermeSoft_Fusion.Business.Usuarios;
 using HermeSoft_Fusion.Models;
-using HermeSoft_Fusion.Models.Servicios;
 using HermeSoft_Fusion.Models.Usuarios;
 using HermeSoft_Fusion.Repository;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace HermeSoft_Fusion.Controllers
 {

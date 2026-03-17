@@ -29,6 +29,16 @@ namespace HermeSoft_Fusion.Repository
                     .ToListAsync();
         }
 
+        public async Task<List<Venta>> ObtenerPendientes()
+        {
+            return await _context.VENTAS
+                    .Include(v => v.Prima)
+                        .ThenInclude(p => p.DesglosesPrimas)
+                    .Include(v => v.Usuario)
+                    .Where(v => v.Estado == "EN PROCESO")
+                    .ToListAsync();
+        }
+
         public async Task<Venta> Obtener(int numContrato)
         {
             return await _context.VENTAS

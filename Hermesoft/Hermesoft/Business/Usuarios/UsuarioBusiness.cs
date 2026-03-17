@@ -1,4 +1,5 @@
 ﻿using HermeSoft_Fusion.Data;
+using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Usuarios;
 using HermeSoft_Fusion.Repository.Usuarios;
 
@@ -132,6 +133,11 @@ namespace HermeSoft_Fusion.Business.Usuarios
         public async Task<Usuario> Obtener(string correo)
         {
             return await _usuarioRepository.Obtener(correo);
+        }
+
+        public async Task<Usuario> ObtenerConPrimas(string correo)
+        {
+            return await _usuarioRepository.ObtenerConPrimas(correo);
         }
 
         public async Task<Usuario> Obtener(int id)

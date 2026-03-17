@@ -21,7 +21,7 @@ namespace HermeSoft_Fusion.Business
         {
             var lotes = await _loteBusiness.ObtenerPorCondominio(condominio);
             List<Venta> ventas = await _ventaBusiness.Obtener();
-            ventas = ventas.Where(v => lotes.Any(l => l.Codigo == v.CodLote)).ToList();
+            ventas = ventas.Where(v => lotes.Any(l => l.Codigo == v.CodLote) && v.Estado != "ANULADA").ToList();
             if(fechaInicio != DateTime.MinValue && fechaFinal != DateTime.MinValue)
             {
                 if (fechaInicio <= fechaFinal)

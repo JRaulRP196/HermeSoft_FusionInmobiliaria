@@ -71,6 +71,16 @@ namespace HermeSoft_Fusion.Business
             return pdf;
         }
 
+        public async Task<bool> EnviarComprobante(string pdf, string correo)
+        {
+            var rutaFisica = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", pdf.TrimStart('/'));
+            byte[] archivo = System.IO.File.ReadAllBytes(rutaFisica);
+            var ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "Comprobante.html");
+            string html = System.IO.File.ReadAllText(ruta);
+            await _emailService.EnviarCorreoAsync(correo, "Comprobante de Venta", html, archivo, "Comprobante.pdf");
+            return true;
+        }
+
         public async Task<Venta> AnularVenta(int numContrato, string motivo)
         {
             using var trasaction = await _context.Database.BeginTransactionAsync();
@@ -86,7 +96,7 @@ namespace HermeSoft_Fusion.Business
                     return null;
                 venta.Estado = "ANULADA";
                 venta.MotivoNulidad = motivo;
-                
+
                 await _context.SaveChangesAsync();
                 await trasaction.CommitAsync();
                 return venta;
@@ -97,14 +107,18 @@ namespace HermeSoft_Fusion.Business
             }
         }
 
-        public async Task<bool> EnviarComprobante(string pdf, string correo)
+        public async Task<string> MotivoNulidad(int numContrato)
         {
-            var rutaFisica = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot",pdf.TrimStart('/'));
-            byte[] archivo = System.IO.File.ReadAllBytes(rutaFisica);
-            var ruta = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot","email","Comprobante.html");
-            string html = System.IO.File.ReadAllText(ruta);
-            await _emailService.EnviarCorreoAsync(correo, "Comprobante de Venta", html,archivo,"Comprobante.pdf");
-            return true;
+            var venta = await _ventaRepository.Obtener(numContrato);
+            if (venta == null)
+            {
+                return "Esta venta no se encuentra en el sistema";
+            }
+            if (venta.Estado != "ANULADA")
+            {
+                return "No se encuentra anulada esta venta";
+            }
+            return venta.MotivoNulidad;
         }
 
         public async Task<List<Venta>> Filtro(List<Venta> ventas, DateTime fechaInicio, DateTime fechaCierre, string condominio)
@@ -124,20 +138,6 @@ namespace HermeSoft_Fusion.Business
                 ventasFiltradas = ventas.Where(v => v.FechaDeRegistro >= fechaInicio && v.FechaDeRegistro <= fechaCierre).ToList();
             }
             return ventasFiltradas;
-        }
-
-        public async Task<string> MotivoNulidad(int numContrato)
-        {
-            var venta = await _ventaRepository.Obtener(numContrato);
-            if (venta == null)
-            {
-                return "Esta venta no se encuentra en el sistema";
-            }
-            if (venta.Estado != "ANULADA")
-            {
-                return "No se encuentra anulada esta venta";
-            }
-            return venta.MotivoNulidad;
         }
 
         public async Task<List<Venta>> Obtener()

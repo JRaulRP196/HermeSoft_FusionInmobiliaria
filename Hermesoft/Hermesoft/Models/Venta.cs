@@ -33,7 +33,7 @@ namespace HermeSoft_Fusion.Models
         public DateTime FechaDeRegistro { get; set; }
 
         [Required]
-        public int IdPrima { get; set; }
+        public int? IdPrima { get; set; }
 
         [Required]
         public int IdBanco { get; set; }
