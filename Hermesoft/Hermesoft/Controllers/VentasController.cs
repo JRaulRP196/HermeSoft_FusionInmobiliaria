@@ -5,6 +5,7 @@ using HermeSoft_Fusion.Models.Servicios;
 using HermeSoft_Fusion.Models.Usuarios;
 using HermeSoft_Fusion.Repository;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace HermeSoft_Fusion.Controllers
         private readonly UsuarioBusiness _usuarioBusiness;
         private readonly CondominioBusiness _condominioBusiness;
 
-        public VentasController(BancoBusiness bancoBusiness, LoteRepository loteRepository, CalculosBusiness calculosBusiness, 
+        public VentasController(BancoBusiness bancoBusiness, LoteRepository loteRepository, CalculosBusiness calculosBusiness,
             TipoCambioBusiness tipoCambioBusiness, PrimaBusiness primaBusiness, VentaBusiness ventaBusiness, UsuarioBusiness usuarioBusiness, CondominioBusiness condominioBusiness)
         {
             _bancoBusiness = bancoBusiness;
@@ -66,12 +67,12 @@ namespace HermeSoft_Fusion.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AgregarPrima(Primas prima, string lote, string desgloseConDescuentoJson, 
+        public async Task<IActionResult> AgregarPrima(Primas prima, string lote, string desgloseConDescuentoJson,
             string desgloseSinDescuentoJson)
         {
             try
             {
-                if(desgloseSinDescuentoJson != null)
+                if (desgloseSinDescuentoJson != null)
                 {
                     prima.DesglosesPrimas = JsonSerializer.Deserialize<List<DesglosesPrimas>>(desgloseSinDescuentoJson);
                 }
@@ -80,24 +81,24 @@ namespace HermeSoft_Fusion.Controllers
                     prima.DesglosesPrimas = JsonSerializer.Deserialize<List<DesglosesPrimas>>(desgloseConDescuentoJson);
                 }
                 prima.FechaInicio = DateTime.Today;
-                
-                foreach(var desglose in prima.DesglosesPrimas)
+
+                foreach (var desglose in prima.DesglosesPrimas)
                 {
                     desglose.Prima = prima;
                 }
                 prima.Total = _calculosBusiness.CalcularTotalPrima(prima.DesglosesPrimas);
                 Primas primaBD = await _primaBusiness.Agregar(prima);
-                if(primaBD != null)
+                if (primaBD != null)
                 {
                     TempData["MensajeExitoPrima"] = $"Prima registrada correctamente para el cliente {primaBD.CorreoCliente}, si quiere proceder con la venta selecciona esta opción";
                     TempData["Cliente"] = primaBD.CorreoCliente;
                 }
-                return RedirectToAction("Prima", new { lote = lote});
+                return RedirectToAction("Prima", new { lote = lote });
             }
             catch
             {
                 TempData["MensajeErrorPrima"] = "Ocurrio un error interno a la hora de registrar una prima";
-                return RedirectToAction("Prima", new { lote = lote});
+                return RedirectToAction("Prima", new { lote = lote });
             }
         }
 
@@ -107,13 +108,13 @@ namespace HermeSoft_Fusion.Controllers
             try
             {
                 Venta ventaBD = await _ventaBusiness.Agregar(venta);
-                if(ventaBD != null)
+                if (ventaBD != null)
                 {
                     TempData["MensajeExitoVenta"] = $"Venta registrada correctamente para el cliente {ventaBD.CorreoCliente}";
                 }
                 return RedirectToAction("Index", "Lote");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["MensajeErrorVenta"] = ex.Message;
                 return RedirectToAction("Index", "Lote");
@@ -121,11 +122,69 @@ namespace HermeSoft_Fusion.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GenerarComprobante(int numContrato)
+        {
+            byte[] pdf = await _ventaBusiness.GenerarComprobanteVenta(numContrato);
+            var rutaPdfs = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/pdfs");
+            if (!Directory.Exists(rutaPdfs))
+            {
+                Directory.CreateDirectory(rutaPdfs);
+            }
+            var nombreArchivo = Guid.NewGuid() + ".pdf";
+            var path = Path.Combine(rutaPdfs, nombreArchivo);
+            System.IO.File.WriteAllBytes(path, pdf);
+            var url = "/pdfs/" + nombreArchivo;
+            return Json(new { url });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EnviarComprobante(string pdf, string correo)
+        {
+            var resultado = await _ventaBusiness.EnviarComprobante(pdf, correo);
+            if (!resultado)
+            {
+                TempData["MensajeErrorEmail"] = "No se pudo enviar el comprobante";
+                return RedirectToAction("Index");
+            }
+            TempData["MensajeExitoEmail"] = "Se le envio el comprobante al cliente";
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AnularVenta(int numContrato, string motivo)
+        {
+            try
+            {
+                var venta = await _ventaBusiness.AnularVenta(numContrato, motivo);
+                if (venta == null)
+                {
+                    TempData["MensajeErrorEmail"] = "No se encuentra la venta disponible";
+                    return RedirectToAction("Index");
+                }
+                TempData["MensajeExitoEmail"] = "Venta anulada correctamente";
+                return RedirectToAction("Index");
+            }
+            catch(Exception ex)
+            {
+                TempData["MensajeErrorEmail"] = ex.Message;
+                return RedirectToAction("Index");
+            }
+            
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MotivoNulidad(int numContrato)
+        {
+            var motivo = await _ventaBusiness.MotivoNulidad(numContrato);
+            return Json(motivo);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> TipoCambioActual()
         {
-            var tc = await _tipoCambioBusiness.Obtener(); // esto ya existe en tu Business
+            var tc = await _tipoCambioBusiness.Obtener();
 
-            if (tc == null || tc.Cambio <= 0) // (o la propiedad equivalente)
+            if (tc == null || tc.Cambio <= 0) 
                 return Json(new { ok = false });
 
             return Json(new { ok = true, tipoCambio = tc.Cambio });

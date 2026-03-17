@@ -56,11 +56,11 @@
                                 <td>@user.Rol.Nombre</td>
                                 @if (@user.Estado)
                                 {
-                                    <td>Activo</td>
+                                    <td><span class="badge bg-success rounded-pill px-3 py-2 me-2">Activo</span></td>
                                 }
                                 else
                                 {
-                                    <td>Inactivo</td>
+                                    <td><span class="badge bg-danger rounded-pill px-3 py-2 me-2">Inactivo</span></td>
                                 }
                                 <td>@user.Correo</td>
                                 <td>

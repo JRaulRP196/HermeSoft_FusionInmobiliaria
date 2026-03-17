@@ -9,26 +9,18 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="fw-bold mb-0">Indicadores</h4>
     </div>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Referencia</th>
-                <th>Valor</th>
-                <th>Fecha Vigente</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var r in Model)
-            {
-                <tr>
-                    <td>@r.Nombre</td>
-                    <td>%@r.PorcSeguro</td>
-                    <td>@r.FechaVigente?.ToString("dd/MM/yyyy")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
+    <div class="row">
+        @foreach(var r in Model)
+        {
+            <div class="col-md-3 mb-3">
+                <div class="card bg-light border-0">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">@r.Nombre</h5>
+                        <p class="card-text display-6 fw-bold">@r.PorcSeguro %</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
     <small class="text-muted">Valores obtenidos desde el BCCR. No editables manualmente.</small>
 </div>

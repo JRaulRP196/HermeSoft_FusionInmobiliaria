@@ -197,6 +197,7 @@
     <Folder Include="wwwroot\assets\libs\toastr\node_modules\jquery\src\" />
     <Folder Include="wwwroot\assets\libs\toastr\tests\" />
     <Folder Include="wwwroot\assets\libs\twitter-bootstrap-wizard\examples\" />
+    <Folder Include="wwwroot\pdfs\" />
     <Folder Include="wwwroot\uploads\logos\" />
   </ItemGroup>
 
@@ -1194,6 +1195,7 @@
     <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.22" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
+    <PackageReference Include="QuestPDF" Version="2026.2.3" />
   </ItemGroup>
 
 </Project>

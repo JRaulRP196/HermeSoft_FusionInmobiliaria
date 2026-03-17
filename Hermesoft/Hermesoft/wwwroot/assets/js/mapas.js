@@ -2,8 +2,8 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     // ========= MAPA ============
-    const w = 1471;
-    const h = 1357;
+    const w = 2000;
+    const h = 1500;
 
     const map = L.map('map', {
         crs: L.CRS.Simple,

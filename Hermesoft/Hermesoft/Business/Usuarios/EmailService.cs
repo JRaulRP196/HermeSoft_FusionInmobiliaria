@@ -13,7 +13,12 @@ namespace HermeSoft_Fusion.Business.Usuarios
             _config = config;
         }
 
-        public async Task EnviarCorreoAsync(string destino, string asunto, string mensaje)
+        public async Task EnviarCorreoAsync(
+            string destino,
+            string asunto,
+            string mensaje,
+            byte[]? archivo = null,
+            string? nombreArchivo = null)
         {
             var email = new MimeMessage();
 
@@ -21,10 +26,17 @@ namespace HermeSoft_Fusion.Business.Usuarios
             email.To.Add(MailboxAddress.Parse(destino));
             email.Subject = asunto;
 
-            email.Body = new TextPart("html")
+            var builder = new BodyBuilder
             {
-                Text = mensaje
+                HtmlBody = mensaje
             };
+
+            if (archivo != null && nombreArchivo != null)
+            {
+                builder.Attachments.Add(nombreArchivo, archivo, ContentType.Parse("application/pdf"));
+            }
+
+            email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
 
