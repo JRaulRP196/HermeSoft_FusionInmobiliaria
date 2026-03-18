@@ -44,17 +44,21 @@
                         {
                             @foreach (var venta in Model)
                             {
-                                <tr>
-                                    <td>@venta.CorreoCliente</td>
-                                    <td>@venta.NumContrato</td>
-                                    <td>@venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").FechaCobro</td>
-                                    <td>@venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").Monto</td>
-                                    <td>
-                                        <span class="badge bg-warning rounded-pill px-3 py-2 me-2">
-                                            @venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").Estado
-                                        </span>
-                                    </td>
-                                </tr>
+                                @if (venta.Prima.DesglosesPrimas.Where(d => d.Estado == "Pendiente").ToList().Count() > 0 &&
+                                     venta.Estado == "EN PROCESO")
+                                {
+                                    <tr>
+                                        <td>@venta.CorreoCliente</td>
+                                        <td>@venta.NumContrato</td>
+                                        <td>@venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").FechaCobro</td>
+                                        <td>@venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").Monto</td>
+                                        <td>
+                                            <span class="badge bg-warning rounded-pill px-3 py-2 me-2">
+                                                @venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").Estado
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
 
                             }
                         }

@@ -97,12 +97,15 @@
                                     <td>
                                         @if (venta.Estado != "ANULADA")
                                         {
-                                            <button class="btn btn-danger border-0 btn-editar"
-                                                    data-numContrato="@venta.NumContrato"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalNulidad">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </button>
+                                            @if(venta.Estado != "TERMINADO")
+                                            {
+                                                <button class="btn btn-danger border-0 btn-editar"
+                                                        data-numContrato="@venta.NumContrato"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalNulidad">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            }
                                             <a class="btn btn-success border-0 btn-editar" onclick="GenerarComprobante(@venta.NumContrato)"
                                                data-correo="@venta.CorreoCliente"
                                                data-bs-toggle="modal"

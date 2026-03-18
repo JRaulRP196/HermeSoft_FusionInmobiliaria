@@ -82,6 +82,14 @@ namespace HermeSoft_Fusion.Business.Usuarios
             return html;
         }
 
+        public string GenerarMensajePrimaCompleta( Venta venta)
+        {
+            var ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "NotificacionPrimaCompleta.html");
+            string html = System.IO.File.ReadAllText(ruta);
+            html = html.Replace("{{numContrato}}", venta.NumContrato.ToString());
+            return html;
+        }
+
         public string GenerarMensajePassword(string password)
         {
             string plantillaHtml = @"

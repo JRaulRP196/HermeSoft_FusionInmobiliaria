@@ -40,8 +40,9 @@ namespace HermeSoft_Fusion.Business
             if (ventas.Any())
             {
                 pagosPendientes = ventas.SelectMany(v => v.Prima.DesglosesPrimas.Where(dp => dp.Estado == "Pendiente")).ToList().Count();
-                pagosPagados = ventas.SelectMany(v => v.Prima.DesglosesPrimas.Where(dp => dp.Estado == "Pagado")).ToList().Count();
-                pagosAtrasados = ventas.SelectMany(v => v.Prima.DesglosesPrimas.Where(dp => dp.Estado == "Atrasado")).ToList().Count();
+                pagosPagados = ventas.SelectMany(v => v.Prima.DesglosesPrimas.Where(dp => dp.Estado == "Terminado")).ToList().Count();
+                pagosAtrasados = ventas.SelectMany(v => v.Prima.DesglosesPrimas.Where(dp => dp.Estado == "Pendiente" &&
+                                                                        dp.FechaCobro < DateTime.Today)).ToList().Count();
             }
 
             return new PagoCondominioViewModel

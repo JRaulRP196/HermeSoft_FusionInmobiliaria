@@ -175,7 +175,18 @@
                                 <tr>
                                     <td>@desglose.FechaCobro.ToString("dd/MM/yyyy")</td>
                                     <td>₡@desglose.Monto.ToString("N2")</td>
-                                    <td>@desglose.Estado</td>
+                                    @if (desglose.Estado == "Pendiente")
+                                    {
+                                        <td><span class="badge bg-warning rounded-pill px-3 py-2 me-2">@desglose.Estado</span></td>
+                                    }
+                                    else if (desglose.Estado == "Pagado")
+                                    {
+                                        <td><span class="badge bg-success rounded-pill px-3 py-2 me-2">@desglose.Estado</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td><span class="badge bg-danger rounded-pill px-3 py-2 me-2">@desglose.Estado</span></td>
+                                    }
                                 </tr>
                             }
                         </tbody>
