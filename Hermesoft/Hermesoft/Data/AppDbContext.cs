@@ -157,8 +157,8 @@ namespace HermeSoft_Fusion.Data
                 entity.HasKey(e => e.NumContrato);
 
                 entity.HasOne(v => v.Prima)
-                      .WithMany()
-                      .HasForeignKey(v => v.IdPrima)
+                      .WithOne(p => p.Venta)
+                      .HasForeignKey<Venta>(v => v.IdPrima)
                       .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(v => v.Banco)
                       .WithMany()

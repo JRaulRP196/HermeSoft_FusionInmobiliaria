@@ -44,6 +44,7 @@ namespace HermeSoft_Fusion.Repository
             return await _context.VENTAS
                     .Include(v => v.Prima)
                         .ThenInclude(p => p.DesglosesPrimas)
+                    .Include(v => v.Usuario)
                     .FirstOrDefaultAsync(v => v.NumContrato == numContrato);
         }
 

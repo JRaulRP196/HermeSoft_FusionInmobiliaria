@@ -1,0 +1,74 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Recordatorio";
+    Layout = "~/Views/Shared/_BlankLayout.cshtml";
+}
+@using HermeSoft_Fusion.Models;
+@model DesglosesPrimas
+
+<div class="container py-5">
+    <div class="card shadow-sm mb-4 border-0">
+        @if (TempData["MensajeErrorEmail"] != null)
+        {
+            <div class="alert alert-danger">@TempData["MensajeErrorEmail"]</div>
+        }
+
+        @if (TempData["MensajeExitoEmail"] != null)
+        {
+            <div class="alert alert-success">
+                <p>@TempData["MensajeExitoEmail"]</p>
+            </div>
+        }
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-12">
+
+            <div class="card shadow-lg border-0 rounded-4">
+
+                <!-- Header -->
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h4 class="mb-0">Recordatorio de Pago</h4>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-4 text-center">
+
+                    <h5 class="mb-3">Hola, <strong>@Model.Prima.Venta.CorreoCliente</strong></h5>
+
+                    <p class="text-muted">
+                        Te recordamos que tienes un pago pendiente correspondiente a tu prima.
+                    </p>
+
+                    <div class="bg-light border rounded-3 p-3 mb-4">
+                        <p class="mb-1"><strong>Monto:</strong> ₡ @Model.Monto</p>
+                        <p class="mb-1"><strong>Fecha de cobro:</strong> @Model.FechaCobro</p>
+                        <p class="mb-0 text-danger"><strong>Estado:</strong> @Model.Estado</p>
+                    </div>
+
+                    <p class="mb-4">
+                        Este pago debe realizarse en los próximos <strong>días</strong>.
+                    </p>
+
+                    <!-- Botón principal -->
+                    @if(Model.FechaPagado == null)
+                    {
+                        <a class="btn btn-success btn-lg w-100 rounded-3 shadow-sm" asp-action="ConfirmarPago"
+                           asp-route-idDesglose="@Model.IdDesglosePrima">
+                            ✔️ Pago ya realizado
+                        </a>
+                    }
+
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer text-center text-muted small">
+                    Si ya realizaste el pago, puedes confirmarlo usando el botón anterior.
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

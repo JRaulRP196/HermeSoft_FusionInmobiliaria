@@ -13,6 +13,7 @@ namespace HermeSoft_Fusion.Models
         public decimal Porcentaje { get; set; }
         public decimal Total {  get; set; }
         public List<DesglosesPrimas>? DesglosesPrimas { get; set; }
+        public Venta Venta { get; set; }
 
     }
 }

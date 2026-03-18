@@ -74,6 +74,9 @@ builder.Services.AddScoped<PrimaBusiness>();
 builder.Services.AddScoped<VentaRepository>();
 builder.Services.AddScoped<VentaBusiness>();
 builder.Services.AddScoped<EstadisticaBusiness>();
+builder.Services.AddScoped<DesglosePrimaBusiness>();
+builder.Services.AddScoped<DesglosePrimaRepository>();
+builder.Services.AddScoped<RecordatorioBusiness>();
 builder.Services.AddScoped<Job>();
 
 builder.Services.AddHangfire(config =>
@@ -93,7 +96,7 @@ using (var scope = app.Services.CreateScope())
     recurringJobManager.AddOrUpdate<Job>(
         "recordatorio-primas",
         job => job.EnviarRecordatorios(),
-        "* * * * *"
+        "8 * * * *"
     );
 }
 

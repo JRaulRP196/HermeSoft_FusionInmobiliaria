@@ -56,16 +56,28 @@ namespace HermeSoft_Fusion.Business.Usuarios
             await smtp.DisconnectAsync(true);
         }
 
-        public string GenerarMensajeRecordatorio(Venta venta)
+        public string GenerarMensajeRecordatorio(DesglosesPrimas desglose)
         {
             var ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "RecordatorioPago.html");
             string html = System.IO.File.ReadAllText(ruta);
-            html = html.Replace("{{correoAsesor}}", venta.Usuario.Correo);
-            var desglose = venta.Prima.DesglosesPrimas.Where(d => d.Estado == "Pendiente").FirstOrDefault();
+            html = html.Replace("{{correoAsesor}}", desglose.Prima.Venta.Usuario.Correo);
 
             html = html.Replace("{{fechaCobro}}", desglose.FechaCobro.ToString("dd/MM/yyyy"));
             html = html.Replace("{{monto}}", desglose.Monto.ToString());
-            var link = _config.GetSection("Url").Value + $"Recordatorio/{desglose.IdDesglosePrima}";
+            var link = _config.GetSection("Url").Value + $"Recordatorio?idDesglose={desglose.IdDesglosePrima}";
+            html = html.Replace("{{linkConfirmacion}}", link);
+            return html;
+        }
+
+        public string GenerarMensajeConfirmacion (DesglosesPrimas desglose)
+        {
+            var ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "ConfirmacionPagoAsesor.html");
+            string html = System.IO.File.ReadAllText(ruta);
+            html = html.Replace("{{correoCliente}}", desglose.Prima.Venta.CorreoCliente);
+
+            html = html.Replace("{{fechaCobro}}", desglose.FechaCobro.ToString("dd/MM/yyyy"));
+            html = html.Replace("{{monto}}", desglose.Monto.ToString());
+            var link = _config.GetSection("Url").Value + $"Recordatorio/ConfirmacionAsesor?idDesglose={desglose.IdDesglosePrima}";
             html = html.Replace("{{linkConfirmacion}}", link);
             return html;
         }
