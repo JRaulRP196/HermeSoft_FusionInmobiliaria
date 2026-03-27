@@ -6,6 +6,7 @@ using HermeSoft_Fusion.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using HermeSoft_Fusion.Models.ViewModels;
 
 namespace HermeSoft_Fusion.Controllers
 {
@@ -49,7 +50,7 @@ namespace HermeSoft_Fusion.Controllers
             return View(await _ventaBusiness.Filtro(usuario.Ventas, filterDesde, filterHasta, filterCondominio));
         }
 
-        public async Task<IActionResult> StepperRegistro(string lote, string cliente)
+        public async Task<IActionResult> StepperRegistro2(string lote, string cliente) // Borrar
         {
             ViewBag.lote = lote;
             ViewBag.Bancos = await _bancoBusiness.ObtenerTodos();
@@ -57,19 +58,59 @@ namespace HermeSoft_Fusion.Controllers
             return View();
         }
 
-        public IActionResult Prima(string lote)
+        public async Task<IActionResult> StepperRegistro(string lote, string cliente) //Q
         {
-            TempData["lote"] = lote;
-            return View();
+            ViewBag.lote = lote;
+            ViewBag.Bancos = await _bancoBusiness.ObtenerTodos();
+            ViewBag.Cliente = cliente;
+            ViewBag.Primas = string.IsNullOrWhiteSpace(cliente)
+                ? new List<Primas>()
+                : await _primaBusiness.ObtenerPorCorreo(cliente);
+
+            return View(new Venta
+            {
+                CorreoCliente = cliente,
+                CodLote = lote
+            });
         }
 
+        public IActionResult Prima(string lote)
+        {
+            var model = new PrimaViewModel
+            {
+                Lote = lote,
+                FechaCierre = DateTime.Today
+            };
+
+            if (TempData["MensajeErrorPrima"] != null)
+                model.MensajeErrorPrima = TempData["MensajeErrorPrima"]!.ToString();
+
+            if (TempData["MensajeExitoPrima"] != null)
+                model.MensajeExitoPrima = TempData["MensajeExitoPrima"]!.ToString();
+
+            if (TempData["Cliente"] != null)
+                model.Cliente = TempData["Cliente"]!.ToString();
+
+            return View(model);
+        }        
+
         [HttpPost]
-        public async Task<IActionResult> AgregarPrima(Primas prima, string lote, string desgloseConDescuentoJson,
-            string desgloseSinDescuentoJson)
+        public async Task<IActionResult> AgregarPrima(
+    PrimaViewModel model,
+    string desgloseConDescuentoJson,
+    string desgloseSinDescuentoJson)
         {
             try
             {
-                if (desgloseSinDescuentoJson != null)
+                var prima = new Primas
+                {
+                    CorreoCliente = model.CorreoCliente,
+                    Porcentaje = model.Porcentaje,
+                    FechaCierre = model.FechaCierre,
+                    FechaInicio = DateTime.Today
+                };
+
+                if (!string.IsNullOrEmpty(desgloseSinDescuentoJson))
                 {
                     prima.DesglosesPrimas = JsonSerializer.Deserialize<List<DesglosesPrimas>>(desgloseSinDescuentoJson);
                 }
@@ -77,25 +118,28 @@ namespace HermeSoft_Fusion.Controllers
                 {
                     prima.DesglosesPrimas = JsonSerializer.Deserialize<List<DesglosesPrimas>>(desgloseConDescuentoJson);
                 }
-                prima.FechaInicio = DateTime.Today;
 
                 foreach (var desglose in prima.DesglosesPrimas)
                 {
                     desglose.Prima = prima;
                 }
+
                 prima.Total = _calculosBusiness.CalcularTotalPrima(prima.DesglosesPrimas);
-                Primas primaBD = await _primaBusiness.Agregar(prima);
+
+                var primaBD = await _primaBusiness.Agregar(prima);
+
                 if (primaBD != null)
                 {
                     TempData["MensajeExitoPrima"] = $"Prima registrada correctamente para el cliente {primaBD.CorreoCliente}, si quiere proceder con la venta selecciona esta opción";
                     TempData["Cliente"] = primaBD.CorreoCliente;
                 }
-                return RedirectToAction("Prima", new { lote = lote });
+
+                return RedirectToAction("Prima", new { lote = model.Lote });
             }
             catch
             {
-                TempData["MensajeErrorPrima"] = "Ocurrio un error interno a la hora de registrar una prima";
-                return RedirectToAction("Prima", new { lote = lote });
+                TempData["MensajeErrorPrima"] = "Ocurrió un error interno a la hora de registrar una prima";
+                return RedirectToAction("Prima", new { lote = model.Lote });
             }
         }
 

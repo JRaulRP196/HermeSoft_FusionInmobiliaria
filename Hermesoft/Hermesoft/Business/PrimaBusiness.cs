@@ -1,6 +1,7 @@
 ﻿using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace HermeSoft_Fusion.Business
 {
@@ -18,7 +19,7 @@ namespace HermeSoft_Fusion.Business
 
         #region Utilidades
 
-        public async Task<Primas> Agregar(Primas prima)
+        public async Task<Primas> Agregar2(Primas prima) // Borrar
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -32,6 +33,22 @@ namespace HermeSoft_Fusion.Business
                 {
                     await _primaRepository.Agregar(prima);
                 }
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return prima;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al agregar la prima: {ex.Message}");
+            }
+        }
+
+        public async Task<Primas> Agregar(Primas prima)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                await _primaRepository.Agregar(prima);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return prima;
@@ -74,6 +91,15 @@ namespace HermeSoft_Fusion.Business
             return await _primaRepository.Obtener(correoCliente);
         }
 
+        public async Task<List<Primas>> ObtenerPorCorreo(string correoCliente) //Q
+        {
+            return await _primaRepository.ObtenerPorCorreo(correoCliente);
+        }
+
+        public async Task<Primas> ObtenerPorId(int idPrima) //Q
+        {
+            return await _primaRepository.ObtenerPorId(idPrima);
+        }
         #endregion
 
     }

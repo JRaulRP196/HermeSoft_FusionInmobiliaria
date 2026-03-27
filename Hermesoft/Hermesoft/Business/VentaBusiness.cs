@@ -34,12 +34,16 @@ namespace HermeSoft_Fusion.Business
             {
                 venta.FechaDeRegistro = DateTime.Now;
                 venta.Estado = "EN PROCESO";
-                var prima = await _primaBusiness.Obtener(venta.CorreoCliente);
-                if(prima == null)
+                var prima = await _primaBusiness.ObtenerPorId(venta.IdPrima.Value);
+                if (prima == null)
                 {
-                    throw new Exception($"Debe registrar una prima para el cliente {venta.CorreoCliente}");
+                    throw new Exception("Debe seleccionar una prima válida para registrar la venta");
                 }
-                venta.IdPrima = prima.IdPrima;
+
+                if (!string.Equals(prima.CorreoCliente, venta.CorreoCliente, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new Exception("La prima seleccionada no pertenece al cliente indicado");
+                }
                 await _ventaRepository.Agregar(venta);
 
                 var lote = await _loteBusiness.Obtener(venta.CodLote);

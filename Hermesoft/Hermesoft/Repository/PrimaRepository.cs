@@ -28,6 +28,22 @@ namespace HermeSoft_Fusion.Repository
                 .FirstOrDefaultAsync(p => p.CorreoCliente == correoCliente);
         }
 
+        public async Task<List<Primas>> ObtenerPorCorreo(string correoCliente) //Q
+        {
+            return await _context.PRIMAS
+                .Include(p => p.DesglosesPrimas)
+                .Where(p => p.CorreoCliente == correoCliente)
+                .OrderByDescending(p => p.IdPrima)
+                .ToListAsync();
+        }
+
+        public async Task<Primas> ObtenerPorId(int idPrima) //Q
+        {
+            return await _context.PRIMAS
+                .Include(p => p.DesglosesPrimas)
+                .FirstOrDefaultAsync(p => p.IdPrima == idPrima);
+        }
+
         #endregion
 
     }

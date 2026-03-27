@@ -1,44 +1,35 @@
 ﻿@using HermeSoft_Fusion.Models
 @using System.Text.Json
-@model Primas
+@using HermeSoft_Fusion.Models.ViewModels
+@model PrimaViewModel
 @{
     ViewBag.Title = "Detalle de Prima";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @{
-    var desglosesSinDescuento = TempData["DesglosePrimaSinDescuento"] != null
-        ? JsonSerializer.Deserialize<List<DesglosesPrimas>>(TempData["DesglosePrimaSinDescuento"].ToString())
-        : new List<DesglosesPrimas>();
-
-    var desglosesConDescuento = TempData["DesglosePrimaConDescuento"] != null
-        ? JsonSerializer.Deserialize<List<DesglosesPrimas>>(TempData["DesglosePrimaConDescuento"].ToString())
-        : new List<DesglosesPrimas>();
-    decimal porcentajeDescuento = TempData["PorcentajeDescuento"] != null
-        ? Convert.ToDecimal(TempData["PorcentajeDescuento"].ToString())
-        : 0;
-    decimal porcentaje = TempData["Porcentaje"] != null
-    ? Convert.ToDecimal(TempData["Porcentaje"].ToString())
-    : 0;
-    DateTime fechaCierre = TempData["FechaFinal"] != null
-        ? Convert.ToDateTime(TempData["FechaFinal"].ToString())
-        : DateTime.Now;
-    bool aplicarDescuento = porcentajeDescuento > 0;
+    var desglosesSinDescuento = Model.DesglosesSinDescuento ?? new List<DesglosesPrimas>();
+    var desglosesConDescuento = Model.DesglosesConDescuento ?? new List<DesglosesPrimas>();
+    decimal porcentajeDescuento = Model.PorcentajeDescuento;
+    decimal porcentaje = Model.Porcentaje;
+    DateTime fechaCierre = Model.FechaCierre;
+    bool aplicarDescuento = Model.AplicarDescuento;
 }
 
 <div class="card shadow-sm mb-4 border-0">
-    @if (TempData["MensajeErrorPrima"] != null)
+    @if (!string.IsNullOrEmpty(Model.MensajeErrorPrima))
     {
-        <div class="alert alert-danger">@TempData["MensajeErrorPrima"]</div>
+        <div class="alert alert-danger">@Model.MensajeErrorPrima</div>
     }
 
-    @if (TempData["MensajeExitoPrima"] != null)
+    @if (!string.IsNullOrEmpty(Model.MensajeExitoPrima))
     {
         <div class="alert alert-success">
-            <p>@TempData["MensajeExitoPrima"]</p>
-            <a class="btn btn-primary" asp-action="StepperRegistro" asp-route-lote="@TempData["lote"]"
-               asp-route-cliente="@TempData["Cliente"]">
-                Continuar Venta</a>
+            <p>@Model.MensajeExitoPrima</p>
+            <a class="btn btn-primary" asp-action="StepperRegistro" asp-route-lote="@Model.Lote"
+                   asp-route-cliente="@Model.Cliente">
+                Continuar Venta
+            </a>
         </div>
     }
 </div>
@@ -53,12 +44,12 @@
                 </a>
             </div>
 
-            <input id="lote" type="hidden" name="lote" form="formAgregarPrima" value="@TempData["lote"]" />
+            <input id="lote" type="hidden" asp-for="Lote" form="formAgregarPrima" />
 
 
             <div class="mb-3">
                 <label>% Prima</label>
-                <input type="number" id="porcPrima" asp-for="Porcentaje" form="formAgregarPrima" class="form-control" placeholder="%" value="@porcentaje" />
+                <input type="number" id="porcPrima" asp-for="Porcentaje" form="formAgregarPrima" class="form-control" placeholder="%" />
             </div>
 
 
@@ -86,9 +77,9 @@
                 <input type="date"
                        id="fechaPrima"
                        class="form-control"
-                       value="@fechaCierre.ToString("yyyy-MM-dd")"
-                       min="@DateTime.Now.ToString("yyyy-MM-dd")"
                        asp-for="FechaCierre"
+                       value="@Model.FechaCierre.ToString("yyyy-MM-dd")"
+                       min="@DateTime.Now.ToString("yyyy-MM-dd")"
                        form="formAgregarPrima" />
             </div>
 
@@ -97,7 +88,7 @@
                     Calcular prima
                 </button>
             </div>
-            @if (desglosesSinDescuento.Any() || desglosesConDescuento.Any())
+            @if (Model.TieneDesglose)
             {
                 <div class="col-12">
                     <button type="button" id="almacenarPrima" class="btn btn-primary w-100"
@@ -111,7 +102,7 @@
     </div>
 </div>
 
-@if (desglosesSinDescuento.Any() || desglosesConDescuento.Any())
+@if (Model.TieneDesglose)
 {
     <div class="row g-4" id="detallePrima">
 
@@ -207,7 +198,7 @@
             </div>
             <div class="modal-body">
 
-                <form id="formAgregarPrima" asp-action="AgregarPrima" method="post" class="needs-validation" novalidate>
+                <form id="formAgregarPrima" asp-controller="Ventas" asp-action="AgregarPrima" method="post" class="needs-validation" novalidate>
                     <div class="row g-3">
 
                         <div class="col-md-12">
@@ -229,7 +220,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">
-                            Guardar usuario
+                            Guardar Prima
                         </button>
                     </div>
                 </form>

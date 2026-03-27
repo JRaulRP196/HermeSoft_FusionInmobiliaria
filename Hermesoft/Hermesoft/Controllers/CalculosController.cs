@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using HermeSoft_Fusion.Models.ViewModels;
 
 namespace HermeSoft_Fusion.Controllers
 {
@@ -17,15 +18,20 @@ namespace HermeSoft_Fusion.Controllers
         public CalculosController(CalculosBusiness calculosBusiness)
         {
             _calculosBusiness = calculosBusiness;
-        }
+        }       
 
         [HttpGet]
-        public async Task<IActionResult> CalcularPrima(
-                                        string codigoLote,
-                                        decimal porcentajePrima,
-                                        DateTime fechaFinal,
-                                        decimal? porcentajeDescuento )
+        public async Task<IActionResult> CalcularPrima( string codigoLote, decimal porcentajePrima,
+            DateTime fechaFinal, decimal? porcentajeDescuento)
         {
+            var model = new PrimaViewModel
+            {
+                Lote = codigoLote,
+                Porcentaje = porcentajePrima,
+                PorcentajeDescuento = porcentajeDescuento ?? 0m,
+                FechaCierre = fechaFinal
+            };
+
             try
             {
                 var desgloseSinDescuento = await _calculosBusiness.CalcularPrima(
@@ -33,29 +39,25 @@ namespace HermeSoft_Fusion.Controllers
                     porcentajePrima,
                     fechaFinal);
 
-                IEnumerable<DesglosesPrimas> desgloseConDescuento = new List<DesglosesPrimas>();
+                model.DesglosesSinDescuento = desgloseSinDescuento.ToList();
 
                 if (porcentajeDescuento.HasValue && porcentajeDescuento.Value > 0)
                 {
-                    desgloseConDescuento = await _calculosBusiness.CalcularPrima(
+                    var desgloseConDescuento = await _calculosBusiness.CalcularPrima(
                         codigoLote,
                         porcentajePrima,
                         fechaFinal,
                         porcentajeDescuento);
+
+                    model.DesglosesConDescuento = desgloseConDescuento.ToList();
                 }
 
-                TempData["DesglosePrimaSinDescuento"] = JsonConvert.SerializeObject(desgloseSinDescuento);
-                TempData["DesglosePrimaConDescuento"] = JsonConvert.SerializeObject(desgloseConDescuento);
-                TempData["PorcentajeDescuento"] = (porcentajeDescuento ?? 0m).ToString();
-                TempData["Porcentaje"] = porcentajePrima.ToString();
-                TempData["FechaFinal"] = fechaFinal.ToString("yyyy-MM-dd");
-
-                return RedirectToAction("Prima", "Ventas", new { lote = codigoLote });
+                return View("~/Views/Ventas/Prima.cshtml", model);
             }
             catch (Exception ex)
             {
-                TempData["ErrorPrima"] = ex.ToString();
-                return RedirectToAction("Prima", "Ventas", new { lote = codigoLote });
+                model.MensajeErrorPrima = "Ocurrió un error al calcular la prima.";
+                return View("~/Views/Ventas/Prima.cshtml", model);
             }
         }
 
@@ -79,7 +81,7 @@ namespace HermeSoft_Fusion.Controllers
         {
             try
             {
-                return Json(await _calculosBusiness.CalcularGastoFormalizacion(seguroVida,seguroDesempleo,honorarioAbogados,comisionBancaria,codLote));
+                return Json(await _calculosBusiness.CalcularGastoFormalizacion(seguroVida, seguroDesempleo, honorarioAbogados, comisionBancaria, codLote));
             }
             catch (Exception ex)
             {
@@ -94,7 +96,8 @@ namespace HermeSoft_Fusion.Controllers
             try
             {
                 return Json(await _calculosBusiness.CalcularIngresoNetoFamiliar(idBanco, idEndeudamiento, cuotaMensual));
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 TempData["ErrorCalculoIngresoNetoFamiliar"] = ex.ToString();
                 return BadRequest();
@@ -108,7 +111,7 @@ namespace HermeSoft_Fusion.Controllers
             {
                 return Json(await _calculosBusiness.ObtenerCambioDelDolar());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["ErrorCambioDolar"] = ex.ToString();
                 return NotFound();

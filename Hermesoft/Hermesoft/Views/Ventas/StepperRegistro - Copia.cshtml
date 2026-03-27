@@ -2,18 +2,12 @@
 @using HermeSoft_Fusion.Models.Banco
 @using Newtonsoft.Json
 @model Venta
-
 @{
     ViewBag.Title = "Registrar Venta";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
-    var primas = ViewBag.Primas as IEnumerable<HermeSoft_Fusion.Models.Primas> ?? new List<HermeSoft_Fusion.Models.Primas>();
-    var bancos = ViewBag.Bancos as IEnumerable<HermeSoft_Fusion.Models.Banco.Banco> ?? new List<HermeSoft_Fusion.Models.Banco.Banco>();
-    string clienteActual = ViewBag.Cliente?.ToString() ?? Model?.CorreoCliente ?? "";
-    string loteActual = ViewBag.lote?.ToString() ?? Model?.CodLote ?? "";
-    string idUsuario = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0";
-    string correoAsesor = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
 }
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <div class="row">
     <div class="col">
@@ -26,9 +20,11 @@
                 </a>
             </div>
 
-            <form asp-controller="Ventas" asp-action="AgregarVenta" id="ventaForm" class="needs-validation" novalidate>
+            <form asp-action="AgregarVenta" id="ventaForm" class="needs-validation" novalidate>
 
+                <!-- STEPPER -->
                 <div class="stepper-wrapper mb-5">
+
                     <div class="stepper-item active" data-step="1">
                         <div class="step-counter">1</div>
                         <div class="step-name">Datos</div>
@@ -48,84 +44,60 @@
                         <div class="step-counter">4</div>
                         <div class="step-name">Confirmar</div>
                     </div>
+
                 </div>
 
                 <div class="step-content" data-step="1">
-                    <input type="hidden" asp-for="IdUsuario" value="@idUsuario" />
-
+                    <!-- ================= DATOS GENERALES ================= -->
+                    <input type="hidden" asp-for="IdUsuario" value="@int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)" />
                     <div class="card border-0 shadow-sm rounded-3 p-3 mb-4">
                         <h5 class="mb-3">Datos Generales</h5>
 
                         <div class="row g-3">
 
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label">Cliente *</label>
-                                <div class="input-group">
-                                    <input type="email"
-                                           id="clienteBusqueda"
-                                           asp-for="CorreoCliente"
-                                           class="form-control"
-                                           placeholder="Correo del cliente"
-                                           value="@clienteActual"
-                                           required />
-                                    <button type="button"
-                                            id="btnBuscarPrimas"
-                                            class="btn btn-outline-primary"
-                                            title="Buscar primas">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                @if (!string.IsNullOrWhiteSpace(clienteActual) && !primas.Any())
+                                @if (ViewBag.Cliente != null)
                                 {
-                                    <small class="text-danger">
-                                        No se encontraron primas para este cliente.
-                                    </small>
-                                }
-                                else if (!primas.Any())
-                                {
-                                    <small class="text-muted">
-                                        Escriba el correo y presione la lupa para cargar las primas.
-                                    </small>
-                                }
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Prima disponible *</label>
-                                @if (primas.Any())
-                                {
-                                    <select asp-for="IdPrima" class="form-select" required>
-                                        <option value="">Seleccione una prima</option>
-                                        @foreach (var prima in primas)
-                                        {
-                                            <option value="@prima.IdPrima">
-                                                Prima #@prima.IdPrima - @prima.Porcentaje% - cierre @prima.FechaCierre.ToString("dd/MM/yyyy") - total ₡@prima.Total.ToString("N2")
-                                            </option>
-                                        }
-                                    </select>
+                                    <input type="email" id="cliente" asp-for="CorreoCliente" class="form-control" placeholder="Correo del cliente" value="@ViewBag.Cliente" readonly required />
                                 }
                                 else
                                 {
-                                    <select asp-for="IdPrima" class="form-select" required disabled>
-                                        <option value="">Seleccione una prima</option>
-                                    </select>
+                                    <input type="email" id="cliente" asp-for="CorreoCliente" class="form-control" placeholder="Correo del cliente" required />
                                 }
                             </div>
 
+                            <!---->
+
+                            <div class="col-md-12">
+                                <label class="form-label">Prima disponible *</label>
+                                <select asp-for="IdPrima" class="form-select" required>
+                                    <option value="" selected hidden>Seleccione una prima</option>
+                                    @foreach (var prima in ViewBag.Primas as IEnumerable<HermeSoft_Fusion.Models.Primas>)
+                                    {
+                                        <option value="@prima.IdPrima">
+                                            Prima #@prima.IdPrima - @prima.Porcentaje% - cierre @prima.FechaCierre.ToString("dd/MM/yyyy") - total ₡@prima.Total.ToString("N2")
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <!---->
+
                             <div class="col-md-4">
                                 <label class="form-label">Lote *</label>
-                                <input id="lote" asp-for="CodLote" class="form-control" value="@loteActual" readonly required />
+                                <input id="lote" asp-for="CodLote" class="form-control" value="@ViewBag.lote" readonly required />
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label">Asesor *</label>
-                                <input type="email" id="asesor" readonly class="form-control" value="@correoAsesor" required />
+                                <input type="email" id="asesor" readonly class="form-control" value="@User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value" required />
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Banco *</label>
                                 <select id="banco" asp-for="IdBanco" class="form-select" required>
                                     <option value="" selected hidden>Seleccione banco</option>
-                                    @foreach (var b in bancos)
+                                    @foreach (var b in ViewBag.Bancos as IEnumerable<HermeSoft_Fusion.Models.Banco.Banco>)
                                     {
                                         <option value="@b.IdBanco">@b.Nombre</option>
                                     }
@@ -148,7 +120,6 @@
 
                         </div>
                     </div>
-
                     <div class="text-end mt-3">
                         <button type="button" class="btn btn-primary next-btn">
                             Siguiente
@@ -157,6 +128,8 @@
                 </div>
 
                 <div class="step-content d-none" data-step="2">
+
+                    <!-- GASTOS -->
                     <div class="col-md-12">
                         <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
                             <h5 class="mb-2">Gastos de Formalización</h5>
@@ -207,15 +180,10 @@
                                 </table>
                             </div>
 
-                            <input type="number"
-                                   id="gastoFormalizacion"
-                                   asp-for="GastoFormalizacion"
-                                   class="form-control mt-2"
-                                   readonly
+                            <input type="number" id="gastoFormalizacion" asp-for="GastoFormalizacion" class="form-control mt-2" readonly
                                    placeholder="Resultado gasto de formalización" />
                         </div>
                     </div>
-
                     <div class="d-flex justify-content-between mt-3">
                         <button type="button" class="btn btn-secondary prev-btn">
                             Anterior
@@ -227,6 +195,7 @@
                 </div>
 
                 <div class="step-content d-none" data-step="3">
+                    <!-- CUOTA -->
                     <div class="col-md-12">
                         <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
                             <h5 class="mb-2">Cuota Bancaria</h5>
@@ -254,7 +223,6 @@
 
                         </div>
                     </div>
-
                     <div class="d-flex justify-content-between mt-3">
                         <button type="button" class="btn btn-secondary prev-btn">
                             Anterior
@@ -301,6 +269,7 @@
     </div>
 </div>
 
+
 <div class="modal fade" id="modalComprobante" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -324,13 +293,17 @@
 
                 <div class="mb-3">
                     <button class="btn btn-primary me-2" id="btnGenerarPDF">
+
                         <i class="fas fa-file-pdf me-2"></i>
                         Generar PDF
+
                     </button>
 
                     <button class="btn btn-success" id="btnEnviarCorreo" disabled>
+
                         <i class="fas fa-envelope me-2"></i>
                         Enviar por correo
+
                     </button>
                 </div>
 
@@ -344,31 +317,8 @@
     </div>
 </div>
 
+
 @section scripts {
     <script src="~/assets/js/stepper.js"></script>
     <script src="~/assets/js/ventaStepper.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const btnBuscar = document.getElementById("btnBuscarPrimas");
-            const inputCliente = document.getElementById("clienteBusqueda");
-            const inputLote = document.getElementById("lote");
-
-            if (btnBuscar && inputCliente && inputLote) {
-                btnBuscar.addEventListener("click", function () {
-                    const cliente = inputCliente.value.trim();
-                    const lote = inputLote.value.trim();
-
-                    if (!cliente) {
-                        inputCliente.focus();
-                        return;
-                    }
-
-                    const baseUrl = '@Url.Action("StepperRegistro", "Ventas")';
-                    const url = `${baseUrl}?lote=${encodeURIComponent(lote)}&cliente=${encodeURIComponent(cliente)}`;
-                    window.location.href = url;
-                });
-            }
-        });
-    </script>
 }
