@@ -48,15 +48,7 @@ namespace HermeSoft_Fusion.Controllers
             Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
             ViewBag.Condominios = await _condominioBusiness.Obtener();
             return View(await _ventaBusiness.Filtro(usuario.Ventas, filterDesde, filterHasta, filterCondominio));
-        }
-
-        public async Task<IActionResult> StepperRegistro2(string lote, string cliente) // Borrar
-        {
-            ViewBag.lote = lote;
-            ViewBag.Bancos = await _bancoBusiness.ObtenerTodos();
-            ViewBag.Cliente = cliente;
-            return View();
-        }
+        }       
 
         public async Task<IActionResult> StepperRegistro(string lote, string cliente) //Q
         {
