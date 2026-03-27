@@ -32,23 +32,33 @@ namespace HermeSoft_Fusion.Business
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                Console.WriteLine($"[Business] IdPrima que entra: {venta.IdPrima}"); //Q Borrar
+                Console.WriteLine($"[Business] CorreoCliente que entra: {venta.CorreoCliente}"); //Q Borrar
                 venta.FechaDeRegistro = DateTime.Now;
                 venta.Estado = "EN PROCESO";
+
+                if (!venta.IdPrima.HasValue)
+                {
+                    throw new Exception("Debe seleccionar una prima para registrar la venta");
+                }
+
                 var prima = await _primaBusiness.ObtenerPorId(venta.IdPrima.Value);
                 if (prima == null)
                 {
-                    throw new Exception("Debe seleccionar una prima válida para registrar la venta");
+                    throw new Exception("La prima seleccionada no existe");
                 }
 
                 if (!string.Equals(prima.CorreoCliente, venta.CorreoCliente, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new Exception("La prima seleccionada no pertenece al cliente indicado");
                 }
+
                 await _ventaRepository.Agregar(venta);
 
                 var lote = await _loteBusiness.Obtener(venta.CodLote);
                 lote.Estado = "En Venta";
                 await _loteBusiness.Editar(lote);
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return venta;

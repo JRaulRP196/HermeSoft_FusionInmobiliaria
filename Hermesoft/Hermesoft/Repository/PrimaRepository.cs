@@ -6,7 +6,6 @@ namespace HermeSoft_Fusion.Repository
 {
     public class PrimaRepository
     {
-
         private readonly AppDbContext _context;
 
         public PrimaRepository(AppDbContext context)
@@ -28,7 +27,7 @@ namespace HermeSoft_Fusion.Repository
                 .FirstOrDefaultAsync(p => p.CorreoCliente == correoCliente);
         }
 
-        public async Task<List<Primas>> ObtenerPorCorreo(string correoCliente) //Q
+        public async Task<List<Primas>> ObtenerPorCorreo(string correoCliente)
         {
             return await _context.PRIMAS
                 .Include(p => p.DesglosesPrimas)
@@ -37,7 +36,7 @@ namespace HermeSoft_Fusion.Repository
                 .ToListAsync();
         }
 
-        public async Task<Primas> ObtenerPorId(int idPrima) //Q
+        public async Task<Primas> ObtenerPorId(int idPrima)
         {
             return await _context.PRIMAS
                 .Include(p => p.DesglosesPrimas)
@@ -45,6 +44,5 @@ namespace HermeSoft_Fusion.Repository
         }
 
         #endregion
-
     }
 }

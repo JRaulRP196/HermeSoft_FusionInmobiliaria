@@ -148,11 +148,13 @@ namespace HermeSoft_Fusion.Controllers
         {
             try
             {
+                Console.WriteLine($"IdPrima seleccionada: {venta.IdPrima}"); //Q Borrar
+                Console.WriteLine($"CorreoCliente: {venta.CorreoCliente}"); //Q Borrar
                 Venta ventaBD = await _ventaBusiness.Agregar(venta);
                 if (ventaBD != null)
                 {
                     TempData["MensajeExitoVenta"] = $"Venta registrada correctamente para el cliente {ventaBD.CorreoCliente}";
-                }
+                }               
                 return RedirectToAction("Index", "Lote");
             }
             catch (Exception ex)
@@ -160,6 +162,7 @@ namespace HermeSoft_Fusion.Controllers
                 TempData["MensajeErrorVenta"] = ex.Message;
                 return RedirectToAction("Index", "Lote");
             }
+
         }
 
         [HttpGet]
