@@ -75,8 +75,8 @@ namespace HermeSoft_Fusion.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> CalcularGastoFormalizacionJS(decimal seguroVida, decimal seguroDesempleo, decimal honorarioAbogados,
+        [HttpGet] // Borrar
+        public async Task<IActionResult> CalcularGastoFormalizacionJS2(decimal seguroVida, decimal seguroDesempleo, decimal honorarioAbogados,
             decimal comisionBancaria, string codLote)
         {
             try
@@ -87,6 +87,29 @@ namespace HermeSoft_Fusion.Controllers
             {
                 TempData["ErrorCalculoFormalizacion"] = ex.ToString();
                 return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CalcularGastoFormalizacionJS(decimal seguroVida, decimal seguroDesempleo, decimal honorarioAbogados,
+    decimal comisionBancaria, string codLote)
+        {
+            try
+            {
+                var resultado = await _calculosBusiness.CalcularGastoFormalizacion(
+                    seguroVida,
+                    seguroDesempleo,
+                    honorarioAbogados,
+                    comisionBancaria,
+                    codLote
+                );
+
+                return Json(resultado);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorCalculoFormalizacion"] = ex.ToString();
+                return BadRequest(ex.ToString());
             }
         }
 

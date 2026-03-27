@@ -4,9 +4,25 @@
     let ingresoNetoOriginal = 0;
     let gastoFormalizacionOriginal = 0;
     let tipoCambio = 1;
+    let cuotaAlta = 0;
 
     $("#banco").on("change", function () {
         var idBanco = this.value;
+
+        $("#escenario").prop("disabled", true).empty()
+            .append('<option value="" selected hidden>Seleccione escenario</option>');
+
+        $("#tipoAsalariado").prop("disabled", true).empty()
+            .append('<option value="" selected hidden>Seleccione un tipo de asalariado</option>');
+
+        cuotaAlta = 0;
+        cuotasOriginales = [];
+        ingresoNetoOriginal = 0;
+        gastoFormalizacionOriginal = 0;
+
+        $("#ingresoNeto").val("");
+        $("#gastoFormalizacion").val("");
+        $("#bodyCuotas").empty();
 
         $.get('/Banco/ObtenerEscenariosJS', { idBanco: idBanco }, function (data) {
             var selectEscenarios = $("#escenario");
@@ -14,18 +30,19 @@
             selectEscenarios.append('<option value="" selected hidden>Seleccione escenario</option>');
 
             for (let i = 0; i < data.length; i++) {
-                selectEscenarios.append(`<option value="${data[i].idEscenario}">${data[i].nombre}</option>`)
+                selectEscenarios.append(`<option value="${data[i].idEscenario}">${data[i].nombre}</option>`);
             }
+
             selectEscenarios.prop("disabled", false);
         });
 
         $.get('/Banco/ObtenerEndeudamientosJS', { idBanco: idBanco }, function (data) {
-
             var selectTipoAsalariado = $("#tipoAsalariado");
             selectTipoAsalariado.empty();
             selectTipoAsalariado.append('<option value="" selected hidden>Seleccione un tipo de asalariado</option>');
+
             for (let i = 0; i < data.length; i++) {
-                selectTipoAsalariado.append(`<option value="${data[i].idEndeudamiento}">${data[i].nombre}</option>`)
+                selectTipoAsalariado.append(`<option value="${data[i].idEndeudamiento}">${data[i].nombre}</option>`);
             }
         });
 
@@ -35,7 +52,6 @@
             $("#porcAbogados").val(data.honorarioAbogados);
             $("#porcComision").val(data.comisionBancaria);
             $("#porcTimbre").val(data.timbreFiscal);
-            calcularGastoFormalizacion();
         });
     });
 
@@ -45,30 +61,46 @@
         let honorarioAbogados = $("#porcAbogados").val();
         let comisionBancaria = $("#porcComision").val();
         let codLote = $("#lote").val();
-        $.get('/Calculos/CalcularGastoFormalizacionJS', {
-            seguroVida: seguroVida, seguroDesempleo: seguroDesempleo, honorarioAbogados: honorarioAbogados,
-            comisionBancaria: comisionBancaria, codLote: codLote
-        }, function (data) {
 
+        if (!seguroVida || !seguroDesempleo || !honorarioAbogados || !comisionBancaria || !codLote) {
+            return;
+        }
+
+        $.get('/Calculos/CalcularGastoFormalizacionJS', {
+            seguroVida: seguroVida,
+            seguroDesempleo: seguroDesempleo,
+            honorarioAbogados: honorarioAbogados,
+            comisionBancaria: comisionBancaria,
+            codLote: codLote
+        }, function (data) {
             gastoFormalizacionOriginal = data;
             renderFormalizacion();
+        }).fail(function (xhr) {
+            console.error("Error al calcular gasto de formalización:", xhr.responseText);
         });
     }
-
-    let cuotaAlta = 0;
 
     $("#escenario").on("change", function () {
         var idEscenario = this.value;
         var codigoLote = $("#lote").val();
-        var selectTipoAsalariado = $("#tipoAsalariado");
-        $.get('/Calculos/CalcularCuotasBancariaJS', { idEscenario: idEscenario, codigoLote: codigoLote }, function (data) {
-            cuotaAlta = 0; 
+
+        if (!idEscenario || !codigoLote) {
+            return;
+        }
+
+        $.get('/Calculos/CalcularCuotasBancariaJS', {
+            idEscenario: idEscenario,
+            codigoLote: codigoLote
+        }, function (data) {
+            cuotaAlta = 0;
             cuotasOriginales = data;
             renderCuotas();
-            calcularIngresoNeto();
 
+            $("#tipoAsalariado").prop("disabled", false);
+            calcularGastoFormalizacion();
+        }).fail(function (xhr) {
+            console.error("Error al calcular cuotas:", xhr.responseText);
         });
-        selectTipoAsalariado.prop("disabled", false);
     });
 
     $("#tipoAsalariado").on("change", function () {
@@ -78,44 +110,51 @@
     function calcularIngresoNeto() {
         var idBanco = $("#banco").val();
         var idEndeudamiento = $("#tipoAsalariado").val();
-        $.get('/Calculos/CalcularIngresoNetoFamiliarJS', { idBanco: idBanco, idEndeudamiento: idEndeudamiento, cuotaMensual: cuotaAlta }, function (data) {
 
+        if (!idBanco || !idEndeudamiento || !cuotaAlta || cuotaAlta <= 0) {
+            return;
+        }
+
+        $.get('/Calculos/CalcularIngresoNetoFamiliarJS', {
+            idBanco: idBanco,
+            idEndeudamiento: idEndeudamiento,
+            cuotaMensual: cuotaAlta
+        }, function (data) {
             ingresoNetoOriginal = data;
             renderIngreso();
-
+        }).fail(function (xhr) {
+            console.error("Error al calcular ingreso neto:", xhr.responseText);
         });
     }
 
     function renderCuotas() {
-
         let moneda = $("#monedaSelect").val();
         let cuerpoTabla = $("#bodyCuotas");
         cuerpoTabla.empty();
+        cuotaAlta = 0;
 
         for (let i = 0; i < cuotasOriginales.length; i++) {
-
             let monto = cuotasOriginales[i].montoMensual;
 
             if (moneda === "USD") {
                 monto = monto / tipoCambio;
             }
 
-            if (cuotaAlta < cuotasOriginales[i].montoMensual) {
-                cuotaAlta = cuotasOriginales[i].montoMensual
+            if (cuotasOriginales[i].montoMensual > cuotaAlta) {
+                cuotaAlta = cuotasOriginales[i].montoMensual;
             }
 
             cuerpoTabla.append(`
-            <tr>
-                <td>${cuotasOriginales[i].plazo}</td>
-                <td>${cuotasOriginales[i].tasaInteres}</td>
-                <td>${monto.toFixed(2)}</td>
-            </tr>
-        `);
+                <tr>
+                    <td>${cuotasOriginales[i].plazo}</td>
+                    <td>${cuotasOriginales[i].tasaInteres}</td>
+                    <td>${monto.toFixed(2)}</td>
+                </tr>
+            `);
         }
     }
 
     function renderIngreso() {
-
         let moneda = $("#monedaSelect").val();
         let ingreso = ingresoNetoOriginal;
 
