@@ -5,6 +5,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
+
 <div class="row">
     <div class="col">
         <div class="card">
@@ -25,174 +27,237 @@
                 }
 
                 <form asp-controller="Banco" asp-action="Registro" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-                    <input type="hidden" asp-for="IdTipoCambio" value="@ViewBag.TipoCambio.IdTipoCambio" />
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="Nombre" class="form-label">Nombre del Banco</label>
-                                <input type="text" class="form-control" id="Nombre" name="Nombre" asp-for="Nombre" placeholder="Nombre del Banco" required>
-                                <div class="valid-feedback">Excelente!</div>
-                            </div>
+
+                    <div class="stepper-wrapper mb-5">
+                        <div class="stepper-item active" data-step="1">
+                            <div class="step-counter">1</div>
+                            <div class="step-name">Datos Generales</div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="Enlace" class="form-label">Enlace Web del Banco</label>
-                                <input type="text" class="form-control" id="Enlace" name="Enlace" asp-for="Enlace" placeholder="Enlace Web del Banco" required>
-                                <div class="valid-feedback">Excelente!</div>
-                            </div>
+
+                        <div class="stepper-item" data-step="2">
+                            <div class="step-counter">2</div>
+                            <div class="step-name">Porcentajes</div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="LogoFile" class="form-label">Logo del Banco</label>
-                                <div class="input-group">
-                                    <input type="file" class="form-control" id="LogoFile" name="LogoFile" accept="image/*" required>
-                                </div>
-                                <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
-                            </div>
+
+                        <div class="stepper-item" data-step="3">
+                            <div class="step-counter">3</div>
+                            <div class="step-name">Escenarios</div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="MaxCredito" class="form-label">Plazo M&aacute;ximo de Cr&eacute;dito</label>
-                                <input type="number" class="form-control" id="MaxCredito" name="MaxCredito" asp-for="MaxCredito" placeholder="Plazo M&aacute;ximo de Cr&eacute;dito en A&ntilde;os" required>
-                                <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="Comision" class="form-label">Comisi&oacute;n Bancaria</label>
-                                <input type="number" class="form-control" id="Comision" name="Comision" asp-for="Comision" placeholder="%" required>
-                                <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
-                            </div>
+
+                        <div class="stepper-item" data-step="4">
+                            <div class="step-counter">4</div>
+                            <div class="step-name">Confirmar</div>
                         </div>
                     </div>
 
-                    <label class="form-label">Porcentaje de Endeudamiento M&aacute;ximo</label>
-                    <div class="row">
-                        @for(int i = 0; i < Model.EndeudamientoMaximos.Count(); i++)
-                        {
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <div class="input-group">
-                                        <div class="input-group-text">@Model.EndeudamientoMaximos[i].TipoAsalariado.Nombre</div>
-                                        <input type="number" class="form-control" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].PorcEndeudamiento" required>
-                                        <input type="hidden" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].IdTipoAsalariado" required>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
+                    <div class="step-content" data-step="1">
 
-                    <div class="row">
-                        @for(int i = 0; i < Model.SeguroBancos.Count(); i++)
-                        {
+                        <input type="hidden" asp-for="IdTipoCambio" value="@ViewBag.TipoCambio.IdTipoCambio" />
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Seguro de @Model.SeguroBancos[i].Seguro.Nombre</label>
-                                    <input type="number" class="form-control" placeholder="%" asp-for="@Model.SeguroBancos[i].PorcSeguro" required>
-                                    <input type="hidden" placeholder="%" asp-for="@Model.SeguroBancos[i].IdSeguro" required>
+                                    <label for="Nombre" class="form-label">Nombre del Banco</label>
+                                    <input type="text" class="form-control" id="Nombre" name="Nombre" asp-for="Nombre" placeholder="Nombre del Banco" required>
+                                    <div class="valid-feedback">Excelente!</div>
                                 </div>
                             </div>
-                        }
-                    </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Enlace" class="form-label">Enlace Web del Banco</label>
+                                    <input type="text" class="form-control" id="Enlace" name="Enlace" asp-for="Enlace" placeholder="Enlace Web del Banco" required>
+                                    <div class="valid-feedback">Excelente!</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="LogoFile" class="form-label">Logo del Banco</label>
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="LogoFile" name="LogoFile" accept="image/*" required>
+                                    </div>
+                                    <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="MaxCredito" class="form-label">Plazo M&aacute;ximo de Cr&eacute;dito</label>
+                                    <input type="number" class="form-control" id="MaxCredito" name="MaxCredito" asp-for="MaxCredito" placeholder="Plazo M&aacute;ximo de Cr&eacute;dito en A&ntilde;os" required>
+                                    <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="Comision" class="form-label">Comisi&oacute;n Bancaria</label>
+                                    <input type="number" class="form-control" id="Comision" name="Comision" asp-for="Comision" placeholder="%" required>
+                                    <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="col">
-                        <div class="mb-3">
-                            <label class="form-label">Gastos de Honorarios de Abogados</label>
-                            <input type="number" class="form-control" placeholder="%" name="HonorarioAbogado" asp-for="HonorarioAbogado" required>
-                            <div class="valid-feedback">Excelente!</div>
+                        <div class="text-end mt-3">
+                            <button type="button" class="btn btn-primary next-btn">
+                                Siguiente
+                            </button>
                         </div>
                     </div>
 
-                    <label class="form-label">Tasas de Inter&eacute;s</label>
-                    <label class="form-label">Escenarios: </label>
-                    <button type="button" class="btn btn-primary" id="addEscenario">+</button>
-                    <div id="listaEscenarios">
-                        <div class="row escenarios">
-                            <div class="col">
-                                <div class="card card-body">
-                                    <h3 class="card-title">Escenario #1</h3>
+                    <div class="step-content d-none" data-step="2">
 
-                                    <div class="row">
-                                        <div class="col-md-9">
-                                            <label class="form-label">Tipo de Tasa de Interés</label>
-                                            <select class="form-select tipoInteres"
-                                                    name="EscenariosTasaInteres[0].IdTasaInteres" required>
-
-                                                @foreach (TasaInteres tasa in ViewBag.TasaInteres)
-                                                {
-                                                    <option value="@tasa.IdTasaInteres">@tasa.Nombre</option>
-                                                }
-                                            </select>
-                                        </div>
-
-                                        <div class="col-md-3">
-                                            <label class="form-label">Nombre del Escenario</label>
-                                            <input type="text" class="form-control"
-                                                   placeholder="Nombre"
-                                                   name="EscenariosTasaInteres[0].Nombre" required>
+                        <label class="form-label">Porcentaje de Endeudamiento M&aacute;ximo</label>
+                        <div class="row">
+                            @for (int i = 0; i < Model.EndeudamientoMaximos.Count(); i++)
+                            {
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <div class="input-group-text">@Model.EndeudamientoMaximos[i].TipoAsalariado.Nombre</div>
+                                            <input type="number" class="form-control" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].PorcEndeudamiento" required>
+                                            <input type="hidden" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].IdTipoAsalariado" required>
                                         </div>
                                     </div>
+                                </div>
+                            }
+                        </div>
 
-                                    <br />
+                        <div class="row">
+                            @for (int i = 0; i < Model.SeguroBancos.Count(); i++)
+                            {
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Seguro de @Model.SeguroBancos[i].Seguro.Nombre</label>
+                                        <input type="number" class="form-control" placeholder="%" asp-for="@Model.SeguroBancos[i].PorcSeguro" required>
+                                        <input type="hidden" placeholder="%" asp-for="@Model.SeguroBancos[i].IdSeguro" required>
+                                    </div>
+                                </div>
+                            }
+                        </div>
 
-                                    <div class="row inputsEscenario">
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Plazo de Duración</label>
-                                                <input type="number" class="form-control"
-                                                       placeholder="Meses"
-                                                       name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
-                                            </div>
-                                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label">Gastos de Honorarios de Abogados</label>
+                                <input type="number" class="form-control" placeholder="%" name="HonorarioAbogado" asp-for="HonorarioAbogado" required>
+                                <div class="valid-feedback">Excelente!</div>
+                            </div>
+                        </div>
 
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Porcentaje Adicional del Banco</label>
-                                                <input type="number" class="form-control"
-                                                       placeholder="%"
-                                                       name="EscenariosTasaInteres[0].PlazosEscenarios[0].PorcAdicional" required>
-                                            </div>
-                                        </div>
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-secondary prev-btn">
+                                Anterior
+                            </button>
+                            <button type="button" class="btn btn-primary next-btn">
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
 
-                                        <div class="col-md-3">
-                                            <div class="mb-3">
-                                                <label class="form-label d-flex align-items-center gap-1">
-                                                    <span>Indicador Bancario</span>
-                                                    <button type="button"
-                                                            class="btn btn-link p-0 text-info indicador-popover-trigger"
-                                                            data-bs-toggle="popover"
-                                                            data-bs-trigger="focus"
-                                                            data-bs-placement="top"
-                                                            title="Informaci&oacute;n"
-                                                            data-bs-content="Si desea m&aacute;s informaci&oacute;n de los indicadores bancarios puede ir a la p&aacute;gina del banco. Link del banco de momento.">
-                                                        <i class="ri-information-line"></i>
-                                                    </button>
-                                                </label>
-                                                <select class="form-select"
-                                                        name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
-                                                    @foreach (IndicadoresBancarios indicador in ViewBag.IndicadoresBancarios)
+                    <div class="step-content d-none" data-step="3">
+
+                        <label class="form-label">Tasas de Inter&eacute;s</label>
+                        <label class="form-label">Escenarios: </label>
+                        <button type="button" class="btn btn-primary" id="addEscenario">+</button>
+                        <div id="listaEscenarios">
+                            <div class="row escenarios">
+                                <div class="col">
+                                    <div class="card card-body">
+                                        <h3 class="card-title">Escenario #1</h3>
+
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <label class="form-label">Tipo de Tasa de Interés</label>
+                                                <select class="form-select tipoInteres"
+                                                        name="EscenariosTasaInteres[0].IdTasaInteres" required>
+
+                                                    @foreach (TasaInteres tasa in ViewBag.TasaInteres)
                                                     {
-                                                        <option value="@indicador.IdIndicador">@indicador.Nombre</option>
+                                                        <option value="@tasa.IdTasaInteres">@tasa.Nombre</option>
                                                     }
                                                 </select>
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    <div class="button-items botonesEscalonada"></div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">Nombre del Escenario</label>
+                                                <input type="text" class="form-control"
+                                                       placeholder="Nombre"
+                                                       name="EscenariosTasaInteres[0].Nombre" required>
+                                            </div>
+                                        </div>
+
+                                        <br />
+
+                                        <div class="row inputsEscenario">
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Plazo de Duración</label>
+                                                    <input type="number" class="form-control"
+                                                           placeholder="Meses"
+                                                           name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Porcentaje Adicional del Banco</label>
+                                                    <input type="number" class="form-control"
+                                                           placeholder="%"
+                                                           name="EscenariosTasaInteres[0].PlazosEscenarios[0].PorcAdicional" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label d-flex align-items-center gap-1">
+                                                        <span>Indicador Bancario</span>
+                                                        <button type="button"
+                                                                class="btn btn-link p-0 text-info indicador-popover-trigger"
+                                                                data-bs-toggle="popover"
+                                                                data-bs-trigger="click"
+                                                                data-bs-placement="top"
+                                                                data-bs-html="true"
+                                                                title="Información"
+                                                                data-bs-content="Si desea más información puede hacer click <a href='../IndicadoresBancarios/Index' target='_blank'>aquí</a>.">
+                                                            <i class="ri-information-line"></i>
+                                                        </button>
+                                                    </label>
+                                                    <select class="form-select"
+                                                            name="EscenariosTasaInteres[0].PlazosEscenarios[0].IdIndicador" required>
+                                                        @foreach (IndicadoresBancarios indicador in ViewBag.IndicadoresBancarios)
+                                                        {
+                                                            <option value="@indicador.IdIndicador">@indicador.Nombre</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="button-items botonesEscalonada"></div>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-secondary prev-btn">
+                                Anterior
+                            </button>
+                            <button type="button" class="btn btn-primary next-btn">
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="step-content d-none" data-step="4">
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-secondary prev-btn">
+                                Anterior
+                            </button>
+                            <div class="button-items">
+                                <button class="btn btn-primary" type="submit">Guardar</button>
+                                <a class="btn btn-danger" asp-action="Index">Cancelar</a>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <div class="button-items">
-                            <button class="btn btn-primary" type="submit">Guardar</button>
-                            <a class="btn btn-danger" asp-action="Index">Cancelar</a>
-                        </div>
-                    </div>
                 </form>
             </div>
         </div>
@@ -254,10 +319,11 @@
                             <button type="button"
                                     class="btn btn-link p-0 text-info indicador-popover-trigger"
                                     data-bs-toggle="popover"
-                                    data-bs-trigger="focus"
+                                    data-bs-trigger="click"
                                     data-bs-placement="top"
-                                    title="Informaci&oacute;n"
-                                    data-bs-content="Si desea m&aacute;s informaci&oacute;n de los indicadores bancarios puede ir a la p&aacute;gina del banco. Link del banco de momento.">
+                                    data-bs-html="true"
+                                    title="Información"
+                                    data-bs-content="Si desea más información puede hacer click <a href='../IndicadoresBancarios/Index' target='_blank'>aquí</a>.">
                                 <i class="ri-information-line"></i>
                             </button>
                         </label>
@@ -278,6 +344,7 @@
 </div>
 
 @section scripts{
+    <script src="~/assets/js/stepper.js"></script>
     <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
     <script src="~/assets/js/pages/form-validation.init.js"></script>
     <script src="~/assets/js/escenariosBanco.js"></script>

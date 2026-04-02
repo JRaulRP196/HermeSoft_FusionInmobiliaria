@@ -1,6 +1,5 @@
-drop database fusion;
-CREATE DATABASE FUSION;
-USE FUSION;
+CREATE DATABASE IF NOT EXISTS fusion;
+USE fusion;
 
 CREATE TABLE TIPO_CAMBIO(
 idTipoCambio int not null primary key auto_increment,
@@ -42,7 +41,9 @@ correoCliente varchar(70) not null,
 fechaInicio date not null,
 fechaCierre date not null,
 porcentaje decimal not null,
-total decimal not null
+total decimal not null,
+codLote VARCHAR(30) NOT NULL,
+asignado BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE DESGLOSES_PRIMAS(
@@ -182,8 +183,22 @@ INSERT IGNORE INTO ROLES (nombre) VALUES
 ('Ventas'),
 ('Administrador');
 
-ALTER TABLE PRIMAS
-ADD COLUMN codLote VARCHAR(30)NOT NULL;
-
-ALTER TABLE PRIMAS
-ADD COLUMN asignado BOOLEAN NOT NULL DEFAULT FALSE;
+INSERT INTO USUARIOS (
+    idUsuario,
+    nombre,
+    apellido1,
+    apellido2,
+    correo,
+    password,
+    estado,
+    idRol
+) VALUES (
+    1,
+    'Root',
+    'Fusion',
+    'Inmobiliaria',
+    'rootFusion@fusion.com',
+    'AQAAAAIAAYagAAAAEEsaECkHwqxrds7VF/kZWxbXsByEh1rrDdlhjJ/BqWd5kaPkuQjT6YrCSfwN6dYiiw==',
+    true,
+    2
+);
