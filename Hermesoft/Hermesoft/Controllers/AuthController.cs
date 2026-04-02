@@ -2,6 +2,7 @@
 using HermeSoft_Fusion.Business.Usuarios;
 using HermeSoft_Fusion.Models.Usuarios;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -39,6 +40,7 @@ namespace Tocly.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(Usuario usuario)
         {
+
             Usuario user = await _usuarioBusiness.Obtener(usuario.Correo);
             if (user == null)
             {

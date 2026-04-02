@@ -137,7 +137,7 @@ namespace HermeSoft_Fusion.Business.Usuarios
 
         public string GenerarMensajeRecuperacion(RecuperacionPassword recuperacion)
         {
-            string enlace = _config["EnlacePagina"] + $"Auth/NuevoPassword?token={recuperacion.Token}";
+            string enlace = _config["Url"] + $"Auth/NuevoPassword?token={recuperacion.Token}";
             string plantillaHtml = @"
                                 <!DOCTYPE html>
                                 <html lang='es'>
