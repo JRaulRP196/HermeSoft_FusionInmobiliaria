@@ -67,3 +67,58 @@
     background: #198754;
     color: white;
 }
+
+@media (max-width: 991.98px) {
+    .navbar-brand-box {
+        display: none !important;
+    }
+
+    body.vertical-collpsed .vertical-menu {
+        width: 260px !important;
+    }
+
+    body.vertical-collpsed .vertical-menu .logo-lg {
+        display: block !important;
+    }
+
+    body.vertical-collpsed .vertical-menu .logo-sm {
+        display: none !important;
+    }
+
+    body.vertical-collpsed .vertical-menu #sidebar-menu ul li a span {
+        display: inline !important;
+    }
+
+    body.vertical-collpsed .vertical-menu #sidebar-menu ul li a i {
+        margin-right: 10px;
+    }
+
+    .vertical-menu {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        height: 100%;
+        width: 260px;
+        z-index: 1050;
+        transition: all 0.3s ease;
+    }
+
+    body.sidebar-enable .vertical-menu {
+        left: 0;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+        z-index: 1040;
+        display: none;
+    }
+
+    body.sidebar-enable .sidebar-overlay {
+        display: block;
+    }
+}

@@ -7,241 +7,229 @@
 @{
     var condominios = ViewBag.Condominios as List<HermeSoft_Fusion.Models.Servicios.Condominio>;
 }
-<div class="card shadow-sm mb-4 border-0">
-    @if (TempData["MensajeErrorEmail"] != null)
-    {
-        <div class="alert alert-danger">@TempData["MensajeErrorEmail"]</div>
-    }
 
-    @if (TempData["MensajeExitoEmail"] != null)
-    {
-        <div class="alert alert-success">
-            <p>@TempData["MensajeExitoEmail"]</p>
-        </div>
-    }
-</div>
-<div class="row">
-    <div class="col">
-        <div class="card border-0 shadow-sm rounded-4 p-4">
-            <form asp-action="Index" method="post">
-                <div class="row g-3 mb-3">
-                    <div class="col-md-3 d-flex align-items-center gap-2">
-                        <label for="filterDesde" class="form-label mb-0">Desde:</label>
-                        <input type="date" id="filterDesde" name="filterDesde" class="form-control" />
-                    </div>
+<div class="container-fluid py-3 py-md-4">
 
-                    <div class="col-md-3 d-flex align-items-center gap-2">
-                        <label for="filterHasta" class="form-label mb-0">Hasta:</label>
-                        <input type="date" id="filterHasta" name="filterHasta" class="form-control" />
-                    </div>
+    <!-- MENSAJES -->
+    <div class="card shadow-sm mb-3 border-0">
+        @if (TempData["MensajeErrorEmail"] != null)
+        {
+            <div class="alert alert-danger m-2">@TempData["MensajeErrorEmail"]</div>
+        }
 
-                    <div class="col-md-3">
-                        <select id="filterCondominio" name="filterCondominio" class="form-select">
-                            <option value="" default hidden>Todos los condominios</option>
-                            @foreach (var condominio in condominios)
-                            {
-                                <option value="@condominio.Id">@condominio.Nombre</option>
-                            }
-                        </select>
-                    </div>
+        @if (TempData["MensajeExitoEmail"] != null)
+        {
+            <div class="alert alert-success m-2">
+                <p class="mb-0">@TempData["MensajeExitoEmail"]</p>
+            </div>
+        }
+    </div>
 
-                    <div class="col-md-3 d-flex gap-2">
-                        <button id="btnFiltrar" class="btn btn-outline-primary">Buscar</button>
-                        <a asp-action="Index" class="btn btn-outline-warning">Reiniciar</a>
-                    </div>
+    <div class="card border-0 shadow-sm rounded-4 p-3 p-md-4">
+
+        <!-- FILTROS -->
+        <form asp-action="Index" method="post">
+            <div class="row g-3 mb-3 align-items-end">
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Desde</label>
+                    <input type="date" name="filterDesde" class="form-control" />
                 </div>
-            </form>
 
-            <div id="historialMessages" class="mb-3"></div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Hasta</label>
+                    <input type="date" name="filterHasta" class="form-control" />
+                </div>
 
-            <div class="table table-responsive">
-                <table class="table table-hover table-bordered" id="tablaVentas">
-                    <thead class="table-dark">
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Condominio</label>
+                    <select name="filterCondominio" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach (var condominio in condominios)
+                        {
+                            <option value="@condominio.Id">@condominio.Nombre</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3 d-flex gap-2">
+                    <button class="btn btn-outline-primary w-100">Buscar</button>
+                    <a asp-action="Index" class="btn btn-outline-warning w-100">Reiniciar</a>
+                </div>
+
+            </div>
+        </form>
+
+        <div id="historialMessages" class="mb-3"></div>
+
+        <!-- TABLA -->
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle text-nowrap">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Contrato</th>
+                        <th class="d-none d-md-table-cell">Cliente</th>
+                        <th>Lote</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
                         <tr>
-                            <th>Contrato</th>
-                            <th>Cliente</th>
-                            <th>Lote</th>
-                            <th>Fecha</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                            <td colspan="6" class="text-center">No se encontraron ventas</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model == null || !Model.Any())
+                    }
+                    else
+                    {
+                        @foreach (var venta in Model)
                         {
                             <tr>
-                                <td colspan="7" class="text-center">No se encontraron ventas</td>
-                            </tr>
-                        }
-                        else
-                        {
-                            @foreach (var venta in Model)
-                            {
-                                <tr>
-                                    <td>@venta.NumContrato</td>
-                                    <td>@venta.CorreoCliente</td>
-                                    <td>@venta.CodLote</td>
-                                    <td>@venta.FechaDeRegistro.ToString("dd/MM/yyyy")</td>
-                                    @if (@venta.Estado == "EN PROCESO")
+                                <td>@venta.NumContrato</td>
+                                <td class="d-none d-md-table-cell">@venta.CorreoCliente</td>
+                                <td>@venta.CodLote</td>
+                                <td>@venta.FechaDeRegistro.ToString("dd/MM/yyyy")</td>
+
+                                <td>
+                                    @if (venta.Estado == "EN PROCESO")
                                     {
-                                        <td><span class="badge bg-warning rounded-pill px-3 py-2 me-2">@venta.Estado</span></td>
+                                        <span class="badge bg-warning">@venta.Estado</span>
                                     }
-                                    else if (@venta.Estado == "TERMINADO")
+                                    else if (venta.Estado == "TERMINADO")
                                     {
-                                        <td><span class="badge bg-success rounded-pill px-3 py-2 me-2">@venta.Estado</span></td>
+                                        <span class="badge bg-success">@venta.Estado</span>
                                     }
                                     else
                                     {
-                                        <td><span class="badge bg-danger rounded-pill px-3 py-2 me-2">@venta.Estado</span></td>
+                                        <span class="badge bg-danger">@venta.Estado</span>
                                     }
-                                    <td>
+                                </td>
+
+                                <!-- ACCIONES -->
+                                <td>
+                                    <div class="d-flex flex-column flex-md-row gap-2">
+
                                         @if (venta.Estado != "ANULADA")
                                         {
-                                            @if(venta.Estado != "TERMINADO")
+                                            @if (venta.Estado != "TERMINADO")
                                             {
-                                                <button class="btn btn-danger border-0 btn-editar"
+                                                <button class="btn btn-danger w-100 w-md-auto"
                                                         data-numContrato="@venta.NumContrato"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#modalNulidad">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             }
-                                            <a class="btn btn-success border-0 btn-editar" onclick="GenerarComprobante(@venta.NumContrato)"
+
+                                            <a class="btn btn-success w-100 w-md-auto"
+                                               onclick="GenerarComprobante(@venta.NumContrato)"
                                                data-correo="@venta.CorreoCliente"
                                                data-bs-toggle="modal"
                                                data-bs-target="#modalComprobante">
-                                                Generar Comprobante
+                                                Comprobante
                                             </a>
                                         }
                                         else
                                         {
-                                            <a class="btn btn-danger border-0 btn-editar"
+                                            <a class="btn btn-danger w-100"
                                                data-numContrato="@venta.NumContrato"
                                                data-bs-toggle="modal"
                                                data-bs-target="#modalMotivoNulidad">
-                                                Motivo de Nulidad
+                                                Motivo
                                             </a>
                                         }
-                                    </td>
-                                </tr>
-                            }
+
+                                    </div>
+                                </td>
+
+                            </tr>
                         }
-
-                    </tbody>
-                </table>
-            </div>
-
+                    }
+                </tbody>
+            </table>
         </div>
+
     </div>
 </div>
 
-<div class="modal fade" id="modalComprobante" tabindex="-1" aria-labelledby="modalComprobanteLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-xl">
+<!-- MODAL COMPROBANTE -->
+<div class="modal fade" id="modalComprobante" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-fullscreen-sm-down modal-dialog-centered">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="modalComprobanteLabel">
-                    Comprobante de Venta
-                </h5>
+                <h5 class="modal-title fw-bold">Comprobante de Venta</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body p-2">
-
                 <form asp-action="EnviarComprobante" method="post">
                     <input type="hidden" name="pdf" id="pdfUrl" />
                     <input type="hidden" name="correo" id="correoCliente" />
-                    <div class="w-100">
-                        <iframe id="visorPDF"
-                                style="width:100%; height:75vh; border:none; border-radius:8px;">
-                        </iframe>
-                    </div>
+
+                    <iframe id="visorPDF"
+                            style="width:100%; height:60vh; border:none; border-radius:8px;">
+                    </iframe>
 
                     <div class="modal-footer mt-2">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                            Cancelar
-                        </button>
-
-                        <button type="submit" class="btn btn-primary">
-                            Enviar por correo
-                        </button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Enviar</button>
                     </div>
-
                 </form>
-
             </div>
+
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modalNulidad" tabindex="-1" aria-labelledby="modalNulidadLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-xl">
+<!-- MODAL NULIDAD -->
+<div class="modal fade" id="modalNulidad" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-fullscreen-sm-down modal-dialog-centered">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="modalNulidadLabel">
-                    Anular Venta
-                </h5>
+                <h5 class="modal-title fw-bold">Anular Venta</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body p-2">
-
                 <form asp-action="AnularVenta" method="post">
                     <input type="hidden" name="numContrato" id="numContrato" />
 
-                    <div class="col-md-12">
-                        <label class="form-label">Motivo de Nulidad</label>
-                        <input type="text" class="form-control" name="motivo" placeholder="Motivo de nulidad" required>
-                    </div>
+                    <label class="form-label">Motivo</label>
+                    <input type="text" class="form-control" name="motivo" required>
 
                     <div class="modal-footer mt-2">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                            Cancelar
-                        </button>
-
-                        <button type="submit" class="btn btn-danger">
-                            Anular Venta
-                        </button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Anular</button>
                     </div>
-
                 </form>
-
             </div>
+
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modalMotivoNulidad" tabindex="-1" aria-labelledby="modalMotivoNulidadLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-xl">
+<!-- MODAL MOTIVO -->
+<div class="modal fade" id="modalMotivoNulidad" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-fullscreen-sm-down modal-dialog-centered">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="modalMotivoNulidadLabel">
-                    Nulidad de Venta
-                </h5>
+                <h5 class="modal-title fw-bold">Motivo de Nulidad</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body p-2">
+                <input type="text" class="form-control" id="motivoNulidad" readonly>
 
-                <form>
-
-                    <div class="col-md-12">
-                        <label class="form-label">Motivo de Nulidad</label>
-                        <input type="text" class="form-control" name="motivo" id="motivoNulidad" placeholder="Motivo de nulidad" readonly>
-                    </div>
-
-
-                    <div class="modal-footer mt-2">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                            Volver
-                        </button>
-                    </div>
-
-                </form>
-
+                <div class="modal-footer mt-2">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Volver</button>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -254,18 +242,21 @@
             document.getElementById("visorPDF").src = data.url;
             document.getElementById("pdfUrl").value = data.url;
         }
+
         document.getElementById('modalComprobante')
         .addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const correo = button.getAttribute('data-correo');
             document.getElementById("correoCliente").value = correo;
         });
+
         document.getElementById('modalNulidad')
         .addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
-            const numContato = button.getAttribute('data-numContrato');
-            document.getElementById("numContrato").value = numContato;
+            const numContrato = button.getAttribute('data-numContrato');
+            document.getElementById("numContrato").value = numContrato;
         });
+
         document.getElementById('modalMotivoNulidad')
         .addEventListener('show.bs.modal', async function (event){
             const button = event.relatedTarget;

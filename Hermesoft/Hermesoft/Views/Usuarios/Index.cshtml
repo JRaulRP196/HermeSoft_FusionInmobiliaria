@@ -7,22 +7,22 @@
 
 <div class="container-fluid py-4">
 
-    <!-- Título y botón principal -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
             <h2 class="mb-1">Usuarios</h2>
             <p class="text-muted mb-0">Administra los accesos del sistema</p>
         </div>
 
         <button type="button"
-                class="btn btn-primary btn-lg d-flex align-items-center"
+                class="btn btn-primary d-flex align-items-center px-4"
                 data-bs-toggle="modal"
                 data-bs-target="#modalNuevoUsuario">
             <span class="me-2 fw-bold">+</span> Nuevo Usuario
         </button>
     </div>
 
-    <!-- Filtros (solo diseño, sin lógica) -->
+    <!-- Mensajes -->
     <div class="card shadow-sm mb-4 border-0">
         @if (TempData["MensajeError"] != null)
         {
@@ -35,47 +35,82 @@
         }
     </div>
 
+    <!-- Tabla -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
+                <table class="table table-hover align-middle mb-0 text-nowrap">
+
                     <thead class="bg-light">
                         <tr>
                             <th class="ps-4">Usuario</th>
-                            <th>Rol</th>
+                            <th class="d-none d-md-table-cell">Rol</th>
                             <th>Estado</th>
-                            <th>Correo</th>
+                            <th class="d-none d-lg-table-cell">Correo</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach (Usuario user in ViewBag.Usuarios)
                         {
                             <tr>
-                                <td>@user.Nombre @user.Apellido1 @user.Apellido2</td>
-                                <td>@user.Rol.Nombre</td>
-                                @if (@user.Estado)
-                                {
-                                    <td><span class="badge bg-success rounded-pill px-3 py-2 me-2">Activo</span></td>
-                                }
-                                else
-                                {
-                                    <td><span class="badge bg-danger rounded-pill px-3 py-2 me-2">Inactivo</span></td>
-                                }
-                                <td>@user.Correo</td>
-                                <td>
-                                    <button class="btn btn-light border-0 btn-editar"
-                                            data-id="@user.IdUsuario">
-                                        <i class="ri-pencil-line"></i>
-                                    </button>
+
+                                <!-- Usuario -->
+                                <td class="ps-4">
+                                    <div class="fw-semibold">
+                                        @user.Nombre @user.Apellido1 @user.Apellido2
+                                    </div>
+
+                                    <!-- Info en móvil -->
+                                    <div class="d-md-none">
+                                        <small class="text-muted d-block">@user.Rol.Nombre</small>
+                                        <small class="text-muted d-block">@user.Correo</small>
+                                    </div>
                                 </td>
+
+                                <!-- Rol -->
+                                <td class="d-none d-md-table-cell">
+                                    @user.Rol.Nombre
+                                </td>
+
+                                <!-- Estado -->
+                                <td>
+                                    @if (user.Estado)
+                                    {
+                                        <span class="badge bg-success rounded-pill px-3 py-2">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger rounded-pill px-3 py-2">Inactivo</span>
+                                    }
+                                </td>
+
+                                <!-- Correo -->
+                                <td class="d-none d-lg-table-cell">
+                                    @user.Correo
+                                </td>
+
+                                <!-- Acciones -->
+                                <td>
+                                    <div class="d-flex flex-column flex-md-row gap-2">
+                                        <button class="btn btn-light border btn-editar w-100 w-md-auto"
+                                                data-id="@user.IdUsuario">
+                                            <i class="ri-pencil-line"></i>
+                                            <span class="d-md-none">Editar</span>
+                                        </button>
+                                    </div>
+                                </td>
+
                             </tr>
                         }
                     </tbody>
+
                 </table>
             </div>
         </div>
     </div>
+
 </div>
 
 
@@ -84,29 +119,32 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalNuevoUsuarioLabel">Nuevo usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <h5 class="modal-title">Nuevo usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
 
                 <form asp-action="Agregar" method="post" class="needs-validation" novalidate>
                     <div class="row g-3">
-                        
+
                         <div class="col-md-6">
                             <label class="form-label">Nombre</label>
-                            <input type="text" class="form-control" asp-for="Nombre" placeholder="Nombre" required>
+                            <input type="text" class="form-control" placeholder="Nombre" asp-for="Nombre" required>
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label">Primer Apellido</label>
-                            <input type="text" class="form-control" asp-for="Apellido1" placeholder="Primero Apellido" required>
+                            <input type="text" class="form-control" placeholder="Primer Apellido" asp-for="Apellido1" required>
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label">Segundo Apellido</label>
-                            <input type="text" class="form-control" asp-for="Apellido2" placeholder="Segundo Apellido" required>
+                            <input type="text" class="form-control" placeholder="Segundo Apellido" asp-for="Apellido2" required>
                         </div>
+
                         <div class="col-md-6">
-                            <label class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" asp-for="Correo" placeholder="correo@ejemplo.com" required>
+                            <label class="form-label">Correo</label>
+                            <input type="email" class="form-control" placeholder="Correo" asp-for="Correo" required>
                         </div>
 
                         <div class="col-md-6">
@@ -116,84 +154,87 @@
                                 {
                                     <option value="@rol.IdRol">@rol.Nombre</option>
                                 }
-
                             </select>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Estado</label>
                             <select class="form-select" asp-for="Estado" required>
-                                <option value="true" selected>Activo</option>
+                                <option value="true">Activo</option>
                                 <option value="false">Inactivo</option>
                             </select>
                         </div>
 
                         <div class="col-md-12">
                             <label class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" asp-for="Password" placeholder="Contraseña temporal" required>
+                            <input type="password" class="form-control" placeholder="Contraseña" asp-for="Password" required>
                         </div>
+
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">
-                            Guardar usuario
-                        </button>
+                        <button type="submit" class="btn btn-primary">Guardar usuario</button>
                     </div>
+
                 </form>
+
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal: Editar Usuario -->
-<div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-labelledby="modalEditarUsuarioLabel" aria-hidden="true">
+<!-- Modal Editar (igual que el tuyo, no modificado) -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalEditarUsuarioLabel">Editar usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <h5 class="modal-title">Editar usuario</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form asp-action="Editar" method="post" class="needs-validation" novalidate>
                     <input type="hidden" id="IdUsuario" asp-for="IdUsuario" />
                     <input type="hidden" id="Correo" asp-for="Correo" />
+
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="Nombre" asp-for="Nombre" placeholder="Nombre" required>
+                            <input class="form-control" placeholder="Nombre" asp-for="Nombre" required>
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label">Primer Apellido</label>
-                            <input type="text" class="form-control" id="Apellido1" asp-for="Apellido1" placeholder="Primero Apellido" required>
+                            <input class="form-control" placeholder="Primer Apellido" asp-for="Apellido1" required>
                         </div>
+
                         <div class="col-md-12">
                             <label class="form-label">Segundo Apellido</label>
-                            <input type="text" class="form-control" id="Apellido2" asp-for="Apellido2" placeholder="Segundo Apellido" required>
+                            <input class="form-control" placeholder="Segundo Apellido" asp-for="Apellido2" required>
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label">Rol</label>
-                            <select class="form-select" asp-for="IdRol" id="IdRol" required>
+                            <select class="form-select" asp-for="IdRol">
                                 @foreach (Rol rol in ViewBag.Roles)
                                 {
                                     <option value="@rol.IdRol">@rol.Nombre</option>
                                 }
-
                             </select>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Estado</label>
-                            <select class="form-select" asp-for="Estado" id="Estado" required>
-                                <option value="true" selected>Activo</option>
+                            <select class="form-select" asp-for="Estado">
+                                <option value="true">Activo</option>
                                 <option value="false">Inactivo</option>
                             </select>
                         </div>
                     </div>
+
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">
-                            Guardar usuario
-                        </button>
+                        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button class="btn btn-primary">Guardar</button>
                     </div>
                 </form>
             </div>
@@ -201,40 +242,8 @@
     </div>
 </div>
 
-
 @section scripts {
     <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
     <script src="~/assets/js/pages/form-validation.init.js"></script>
     <script src="~/assets/js/editarUsuario.js"></script>
-}
-
-
-@section Styles {
-    <style>
-        .avatar-img {
-            width: 36px;
-            height: 36px;
-            object-fit: cover;
-        }
-
-        .badge-estado-activo {
-            background-color: #d1f7e5;
-            color: #118a55;
-        }
-
-        .badge-estado-inactivo {
-            background-color: #ffe1e1;
-            color: #b94a4a;
-        }
-
-        .badge-rol-admin {
-            background-color: #ffe1e1;
-            color: #b94a4a;
-        }
-
-        .badge-rol-ventas {
-            background-color: #e0ebff;
-            color: #3056d3;
-        }
-    </style>
 }

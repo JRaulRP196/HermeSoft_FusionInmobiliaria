@@ -4,27 +4,34 @@
 }
 @model HermeSoft_Fusion.Models.Mapa
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="mb-1">Listado de Lotes</h2>
-        <p class="text-muted mb-0">Administra los lotes del sistema</p>
+<div class="container-fluid px-3 px-md-4">
+
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+
+        <div>
+            <h2 class="mb-1 fw-bold">Listado de Lotes</h2>
+            <p class="text-muted mb-0">Administra los lotes del sistema</p>
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row gap-2">
+            <a class="btn btn-outline-primary px-4"
+               id="listadoLotes"
+               asp-action="ListadoLotes">
+                + Listado
+            </a>
+
+            <button type="button"
+                    class="btn btn-primary px-4"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalNuevoMapa">
+                + Agregar Mapa
+            </button>
+        </div>
+
     </div>
 
-    <div class="d-flex justify-content-between align-items-center gap-3">
-        <a class="btn btn-primary btn-lg d-flex align-items-center" id="listadoLotes" asp-action="ListadoLotes">
-            <span class="me-2 fw-bold">+</span> Listado
-        </a>
-
-        <button type="button"
-                class="btn btn-primary btn-lg d-flex align-items-center"
-                data-bs-toggle="modal"
-                data-bs-target="#modalNuevoMapa">
-            <span class="me-2 fw-bold">+</span> Agregar Mapa
-        </button>
-    </div>
-</div>
-
-<div class="card shadow-sm mb-4 border-0">
+    <!-- MENSAJES -->
     @if (TempData["MensajeErrorVenta"] != null)
     {
         <div class="alert alert-danger">@TempData["MensajeErrorVenta"]</div>
@@ -34,84 +41,102 @@
     {
         <div class="alert alert-success">@TempData["MensajeExitoVenta"]</div>
     }
-</div>
 
+    <!-- SELECTOR -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body py-3">
 
-<!-- Selector de Condominios -->
-<div class="card border-0 shadow-sm rounded-4 mb-4 p-3">
-    <div class="d-flex justify-content-center align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-between gap-2">
 
-        <!-- Botón Anterior -->
-        <button id="btnPrevCondominio" class="btn btn-outline-primary rounded-pill px-3">
-            <i class="fas fa-chevron-left"></i>
-        </button>
+                <button id="btnPrevCondominio"
+                        class="btn btn-outline-secondary rounded-circle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
 
-        <!-- Nombre del Condominio -->
-        <div class="flex-grow-1 text-center">
-            <h4 id="nombreCondominio" class="fw-bold mb-0">Nombre Condominio</h4>
+                <h5 id="nombreCondominio"
+                    class="fw-bold mb-0 text-center flex-grow-1">
+                    Nombre Condominio
+                </h5>
+
+                <button id="btnNextCondominio"
+                        class="btn btn-outline-secondary rounded-circle">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MAPA -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+        <div class="card-body p-2 p-md-3">
+
+            <div class="d-flex justify-content-between align-items-center mb-2 px-2">
+                <h5 class="fw-bold mb-0">Mapa del Condominio</h5>
+                <small class="text-muted">Lotes disponibles</small>
+            </div>
+
+            <!-- IMPORTANTE: NO TOCAR ID -->
+            <div id="map"
+                 class="w-100 rounded-3"
+                 style="height: 65vh; min-height: 450px;">
+            </div>
+
         </div>
 
-        <!-- Botón Siguiente -->
-        <button id="btnNextCondominio" class="btn btn-outline-primary rounded-pill px-3">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-
     </div>
+
 </div>
 
-<div class="col-12">
-    <div class="card">
-
-        <div class="card-body">
-            <h4 class="card-title">Mapa del Condominio</h4>
-            <p class="card-title-dsec">Este es el mapa de los lotes.</p>
-            <div id="map" style="height: 600px"></div>
-        </div> <!-- end card-body-->
-    </div> <!-- end card-->
-</div>
-
-
-<!-- Modal -->
+<!-- MODAL INFO -->
 <div id="miModalCentro" class="modal fade bs-example-modal-center" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content rounded-4">
             <div class="modal-header">
                 <h5 class="modal-title">Información del Lote</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="contenidoModal">
-                <!-- Aquí meto la info dinámica -->
-            </div>
+            <div class="modal-body" id="contenidoModal"></div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modalNuevoMapa" tabindex="-1" aria-labelledby="modalNuevoMapaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
+<!-- MODAL MAPA -->
+<div class="modal fade" id="modalNuevoMapa" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+        <div class="modal-content rounded-4">
+
             <div class="modal-header">
-                <h5 class="modal-title" id="modalNuevoMapaLabel">Nuevo mapa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <h5 class="modal-title">Nuevo mapa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
                 <form asp-controller="Mapa" asp-action="Registro" enctype="multipart/form-data">
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Condominio</label>
-                            <select class="form-select" id="condominios" asp-for="condominio">
 
-                            </select>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Condominio</label>
+                            <select class="form-select" id="condominios" asp-for="condominio"></select>
                         </div>
-                        <div class="col-md-6">
+
+                        <div class="col-12 col-md-6">
                             <label class="form-label">Imagen del Mapa</label>
                             <input type="file" class="form-control" accept="image/*" name="ImagenMapa">
                         </div>
-                        <button type="submit" class="btn btn-primary">
-                            Guardar mapa
-                        </button>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary w-100">
+                                Guardar mapa
+                            </button>
+                        </div>
+
                     </div>
                 </form>
             </div>
+
         </div>
     </div>
 </div>
@@ -119,7 +144,8 @@
 <select id="filtro" hidden>
     <option value="-1" hidden selected>Filtros</option>
 </select>
-@section scripts{
+
+@section scripts {
     <script src="~/assets/js/mapas.js"></script>
     <script src="~/assets/js/app.js"></script>
 }
