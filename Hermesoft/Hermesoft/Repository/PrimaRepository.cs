@@ -20,7 +20,7 @@ namespace HermeSoft_Fusion.Repository
             await _context.PRIMAS.AddAsync(prima);
         }
 
-        public async Task<Primas> Obtener(string correoCliente)
+        public async Task<Primas?> Obtener(string correoCliente)
         {
             return await _context.PRIMAS
                 .Include(p => p.DesglosesPrimas)
@@ -36,11 +36,32 @@ namespace HermeSoft_Fusion.Repository
                 .ToListAsync();
         }
 
-        public async Task<Primas> ObtenerPorId(int idPrima)
+        public async Task<Primas?> ObtenerPorId(int idPrima)
         {
             return await _context.PRIMAS
                 .Include(p => p.DesglosesPrimas)
                 .FirstOrDefaultAsync(p => p.IdPrima == idPrima);
+        }
+
+        public async Task<List<Primas>> ObtenerDisponiblesPorCorreoYLote(string correoCliente, string codLote)
+        {
+            return await _context.PRIMAS
+                .Include(p => p.DesglosesPrimas)
+                .Where(p => p.CorreoCliente == correoCliente
+                         && p.CodLote == codLote
+                         && p.Asignado == false)
+                .OrderByDescending(p => p.IdPrima)
+                .ToListAsync();
+        }
+
+        public async Task<List<Primas>> ObtenerDisponiblesPorLote(string codLote)
+        {
+            return await _context.PRIMAS
+                .Include(p => p.DesglosesPrimas)
+                .Where(p => p.CodLote == codLote
+                         && p.Asignado == false)
+                .OrderByDescending(p => p.IdPrima)
+                .ToListAsync();
         }
 
         #endregion

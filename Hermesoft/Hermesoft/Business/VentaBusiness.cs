@@ -32,8 +32,9 @@ namespace HermeSoft_Fusion.Business
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                Console.WriteLine($"[Business] IdPrima que entra: {venta.IdPrima}"); //Q Borrar
-                Console.WriteLine($"[Business] CorreoCliente que entra: {venta.CorreoCliente}"); //Q Borrar
+                Console.WriteLine($"[Business] IdPrima que entra: {venta.IdPrima}");
+                Console.WriteLine($"[Business] CorreoCliente que entra: {venta.CorreoCliente}");
+
                 venta.FechaDeRegistro = DateTime.Now;
                 venta.Estado = "EN PROCESO";
 
@@ -53,6 +54,18 @@ namespace HermeSoft_Fusion.Business
                     throw new Exception("La prima seleccionada no pertenece al cliente indicado");
                 }
 
+                if (prima.Asignado)
+                {
+                    throw new Exception("La prima seleccionada ya fue asignada a otra venta");
+                }
+
+                if (!string.Equals(prima.CodLote, venta.CodLote, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new Exception("La prima seleccionada no pertenece al lote indicado");
+                }
+
+                prima.Asignado = true;
+
                 await _ventaRepository.Agregar(venta);
 
                 var lote = await _loteBusiness.Obtener(venta.CodLote);
@@ -65,6 +78,7 @@ namespace HermeSoft_Fusion.Business
             }
             catch (Exception e)
             {
+                await transaction.RollbackAsync();
                 throw new Exception(e.Message);
             }
         }

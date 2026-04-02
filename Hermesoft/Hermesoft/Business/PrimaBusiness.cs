@@ -41,6 +41,9 @@ namespace HermeSoft_Fusion.Business
                 primaBD.FechaCierre = prima.FechaCierre;
                 primaBD.Porcentaje = prima.Porcentaje;
                 primaBD.Total = prima.Total;
+                primaBD.CodLote = prima.CodLote;
+                primaBD.Asignado = prima.Asignado;
+
                 _context.DESGLOSES_PRIMAS.RemoveRange(primaBD.DesglosesPrimas);
                 primaBD.DesglosesPrimas.Clear();
 
@@ -72,6 +75,11 @@ namespace HermeSoft_Fusion.Business
         public async Task<Primas> ObtenerPorId(int idPrima)
         {
             return await _primaRepository.ObtenerPorId(idPrima);
+        }
+
+        public async Task<List<Primas>> ObtenerDisponiblesPorCorreoYLote(string correoCliente, string codLote)
+        {
+            return await _primaRepository.ObtenerDisponiblesPorCorreoYLote(correoCliente, codLote);
         }
 
         #endregion

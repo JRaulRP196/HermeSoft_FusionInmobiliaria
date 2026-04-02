@@ -48,16 +48,16 @@ namespace HermeSoft_Fusion.Controllers
             Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
             ViewBag.Condominios = await _condominioBusiness.Obtener();
             return View(await _ventaBusiness.Filtro(usuario.Ventas, filterDesde, filterHasta, filterCondominio));
-        }       
+        }
 
         public async Task<IActionResult> StepperRegistro(string lote, string cliente) //Q
         {
             ViewBag.lote = lote;
             ViewBag.Bancos = await _bancoBusiness.ObtenerTodos();
             ViewBag.Cliente = cliente;
-            ViewBag.Primas = string.IsNullOrWhiteSpace(cliente)
-                ? new List<Primas>()
-                : await _primaBusiness.ObtenerPorCorreo(cliente);
+            ViewBag.Primas = string.IsNullOrWhiteSpace(cliente) || string.IsNullOrWhiteSpace(lote)
+            ? new List<Primas>()
+            : await _primaBusiness.ObtenerDisponiblesPorCorreoYLote(cliente, lote);
 
             return View(new Venta
             {
@@ -84,7 +84,7 @@ namespace HermeSoft_Fusion.Controllers
                 model.Cliente = TempData["Cliente"]!.ToString();
 
             return View(model);
-        }        
+        }
 
         [HttpPost]
         public async Task<IActionResult> AgregarPrima(
@@ -99,7 +99,9 @@ namespace HermeSoft_Fusion.Controllers
                     CorreoCliente = model.CorreoCliente,
                     Porcentaje = model.Porcentaje,
                     FechaCierre = model.FechaCierre,
-                    FechaInicio = DateTime.Today
+                    FechaInicio = DateTime.Today,
+                    CodLote = model.Lote,
+                    Asignado = false
                 };
 
                 if (!string.IsNullOrEmpty(desgloseSinDescuentoJson))
@@ -146,7 +148,7 @@ namespace HermeSoft_Fusion.Controllers
                 if (ventaBD != null)
                 {
                     TempData["MensajeExitoVenta"] = $"Venta registrada correctamente para el cliente {ventaBD.CorreoCliente}";
-                }               
+                }
                 return RedirectToAction("Index", "Lote");
             }
             catch (Exception ex)
@@ -200,12 +202,12 @@ namespace HermeSoft_Fusion.Controllers
                 TempData["MensajeExitoEmail"] = "Venta anulada correctamente";
                 return RedirectToAction("Index");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["MensajeErrorEmail"] = ex.Message;
                 return RedirectToAction("Index");
             }
-            
+
         }
 
         [HttpGet]
@@ -220,7 +222,7 @@ namespace HermeSoft_Fusion.Controllers
         {
             var tc = await _tipoCambioBusiness.Obtener();
 
-            if (tc == null || tc.Cambio <= 0) 
+            if (tc == null || tc.Cambio <= 0)
                 return Json(new { ok = false });
 
             return Json(new { ok = true, tipoCambio = tc.Cambio });
