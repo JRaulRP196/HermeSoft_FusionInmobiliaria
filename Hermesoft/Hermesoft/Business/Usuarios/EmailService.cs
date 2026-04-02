@@ -1,4 +1,5 @@
-﻿using HermeSoft_Fusion.Models.Usuarios;
+﻿using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Usuarios;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
@@ -13,7 +14,12 @@ namespace HermeSoft_Fusion.Business.Usuarios
             _config = config;
         }
 
-        public async Task EnviarCorreoAsync(string destino, string asunto, string mensaje)
+        public async Task EnviarCorreoAsync(
+            string destino,
+            string asunto,
+            string mensaje,
+            byte[]? archivo = null,
+            string? nombreArchivo = null)
         {
             var email = new MimeMessage();
 
@@ -21,10 +27,17 @@ namespace HermeSoft_Fusion.Business.Usuarios
             email.To.Add(MailboxAddress.Parse(destino));
             email.Subject = asunto;
 
-            email.Body = new TextPart("html")
+            var builder = new BodyBuilder
             {
-                Text = mensaje
+                HtmlBody = mensaje
             };
+
+            if (archivo != null && nombreArchivo != null)
+            {
+                builder.Attachments.Add(nombreArchivo, archivo, ContentType.Parse("application/pdf"));
+            }
+
+            email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
 
@@ -43,6 +56,39 @@ namespace HermeSoft_Fusion.Business.Usuarios
             await smtp.DisconnectAsync(true);
         }
 
+        public string GenerarMensajeRecordatorio(DesglosesPrimas desglose)
+        {
+            var ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "RecordatorioPago.html");
+            string html = System.IO.File.ReadAllText(ruta);
+            html = html.Replace("{{correoAsesor}}", desglose.Prima.Venta.Usuario.Correo);
+
+            html = html.Replace("{{fechaCobro}}", desglose.FechaCobro.ToString("dd/MM/yyyy"));
+            html = html.Replace("{{monto}}", desglose.Monto.ToString());
+            var link = _config.GetSection("Url").Value + $"Recordatorio?idDesglose={desglose.IdDesglosePrima}";
+            html = html.Replace("{{linkConfirmacion}}", link);
+            return html;
+        }
+
+        public string GenerarMensajeConfirmacion (DesglosesPrimas desglose)
+        {
+            var ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "ConfirmacionPagoAsesor.html");
+            string html = System.IO.File.ReadAllText(ruta);
+            html = html.Replace("{{correoCliente}}", desglose.Prima.Venta.CorreoCliente);
+
+            html = html.Replace("{{fechaCobro}}", desglose.FechaCobro.ToString("dd/MM/yyyy"));
+            html = html.Replace("{{monto}}", desglose.Monto.ToString());
+            var link = _config.GetSection("Url").Value + $"Recordatorio/ConfirmacionAsesor?idDesglose={desglose.IdDesglosePrima}";
+            html = html.Replace("{{linkConfirmacion}}", link);
+            return html;
+        }
+
+        public string GenerarMensajePrimaCompleta( Venta venta)
+        {
+            var ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "NotificacionPrimaCompleta.html");
+            string html = System.IO.File.ReadAllText(ruta);
+            html = html.Replace("{{numContrato}}", venta.NumContrato.ToString());
+            return html;
+        }
 
         public string GenerarMensajePassword(string password)
         {
@@ -91,7 +137,7 @@ namespace HermeSoft_Fusion.Business.Usuarios
 
         public string GenerarMensajeRecuperacion(RecuperacionPassword recuperacion)
         {
-            string enlace = _config["EnlacePagina"] + $"Auth/NuevoPassword?token={recuperacion.Token}";
+            string enlace = _config["Url"] + $"Auth/NuevoPassword?token={recuperacion.Token}";
             string plantillaHtml = @"
                                 <!DOCTYPE html>
                                 <html lang='es'>

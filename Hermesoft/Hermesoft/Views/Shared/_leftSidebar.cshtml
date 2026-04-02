@@ -74,6 +74,12 @@
                         <span>Lotes</span>
                     </a>
                 </li>
+                <li>
+                    <a asp-controller="Estadistica" asp-action="Primas" class="has-arrow waves-effect">
+                        <i class="ri-money-dollar-circle-fill"></i>
+                        <span>Listado de Primas</span>
+                    </a>
+                </li>
 
                 @if (User.IsInRole("Administrador"))
                 {
@@ -82,9 +88,6 @@
                             <i class="ri-pie-chart-2-line"></i>
                             <span>Estadisticas</span>
                         </a>
-                        <ul class="sub-menu" aria-expanded="false">
-                            <li><a asp-controller="Estadistica" asp-action="Primas">Listado de Primas</a></li>
-                        </ul>
                     </li>
 
                     <li>

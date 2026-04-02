@@ -1,0 +1,61 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Confirmación";
+    Layout = "~/Views/Shared/_BlankLayout.cshtml";
+}
+@using HermeSoft_Fusion.Models;
+@model DesglosesPrimas
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-12">
+
+            <div class="card shadow-lg border-0 rounded-4">
+
+                <!-- Header -->
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h4 class="mb-0">Recordatorio de Pago</h4>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-4 text-center">
+
+                    <h5 class="mb-3">Hola, <strong>@Model.Prima.Venta.Usuario.Nombre</strong></h5>
+
+                    <p class="text-muted"> 
+                        Te hacemos la notificación sobre que @Model.Prima.Venta.CorreoCliente indico que realizo el pago de la siguiente prima
+                    </p>
+
+                    <div class="bg-light border rounded-3 p-3 mb-4">
+                        <p class="mb-1"><strong>Numero de contrato:</strong> @Model.Prima.Venta.NumContrato</p>
+                        <p class="mb-1"><strong>Monto:</strong> ₡ @Model.Monto</p>
+                        <p class="mb-1"><strong>Fecha de cobro:</strong> @Model.FechaCobro</p>
+                        <p class="mb-0 text-danger"><strong>Estado:</strong> @Model.Estado</p>
+                    </div>
+
+                    <p class="mb-4">
+                        Si es realmente cierto favor <strong>confirmar</strong>.
+                    </p>
+
+                    <!-- Botón principal -->
+                    @if(Model.FechaPagado == null)
+                    {
+                        <a class="btn btn-success btn-lg w-100 rounded-3 shadow-sm" asp-action="ActualizarDesglose"
+                           asp-route-idDesglose="@Model.IdDesglosePrima">
+                            ✔️ Confirmar Pago
+                        </a>
+                    }
+
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer text-center text-muted small">
+                    Si ya lo confirmaste favor ignorar este recordatorio
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -37,6 +37,17 @@ namespace HermeSoft_Fusion.Repository.Usuarios
         {
             return await _context.USUARIOS
                 .Include(r => r.Rol)
+                .Include(v => v.Ventas)
+                .FirstOrDefaultAsync(u => u.Correo == correo);
+        }
+
+        public async Task<Usuario> ObtenerConPrimas(string correo)
+        {
+            return await _context.USUARIOS
+                .Include(r => r.Rol)
+                .Include(v => v.Ventas)
+                    .ThenInclude(pv => pv.Prima)
+                        .ThenInclude(dp => dp.DesglosesPrimas)
                 .FirstOrDefaultAsync(u => u.Correo == correo);
         }
 

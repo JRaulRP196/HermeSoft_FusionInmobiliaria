@@ -6,6 +6,10 @@ using HermeSoft_Fusion.Repository.Servicios;
 using HermeSoft_Fusion.Repository.Usuarios;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
+using QuestPDF.Infrastructure;
+using Hangfire;
+using Hangfire.MemoryStorage;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,11 +69,36 @@ builder.Services.AddScoped<RolBusiness>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<RecuperacionPasswordRepository>();
+builder.Services.AddScoped<PrimaRepository>();
+builder.Services.AddScoped<PrimaBusiness>();
+builder.Services.AddScoped<VentaRepository>();
+builder.Services.AddScoped<VentaBusiness>();
+builder.Services.AddScoped<EstadisticaBusiness>();
+builder.Services.AddScoped<DesglosePrimaBusiness>();
+builder.Services.AddScoped<DesglosePrimaRepository>();
+builder.Services.AddScoped<RecordatorioBusiness>();
+builder.Services.AddScoped<Job>();
+
+builder.Services.AddHangfire(config =>
+    config.UseMemoryStorage() 
+);
+
+builder.Services.AddHangfireServer();
 
 
-
-
+QuestPDF.Settings.License = LicenseType.Community;
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+
+    recurringJobManager.AddOrUpdate<Job>(
+        "recordatorio-primas",
+        job => job.EnviarRecordatorios(),
+        "8 * * * *"
+    );
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -78,7 +107,6 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

@@ -1,9 +1,11 @@
 ﻿using HermeSoft_Fusion.Business;
+using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Banco;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using HermeSoft_Fusion.Models.ViewModels;
 
 namespace HermeSoft_Fusion.Controllers
 {
@@ -16,21 +18,46 @@ namespace HermeSoft_Fusion.Controllers
         public CalculosController(CalculosBusiness calculosBusiness)
         {
             _calculosBusiness = calculosBusiness;
-        }
+        }       
 
         [HttpGet]
-        public async Task<IActionResult> CalcularPrima(string codigoLote, decimal porcentajePrima, DateTime fechaFinal)
+        public async Task<IActionResult> CalcularPrima( string codigoLote, decimal porcentajePrima,
+            DateTime fechaFinal, decimal? porcentajeDescuento)
         {
+            var model = new PrimaViewModel
+            {
+                Lote = codigoLote,
+                Porcentaje = porcentajePrima,
+                PorcentajeDescuento = porcentajeDescuento ?? 0m,
+                FechaCierre = fechaFinal
+            };
+
             try
             {
-                var desglose = await _calculosBusiness.CalcularPrima(codigoLote, porcentajePrima, fechaFinal);
-                TempData["DesglosePrima"] = JsonConvert.SerializeObject(desglose);
-                return RedirectToAction("Prima", "Ventas", new {lote = codigoLote});
+                var desgloseSinDescuento = await _calculosBusiness.CalcularPrima(
+                    codigoLote,
+                    porcentajePrima,
+                    fechaFinal);
 
-            }catch (Exception ex)
+                model.DesglosesSinDescuento = desgloseSinDescuento.ToList();
+
+                if (porcentajeDescuento.HasValue && porcentajeDescuento.Value > 0)
+                {
+                    var desgloseConDescuento = await _calculosBusiness.CalcularPrima(
+                        codigoLote,
+                        porcentajePrima,
+                        fechaFinal,
+                        porcentajeDescuento);
+
+                    model.DesglosesConDescuento = desgloseConDescuento.ToList();
+                }
+
+                return View("~/Views/Ventas/Prima.cshtml", model);
+            }
+            catch (Exception ex)
             {
-                TempData["ErrorPrima"] = ex.ToString();
-                return RedirectToAction("Prima", "Ventas");
+                model.MensajeErrorPrima = "Ocurrió un error al calcular la prima.";
+                return View("~/Views/Ventas/Prima.cshtml", model);
             }
         }
 
@@ -48,13 +75,13 @@ namespace HermeSoft_Fusion.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> CalcularGastoFormalizacionJS(decimal seguroVida, decimal seguroDesempleo, decimal honorarioAbogados,
+        [HttpGet] // Borrar
+        public async Task<IActionResult> CalcularGastoFormalizacionJS2(decimal seguroVida, decimal seguroDesempleo, decimal honorarioAbogados,
             decimal comisionBancaria, string codLote)
         {
             try
             {
-                return Json(await _calculosBusiness.CalcularGastoFormalizacion(seguroVida,seguroDesempleo,honorarioAbogados,comisionBancaria,codLote));
+                return Json(await _calculosBusiness.CalcularGastoFormalizacion(seguroVida, seguroDesempleo, honorarioAbogados, comisionBancaria, codLote));
             }
             catch (Exception ex)
             {
@@ -64,12 +91,36 @@ namespace HermeSoft_Fusion.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> CalcularGastoFormalizacionJS(decimal seguroVida, decimal seguroDesempleo, decimal honorarioAbogados,
+    decimal comisionBancaria, string codLote)
+        {
+            try
+            {
+                var resultado = await _calculosBusiness.CalcularGastoFormalizacion(
+                    seguroVida,
+                    seguroDesempleo,
+                    honorarioAbogados,
+                    comisionBancaria,
+                    codLote
+                );
+
+                return Json(resultado);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorCalculoFormalizacion"] = ex.ToString();
+                return BadRequest(ex.ToString());
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> CalcularIngresoNetoFamiliarJS(int idBanco, int idEndeudamiento, decimal cuotaMensual)
         {
             try
             {
                 return Json(await _calculosBusiness.CalcularIngresoNetoFamiliar(idBanco, idEndeudamiento, cuotaMensual));
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 TempData["ErrorCalculoIngresoNetoFamiliar"] = ex.ToString();
                 return BadRequest();
@@ -83,7 +134,7 @@ namespace HermeSoft_Fusion.Controllers
             {
                 return Json(await _calculosBusiness.ObtenerCambioDelDolar());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["ErrorCambioDolar"] = ex.ToString();
                 return NotFound();
