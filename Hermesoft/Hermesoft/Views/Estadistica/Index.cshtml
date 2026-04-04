@@ -3,11 +3,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
-
 <div class="row">
 
-    <!-- ==== OPCIONES ==== -->
+    <!-- ==== FILTROS ==== -->
     <div class="col-12 mb-4">
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-body d-flex flex-wrap align-items-center gap-3">
@@ -15,25 +13,20 @@
                 <h5 class="mb-0 fw-semibold">Opciones</h5>
 
                 <div class="ms-auto d-flex flex-wrap gap-2">
-                    
-                    <form id="formFechas" class="needs-validation" novalidate>
 
+                    <form id="formFechas" class="needs-validation" novalidate>
                         <div class="d-flex flex-wrap align-items-center gap-3">
 
                             <div class="d-flex align-items-center gap-2">
                                 <label class="fw-semibold">De:</label>
-                                <div>
-                                    <input type="date" id="fechaInicio" name="fechaDe"
-                                           class="form-control form-control-sm" required>
-                                </div>
+                                <input type="date" id="fechaInicio"
+                                       class="form-control form-control-sm" required>
                             </div>
 
                             <div class="d-flex align-items-center gap-2">
                                 <label class="fw-semibold">A:</label>
-                                <div>
-                                    <input type="date" id="fechaFinal" name="fechaA"
-                                           class="form-control form-control-sm" required>
-                                </div>
+                                <input type="date" id="fechaFinal"
+                                       class="form-control form-control-sm" required>
                             </div>
 
                             <button class="btn btn-primary btn-sm px-3" id="filtro">
@@ -41,37 +34,32 @@
                             </button>
 
                         </div>
-
                     </form>
 
-
                 </div>
-
             </div>
         </div>
     </div>
 
-    <div class="card shadow-sm mb-4 border-0">
-        @if (TempData["MensajeErrorFiltro"] != null)
-        {
-            <div class="alert alert-danger">@TempData["MensajeErrorFiltro"]</div>
-        }
+    <!-- ==== MENSAJE ERROR ==== -->
+    <div class="col-12">
+        <div id="mensajeError"></div>
     </div>
 
     <!-- ==== ESTADÍSTICA ==== -->
     <div class="col-12">
         <div class="card shadow-sm border-0 rounded-4">
 
-            <div class="card-header border-0 d-flex justify-content-between align-items-center px-4 pt-4 rounded-4">
-                <h5 class="fw-semibold mb-0">Estadística</h5>
+            <div class="card-header border-0 d-flex justify-content-between align-items-center px-4 pt-4">
+                <h5 class="fw-semibold mb-0">Motricidad de Pagos</h5>
 
-                <button class="btn btn-outline-secondary btn-sm px-3">
-                    Descargar
+                <button id="descargarPdf" class="btn btn-outline-secondary btn-sm px-3">
+                    Descargar PDF
                 </button>
             </div>
 
             <div class="card-body px-4 pb-4">
-                <div id="column_stacked" class="apex-charts" dir="ltr"></div>
+                <div id="column_stacked" class="apex-charts"></div>
             </div>
 
         </div>
@@ -80,10 +68,171 @@
 </div>
 
 @section scripts {
+
+    <!-- Validación -->
     <script src="~/assets/js/pages/form-validation.init.js"></script>
-    <!-- apexcharts -->
+
+    <!-- ApexCharts -->
     <script src="~/assets/libs/apexcharts/apexcharts.min.js"></script>
-    <!-- apexcharts init -->
-    <script src="~/assets/js/estadisticas.js"></script>
-    <script src="~/assets/js/app.js"></script>
+
+    <script>
+
+        let categorias = [];
+        let pagados = [];
+        let pendientes = [];
+        let atrasados = [];
+
+        let chart = null;
+
+        $(document).ready(function () {
+            cargarDatos();
+        });
+
+        // ==============================
+        // CARGAR DATOS
+        // ==============================
+        async function cargarDatos() {
+
+            limpiarDatos();
+
+            let fechaInicio = $("#fechaInicio").val();
+            let fechaFinal = $("#fechaFinal").val();
+
+            try {
+
+                const response = await fetch('/Condominio/Obtener');
+                const data = await response.json();
+
+                for (let i = 0; i < data.length; i++) {
+
+                    const res = await fetch(`/Estadistica/PagosPorCondominio?condominio=${data[i].id}&fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+                    const datos = await res.json();
+
+                    if (datos.pagados > 0 || datos.pendientes > 0 || datos.atrasados > 0) {
+                        categorias.push(data[i].nombre);
+                        pagados.push(datos.pagados);
+                        pendientes.push(datos.pendientes);
+                        atrasados.push(datos.atrasados);
+                    }
+                }
+
+                if (categorias.length === 0) {
+                    mostrarMensaje("No hay ventas registradas en ese rango.");
+                    return;
+                }
+
+                crearGrafico();
+
+            } catch (error) {
+                mostrarMensaje("Error al cargar los datos.");
+            }
+        }
+
+        function limpiarDatos() {
+            categorias = [];
+            pagados = [];
+            pendientes = [];
+            atrasados = [];
+        }
+
+        // ==============================
+        // FILTRO
+        // ==============================
+        $("#filtro").on("click", function (e) {
+            e.preventDefault();
+            cargarDatos();
+        });
+
+        // ==============================
+        // MENSAJES
+        // ==============================
+        function mostrarMensaje(texto) {
+
+            if (chart) {
+                chart.destroy();
+                chart = null;
+            }
+
+            document.querySelector("#column_stacked").innerHTML = `
+                <div class="text-center p-5">
+                    <h5 class="text-muted">${texto}</h5>
+                </div>
+            `;
+        }
+
+        // ==============================
+        // GRÁFICO
+        // ==============================
+        function crearGrafico() {
+
+            const contenedor = document.querySelector("#column_stacked");
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            contenedor.innerHTML = "";
+
+            var options = {
+                series: [
+                    { name: 'PAGOS AL DÍA', data: pagados },
+                    { name: 'PAGOS PENDIENTES', data: pendientes },
+                    { name: 'PAGOS ATRASADOS', data: atrasados }
+                ],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: true,
+                    toolbar: { show: false }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        borderRadius: 8
+                    }
+                },
+                xaxis: {
+                    categories: categorias
+                },
+                legend: {
+                    position: 'right'
+                },
+                colors: ['#28a745', '#ffc107', '#dc3545']
+            };
+
+            chart = new ApexCharts(contenedor, options);
+            chart.render();
+        }
+
+        // ==============================
+        // DESCARGAR PDF
+        // ==============================
+        $("#descargarPdf").on("click", async function () {
+
+            let fechaInicio = $("#fechaInicio").val();
+            let fechaFinal = $("#fechaFinal").val();
+
+            if (!fechaInicio || !fechaFinal) {
+                alert("Debe seleccionar un rango de fechas");
+                return;
+            }
+
+            const response = await fetch(`/Estadistica/DescargarPdf?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+
+            if (!response.ok) {
+                const mensaje = await response.text();
+                alert(mensaje);
+                return;
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "ReportePagos.pdf";
+            a.click();
+        });
+
+    </script>
 }

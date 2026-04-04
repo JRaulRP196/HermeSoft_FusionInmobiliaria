@@ -5,16 +5,19 @@
     let pendientes = [];
     let atrasados = [];
 
-    let chart = null; 
+    let chart = null;
+    let hayDatos = false; 
 
     cargarDatos();
 
+  
     async function cargarDatos() {
 
         categorias = [];
         pagados = [];
         pendientes = [];
         atrasados = [];
+        hayDatos = false;
 
         let fechaInicio = $("#fechaInicio").val();
         let fechaFinal = $("#fechaFinal").val();
@@ -35,10 +38,16 @@
             }
         }
 
+       
         if (categorias.length === 0) {
-            mostrarMensajeSinDatos();
+            hayDatos = false;
+            $("#descargarPdf").prop("disabled", true);
+            mostrarMensaje();
             return;
         }
+
+        hayDatos = true;
+        $("#descargarPdf").prop("disabled", false);
 
         crearGrafico();
     }
@@ -48,7 +57,7 @@
         cargarDatos();
     });
 
-    function mostrarMensajeSinDatos() {
+    function mostrarMensaje() {
 
         const contenedor = document.querySelector("#column_stacked");
 
@@ -67,6 +76,9 @@
         `;
     }
 
+    // ==============================
+    // GRÁFICO
+    // ==============================
     function crearGrafico() {
 
         const contenedor = document.querySelector("#column_stacked");
@@ -96,12 +108,10 @@
                 }
             },
             xaxis: {
-                type: 'category',
                 categories: categorias
             },
             legend: {
-                position: 'right',
-                offsetY: 40
+                position: 'right'
             },
             fill: {
                 opacity: 1
@@ -112,5 +122,54 @@
         chart = new ApexCharts(contenedor, options);
         chart.render();
     }
+
+    // ==============================
+    // DESCARGAR PDF
+    // ==============================
+    $("#descargarPdf").on("click", async function () {
+
+        let fechaInicio = $("#fechaInicio").val();
+        let fechaFinal = $("#fechaFinal").val();
+
+        if (!fechaInicio || !fechaFinal) {
+            alert("Debe seleccionar un rango de fechas");
+            return;
+        }
+
+      
+        if (!hayDatos) {
+            alert("No hay datos para generar el reporte.");
+            return;
+        }
+
+        const responseCondominios = await fetch('/Condominio/Obtener');
+        const condominios = await responseCondominios.json();
+
+        const response = await fetch('/Estadistica/DescargarPdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                fechaInicio,
+                fechaFinal,
+                condominios
+            })
+        });
+
+        if (!response.ok) {
+            const mensaje = await response.text();
+            alert(mensaje);
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ReportePagos.pdf";
+        a.click();
+    });
 
 });
