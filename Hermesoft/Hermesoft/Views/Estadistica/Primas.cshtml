@@ -1,10 +1,17 @@
-﻿@{
+﻿@using HermeSoft_Fusion.Models;
+@model List<Venta>
+
+@{
     ViewBag.Title = "Estadísticas";
     Layout = "~/Views/Shared/_Layout.cshtml";
-}
 
-@using HermeSoft_Fusion.Models;
-@model List<Venta>
+    var ventasConPagosPendientes = Model?
+        .Where(v => v.Prima != null
+                 && v.Prima.DesglosesPrimas != null
+                 && v.Prima.DesglosesPrimas.Any(d => d.Estado == "Pendiente")
+                 && v.Estado == "EN PROCESO")
+        .ToList() ?? new List<Venta>();
+}
 
 @section styles {
 
@@ -22,60 +29,71 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Detalles de Proximos Cobros</h4>
+                <h4 class="card-title">Detalles de Próximos Cobros</h4>
                 <p class="card-title-desc">
-                    Esta es una tabla que detalla los proximos cobros que puede realizar el personal de ventas sobre las primas
+                    Esta es una tabla que detalla los próximos cobros que puede realizar el personal de ventas sobre las primas
                 </p>
 
-                <table id="key-datatable" class="table dt-responsive nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Código de Venta</th>
-                            <th>Fecha Cobro</th>
-                            <th>Monto</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-
-
-                    <tbody>
-                        @if (Model.Any())
-                        {
-                            @foreach (var venta in Model)
-                            {
-                                @if (venta.Prima.DesglosesPrimas.Where(d => d.Estado == "Pendiente").ToList().Count() > 0 &&
-                                     venta.Estado == "EN PROCESO")
-                                {
-                                    <tr>
-                                        <td>@venta.CorreoCliente</td>
-                                        <td>@venta.NumContrato</td>
-                                        <td>@venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").FechaCobro</td>
-                                        <td>@venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").Monto</td>
-                                        <td>
-                                            <span class="badge bg-warning rounded-pill px-3 py-2 me-2">
-                                                @venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").Estado
-                                            </span>
-                                        </td>
-                                    </tr>
-                                }
-
-                            }
-                        }
-                        else
-                        {
+                @if (ventasConPagosPendientes.Any())
+                {
+                    <table id="key-datatable" class="table dt-responsive nowrap w-100">
+                        <thead>
                             <tr>
-                                <td colspan="5" class="text-center">No se encontraron pagos pendientes</td>
+                                <th>Cliente</th>
+                                <th>Número de contrato</th>
+                                <th>Código de Lote</th>
+                                <th>Asignado</th>
+                                <th>Fecha Cobro</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Detalle</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div> <!-- end card body-->
-        </div> <!-- end card -->
-    </div><!-- end col-->
+                        </thead>
+
+                        <tbody>
+                            @foreach (var venta in ventasConPagosPendientes)
+                            {
+                                var proximoPendiente = venta.Prima?.DesglosesPrimas?
+                                    .FirstOrDefault(d => d.Estado == "Pendiente");
+
+                                <tr>
+                                    <td>@venta.CorreoCliente</td>
+                                    <td>@venta.NumContrato</td>
+                                    <td>@venta.CodLote</td>
+                                    <td>@(venta.Prima != null && venta.Prima.Asignado ? "Verdadero" : "Falso")</td>
+                                    <td>@(proximoPendiente?.FechaCobro.ToString("dd/MM/yyyy") ?? "No disponible")</td>
+                                    <td>@(proximoPendiente?.Monto.ToString() ?? "No disponible")</td>
+                                    <td>
+                                        <span class="badge bg-warning rounded-pill px-3 py-2 me-2">
+                                            @(proximoPendiente?.Estado ?? "No disponible")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Prima"
+                                               asp-action="Detalle"
+                                               asp-route-idPrima="@venta.Prima?.IdPrima"
+                                               class="btn btn-outline-primary btn-sm"
+                                               title="Ver detalle">
+                                            <i class="fas fa-book-open"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-info text-center mb-0">
+                        No se encontraron pagos pendientes
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
-<!-- end row-->
-@section scripts{
+
+@section scripts {
     <!-- Required datatable js -->
     <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="~/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>

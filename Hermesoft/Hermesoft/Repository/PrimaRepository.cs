@@ -40,6 +40,7 @@ namespace HermeSoft_Fusion.Repository
         {
             return await _context.PRIMAS
                 .Include(p => p.DesglosesPrimas)
+                .Include(p => p.Venta)
                 .FirstOrDefaultAsync(p => p.IdPrima == idPrima);
         }
 
