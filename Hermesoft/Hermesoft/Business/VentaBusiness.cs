@@ -178,6 +178,11 @@ namespace HermeSoft_Fusion.Business
             return await _ventaRepository.Obtener(numContrato);
         }
 
+        public async Task<Venta> ObtenerPorLote(string codLote)
+        {
+            return await _ventaRepository.ObtenerPorLote(codLote);
+        }
+
         #endregion
 
     }

@@ -1,4 +1,5 @@
-﻿using HermeSoft_Fusion.Data;
+﻿using HermeSoft_Fusion.Business;
+using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,11 @@ namespace HermeSoft_Fusion.Controllers
     public class MapaController : Controller
     {
 
-        private readonly AppDbContext _context;
+        private readonly MapaBusiness _mapaBusiness;
 
-        public MapaController(AppDbContext context)
+        public MapaController( MapaBusiness mapaBusiness)
         {
-            _context = context;
+            _mapaBusiness = mapaBusiness;
         }
 
         public IActionResult Index()
@@ -25,58 +26,25 @@ namespace HermeSoft_Fusion.Controllers
         [HttpPost]
         public async Task<IActionResult> Registro(Mapa mapa, IFormFile ImagenMapa)
         {
-
             if (ImagenMapa == null || ImagenMapa.Length <= 0 || mapa.condominio == null)
             {
-                
-                // RECORDATORIO: VALIDAR
+                TempData["ErrorMapa"] = "El mapa tiene que ser valido";
                 return RedirectToAction("Index", "Lote");
             }
-
-            var carpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/mapas");
-
-            if (!Directory.Exists(carpeta))
-                Directory.CreateDirectory(carpeta);
-
-            var nombreArchivo = Guid.NewGuid() + Path.GetExtension(ImagenMapa.FileName);
-            var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
-
-            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+            var map = await _mapaBusiness.Agregar(mapa, ImagenMapa);
+            if (map == null)
             {
-                await ImagenMapa.CopyToAsync(stream);
-            }
-
-            // guardar la ruta en la BD
-            mapa.Direccion = "/mapas/" + nombreArchivo;
-
-            var mapaBD = await _context.MAPAS.FirstOrDefaultAsync(m => m.condominio == mapa.condominio);
-
-            if ( mapaBD != null )
-            {
-                mapaBD.Direccion = "/mapas/" + nombreArchivo;
-                _context.MAPAS.Update(mapaBD);
-                if (await _context.SaveChangesAsync() <= 0)
-                {
-                    //VALIDAR
-                    return RedirectToAction("Index", "Lote");
-                }
+                TempData["ErrorMapa"] = "Ocurrio un error a la hora de guardar el mapa";
                 return RedirectToAction("Index", "Lote");
             }
-
-            _context.MAPAS.Add(mapa);
-            if (await _context.SaveChangesAsync() <= 0)
-            {
-                //VALIDAR
-                return RedirectToAction("Index", "Lote");
-            }
-
+            TempData["SuccessMapa"] = "Mapa registrado correctamente";
             return RedirectToAction("Index", "Lote");
         }
 
         [HttpGet]
         public async Task<IActionResult> GetMapas()
         {
-            List<Mapa> mapas = await _context.MAPAS.ToListAsync();
+            IEnumerable<Mapa> mapas = await _mapaBusiness.GetMapas();
             return Ok(mapas);
         }
 

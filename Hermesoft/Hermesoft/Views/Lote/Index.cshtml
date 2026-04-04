@@ -42,6 +42,18 @@
         <div class="alert alert-success">@TempData["MensajeExitoVenta"]</div>
     }
 
+    @if (TempData["ErrorMapa"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMapa"]</div>
+    }
+
+    @if (TempData["SuccessMapa"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMapa"]</div>
+    }
+
+
+
     <!-- SELECTOR -->
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body py-3">
