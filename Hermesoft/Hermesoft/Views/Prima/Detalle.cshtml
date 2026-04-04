@@ -19,8 +19,10 @@
 
             <div class="mb-4">
                 <div><strong>ID Prima:</strong> @Model.IdPrima</div>
+                <div><strong>Cliente:</strong> @Model.CorreoCliente</div>             
+                <div><strong>Número de contrato:</strong> @(Model.Venta != null ? Model.Venta.NumContrato.ToString() : "No disponible")</div>
                 <div><strong>Código Lote:</strong> @Model.CodLote</div>
-                <div><strong>Asignado:</strong> @(Model.Asignado ? "Si" : "No")</div>
+                <div><strong>Asignado:</strong> @(Model.Asignado ? "Sí" : "No")</div>
             </div>
 
             <div class="card border-0 bg-white rounded-4">
