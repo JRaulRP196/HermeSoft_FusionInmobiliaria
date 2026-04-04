@@ -32,12 +32,14 @@
                         <tr>
                             <th>Cliente</th>
                             <th>Código de Venta</th>
+                            <th>Código de Lote</th>
+                            <th>Asignado</th>
                             <th>Fecha Cobro</th>
                             <th>Monto</th>
                             <th>Estado</th>
+                            <th>Detalle</th>
                         </tr>
                     </thead>
-
 
                     <tbody>
                         @if (Model.Any())
@@ -45,17 +47,32 @@
                             @foreach (var venta in Model)
                             {
                                 @if (venta.Prima.DesglosesPrimas.Where(d => d.Estado == "Pendiente").ToList().Count() > 0 &&
-                                     venta.Estado == "EN PROCESO")
+                                                                     venta.Estado == "EN PROCESO")
                                 {
+                                    var proximoPendiente = venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente");
+
                                     <tr>
                                         <td>@venta.CorreoCliente</td>
                                         <td>@venta.NumContrato</td>
-                                        <td>@venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").FechaCobro</td>
-                                        <td>@venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").Monto</td>
+                                        <td>@venta.CodLote</td>
+                                        <td>
+                                            @(venta.Prima.Asignado ? "Verdadero" : "Falso")
+                                        </td>
+                                        <td>@proximoPendiente.FechaCobro</td>
+                                        <td>@proximoPendiente.Monto</td>
                                         <td>
                                             <span class="badge bg-warning rounded-pill px-3 py-2 me-2">
-                                                @venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente").Estado
+                                                @proximoPendiente.Estado
                                             </span>
+                                        </td>
+                                        <td>
+                                            <a asp-controller="Prima"
+                                                   asp-action="Detalle"
+                                                   asp-route-idPrima="@venta.Prima.IdPrima"
+                                                   class="btn btn-outline-primary btn-sm"
+                                                   title="Ver detalle">
+                                                <i class="fas fa-book-open"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 }
@@ -65,7 +82,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="7" class="text-center">No se encontraron pagos pendientes</td>
+                                <td colspan="8" class="text-center">No se encontraron pagos pendientes</td>
                             </tr>
                         }
                     </tbody>
@@ -75,7 +92,7 @@
     </div><!-- end col-->
 </div>
 <!-- end row-->
-@section scripts{
+@section scripts {
     <!-- Required datatable js -->
     <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="~/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>

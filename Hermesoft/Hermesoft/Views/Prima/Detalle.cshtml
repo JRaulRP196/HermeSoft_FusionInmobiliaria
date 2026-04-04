@@ -1,0 +1,84 @@
+﻿@model HermeSoft_Fusion.Models.Primas
+
+@{
+    ViewData["Title"] = "Detalle de Prima";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Detalle de Prima</h3>
+
+                <a asp-controller="Estadistica" asp-action="Primas" class="btn btn-light border">
+                    <i class="fas fa-arrow-left me-2"></i> Volver
+                </a>
+            </div>
+
+            <div class="mb-4">
+                <div><strong>ID Prima:</strong> @Model.IdPrima</div>
+                <div><strong>Código Lote:</strong> @Model.CodLote</div>
+                <div><strong>Asignado:</strong> @(Model.Asignado ? "Si" : "No")</div>
+            </div>
+
+            <div class="card border-0 bg-white rounded-4">
+                <div class="card-body">
+                    <h4 class="fw-bold mb-3">Plan completo de prima</h4>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha de Pago</th>
+                                    <th>Monto a Pagar</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.DesglosesPrimas != null && Model.DesglosesPrimas.Any())
+                                {
+                                    @foreach (var item in Model.DesglosesPrimas.OrderBy(x => x.FechaCobro))
+                                    {
+                                        <tr>
+                                            <td>@item.FechaCobro.ToString("dd/MM/yyyy")</td>
+                                            <td>₡@item.Monto.ToString("N2")</td>
+                                            <td>
+                                                @if (item.Estado == "Pendiente")
+                                                {
+                                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                                        @item.Estado
+                                                    </span>
+                                                }
+                                                else if (item.Estado == "Terminado" || item.Estado == "Pagado")
+                                                {
+                                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                                        @item.Estado
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary rounded-pill px-3 py-2">
+                                                        @item.Estado
+                                                    </span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center">No hay desgloses registrados para esta prima.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
