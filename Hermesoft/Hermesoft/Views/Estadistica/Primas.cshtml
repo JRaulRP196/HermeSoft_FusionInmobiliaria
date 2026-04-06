@@ -62,7 +62,7 @@
                                     <td>@venta.CodLote</td>
                                     <td>@(venta.Prima != null && venta.Prima.Asignado ? "Verdadero" : "Falso")</td>
                                     <td>@(proximoPendiente?.FechaCobro.ToString("dd/MM/yyyy") ?? "No disponible")</td>
-                                    <td>@(proximoPendiente?.Monto.ToString() ?? "No disponible")</td>
+                                    <td>@(proximoPendiente?.Monto.ToString("N2") ?? "No disponible")</td>
                                     <td>
                                         <span class="badge bg-warning rounded-pill px-3 py-2 me-2">
                                             @(proximoPendiente?.Estado ?? "No disponible")

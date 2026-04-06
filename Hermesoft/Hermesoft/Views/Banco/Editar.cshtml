@@ -380,7 +380,7 @@
                 <div class="col-md-3">
                     <label class="form-label">Nombre del Escenario</label>
                     <input type="text" class="form-control"
-                           name="EscenariosTasaInteres[0].Nombre" required>
+                           name="EscenariosTasaInteres[0].Nombre" placeholder="Nombre" required>
                     <input type="hidden" name="EscenariosTasaInteres[0].IdBanco" value="@Model.IdBanco" />
                     <input type="hidden" name="EscenariosTasaInteres[0].IdEscenario" />
                 </div>
@@ -394,7 +394,7 @@
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Plazo de Duración</label>
-                        <input type="number" class="form-control"
+                        <input type="number" class="form-control" placeholder="Meses" value=""
                                name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
 
                     </div>
@@ -403,7 +403,7 @@
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Porcentaje Adicional del Banco</label>
-                        <input type="number" class="form-control"
+                        <input type="number" class="form-control" placeholder="%" value=""
                                name="EscenariosTasaInteres[0].PlazosEscenarios[0].PorcAdicional" required>
                     </div>
                 </div>

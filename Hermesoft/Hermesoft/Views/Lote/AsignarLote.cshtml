@@ -61,7 +61,11 @@
         <div class="card-body">
             <h4 class="card-title">Mapa del Condominio</h4>
             <p class="card-title-dsec">Este es el mapa de los lotes.</p>
-            <div id="map" style="height: 600px"></div>
+            <div id="map"
+                 class="w-100 rounded-3 d-flex justify-content-center align-items-center"
+                 style="height: 65vh; min-height: 450px;">
+                <div class="alert alert-danger d-none" id="error">No hay mapa configurado</div>
+            </div>
         </div> <!-- end card-body-->
     </div> <!-- end card-->
 </div>

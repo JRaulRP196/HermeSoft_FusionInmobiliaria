@@ -5,37 +5,73 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-3 py-md-4">
     <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-md-4">
 
+            <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="fw-bold mb-0">Detalle de Prima</h3>
 
-                <a asp-controller="Estadistica" asp-action="Primas" class="btn btn-light border">
-                    <i class="fas fa-arrow-left me-2"></i> Volver
+                <a asp-controller="Estadistica" asp-action="Primas"
+                   class="btn btn-light border d-flex align-items-center gap-2">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver
                 </a>
             </div>
+            <div class="row g-3 mb-4">
 
-            <div class="mb-4">
-                <div><strong>ID Prima:</strong> @Model.IdPrima</div>
-                <div><strong>Cliente:</strong> @Model.CorreoCliente</div>             
-                <div><strong>Número de contrato:</strong> @(Model.Venta != null ? Model.Venta.NumContrato.ToString() : "No disponible")</div>
-                <div><strong>Código Lote:</strong> @Model.CodLote</div>
-                <div><strong>Asignado:</strong> @(Model.Asignado ? "Sí" : "No")</div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="p-3 border rounded-3 h-100 bg-light">
+                        <small class="text-muted d-block">ID Prima</small>
+                        <strong>@Model.IdPrima</strong>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="p-3 border rounded-3 h-100 bg-light">
+                        <small class="text-muted d-block">Cliente</small>
+                        <strong class="text-break">@Model.CorreoCliente</strong>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="p-3 border rounded-3 h-100 bg-light">
+                        <small class="text-muted d-block">Número de contrato</small>
+                        <strong>
+                            @(Model.Venta != null ? Model.Venta.NumContrato.ToString() : "No disponible")
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="p-3 border rounded-3 h-100 bg-light">
+                        <small class="text-muted d-block">Código Lote</small>
+                        <strong>@Model.CodLote</strong>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="p-3 border rounded-3 h-100 bg-light">
+                        <small class="text-muted d-block">Asignado</small>
+                        <strong>@(Model.Asignado ? "Sí" : "No")</strong>
+                    </div>
+                </div>
+
             </div>
 
+            <!-- Tabla -->
             <div class="card border-0 bg-white rounded-4">
-                <div class="card-body">
+                <div class="card-body p-2 p-md-3">
                     <h4 class="fw-bold mb-3">Plan completo de prima</h4>
 
                     <div class="table-responsive">
-                        <table class="table align-middle">
+                        <table class="table align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Fecha de Pago</th>
-                                    <th>Monto a Pagar</th>
-                                    <th>Estado</th>
+                                    <th class="text-nowrap">Fecha</th>
+                                    <th class="text-nowrap">Monto</th>
+                                    <th class="text-nowrap">Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,24 +80,30 @@
                                     @foreach (var item in Model.DesglosesPrimas.OrderBy(x => x.FechaCobro))
                                     {
                                         <tr>
-                                            <td>@item.FechaCobro.ToString("dd/MM/yyyy")</td>
-                                            <td>₡@item.Monto.ToString("N2")</td>
+                                            <td class="text-nowrap">
+                                                @item.FechaCobro.ToString("dd/MM/yyyy")
+                                            </td>
+
+                                            <td class="text-nowrap">
+                                                ₡@item.Monto.ToString("N2")
+                                            </td>
+
                                             <td>
                                                 @if (item.Estado == "Pendiente")
                                                 {
-                                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2 d-block d-md-inline text-center">
                                                         @item.Estado
                                                     </span>
                                                 }
                                                 else if (item.Estado == "Terminado" || item.Estado == "Pagado")
                                                 {
-                                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                                    <span class="badge bg-success rounded-pill px-3 py-2 d-block d-md-inline text-center">
                                                         @item.Estado
                                                     </span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-secondary rounded-pill px-3 py-2">
+                                                    <span class="badge bg-secondary rounded-pill px-3 py-2 d-block d-md-inline text-center">
                                                         @item.Estado
                                                     </span>
                                                 }
@@ -72,12 +114,15 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="3" class="text-center">No hay desgloses registrados para esta prima.</td>
+                                        <td colspan="3" class="text-center">
+                                            No hay desgloses registrados para esta prima.
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     </div>
+
                 </div>
             </div>
 

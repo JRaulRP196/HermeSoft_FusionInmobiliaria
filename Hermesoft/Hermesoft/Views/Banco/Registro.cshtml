@@ -82,14 +82,14 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="MaxCredito" class="form-label">Plazo M&aacute;ximo de Cr&eacute;dito</label>
-                                    <input type="number" class="form-control" id="MaxCredito" name="MaxCredito" asp-for="MaxCredito" placeholder="Plazo M&aacute;ximo de Cr&eacute;dito en A&ntilde;os" required>
+                                    <input type="number" class="form-control" id="MaxCredito" value="" name="MaxCredito" asp-for="MaxCredito" placeholder="Plazo M&aacute;ximo de Cr&eacute;dito en A&ntilde;os" required>
                                     <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="Comision" class="form-label">Comisi&oacute;n Bancaria</label>
-                                    <input type="number" class="form-control" id="Comision" name="Comision" asp-for="Comision" placeholder="%" required>
+                                    <input type="number" value="" class="form-control" id="Comision" name="Comision" asp-for="Comision" placeholder="%" required>
                                     <div class="invalid-feedback">Ingrese un valor v&aacute;lido.</div>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@
                                     <div class="mb-3">
                                         <div class="input-group">
                                             <div class="input-group-text">@Model.EndeudamientoMaximos[i].TipoAsalariado.Nombre</div>
-                                            <input type="number" class="form-control" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].PorcEndeudamiento" required>
+                                            <input type="number" value="" class="form-control" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].PorcEndeudamiento" required>
                                             <input type="hidden" placeholder="%" asp-for="@Model.EndeudamientoMaximos[i].IdTipoAsalariado" required>
                                         </div>
                                     </div>
@@ -126,7 +126,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Seguro de @Model.SeguroBancos[i].Seguro.Nombre</label>
-                                        <input type="number" class="form-control" placeholder="%" asp-for="@Model.SeguroBancos[i].PorcSeguro" required>
+                                        <input type="number" value="" class="form-control" placeholder="%" asp-for="@Model.SeguroBancos[i].PorcSeguro" required>
                                         <input type="hidden" placeholder="%" asp-for="@Model.SeguroBancos[i].IdSeguro" required>
                                     </div>
                                 </div>
@@ -136,7 +136,7 @@
                         <div class="col">
                             <div class="mb-3">
                                 <label class="form-label">Gastos de Honorarios de Abogados</label>
-                                <input type="number" class="form-control" placeholder="%" name="HonorarioAbogado" asp-for="HonorarioAbogado" required>
+                                <input type="number" value="" class="form-control" placeholder="%" name="HonorarioAbogado" asp-for="HonorarioAbogado" required>
                                 <div class="valid-feedback">Excelente!</div>
                             </div>
                         </div>
@@ -189,7 +189,7 @@
                                             <div class="col-md-3">
                                                 <div class="mb-3">
                                                     <label class="form-label">Plazo de Duración</label>
-                                                    <input type="number" class="form-control"
+                                                    <input type="number" value="" class="form-control"
                                                            placeholder="Meses"
                                                            name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
                                                 </div>
@@ -198,7 +198,7 @@
                                             <div class="col-md-3">
                                                 <div class="mb-3">
                                                     <label class="form-label">Porcentaje Adicional del Banco</label>
-                                                    <input type="number" class="form-control"
+                                                    <input type="number" value="" class="form-control"
                                                            placeholder="%"
                                                            name="EscenariosTasaInteres[0].PlazosEscenarios[0].PorcAdicional" required>
                                                 </div>
@@ -289,7 +289,7 @@
                 <div class="col-md-3">
                     <label class="form-label">Nombre del Escenario</label>
                     <input type="text" class="form-control"
-                           name="EscenariosTasaInteres[0].Nombre" required>
+                           name="EscenariosTasaInteres[0].Nombre" placeholder="Nombre" required>
                 </div>
             </div>
 
@@ -299,7 +299,7 @@
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Plazo de Duración</label>
-                        <input type="number" class="form-control"
+                        <input type="number" value="" placeholder="Meses" class="form-control"
                                name="EscenariosTasaInteres[0].PlazosEscenarios[0].Plazo" required>
                     </div>
                 </div>
@@ -307,7 +307,7 @@
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Porcentaje Adicional del Banco</label>
-                        <input type="number" class="form-control"
+                        <input type="number" value="" placeholder="%" class="form-control"
                                name="EscenariosTasaInteres[0].PlazosEscenarios[0].PorcAdicional" required>
                     </div>
                 </div>

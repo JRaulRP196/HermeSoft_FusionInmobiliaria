@@ -192,9 +192,14 @@
         limpiarMapa();
 
         if (!data) {
-            alert(`No hay mapa configurado para ${nombreMapa}`);
+            map.removeLayer(overlayActual);
+            $("#error").removeClass("d-none");
+            $("#opciones").addClass("d-none");
             return;
         }
+
+        $("#error").addClass("d-none");
+        $("#opciones").removeClass("d-none");
 
         if (overlayActual) map.removeLayer(overlayActual);
 
