@@ -39,6 +39,7 @@ namespace HermeSoft_Fusion.Business
             foreach (var lote in lotes)
             {
                 var venta = await _ventaBusiness.ObtenerPorLote(lote.Codigo);
+
                 if(venta != null)
                 {
                     var l = new LoteDetalle
@@ -54,7 +55,8 @@ namespace HermeSoft_Fusion.Business
                         PrecioLista = lote.PrecioLista,
                         PrecioM2 = lote.PrecioM2,
                         X = lote.X,
-                        Y = lote.Y
+                        Y = lote.Y,
+                        Vendido = true
                     };
                     lotesDetalles.Add(l);
                 }
@@ -73,7 +75,8 @@ namespace HermeSoft_Fusion.Business
                         PrecioLista = lote.PrecioLista,
                         PrecioM2 = lote.PrecioM2,
                         X = lote.X,
-                        Y = lote.Y
+                        Y = lote.Y,
+                        Vendido = false
                     };
                     lotesDetalles.Add(l);
                 }

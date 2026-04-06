@@ -54,7 +54,7 @@ namespace HermeSoft_Fusion.Repository
                     .Include(v => v.Prima)
                         .ThenInclude(p => p.DesglosesPrimas)
                     .Include(v => v.Usuario)
-                    .FirstOrDefaultAsync(v => v.CodLote == codLote);
+                    .FirstOrDefaultAsync(v => v.CodLote == codLote && v.Estado != "ANULADA");
         }
 
         #endregion

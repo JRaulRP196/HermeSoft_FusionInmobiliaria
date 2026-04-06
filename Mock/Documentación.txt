@@ -2,7 +2,7 @@
 Tener el node.js instalado 
 2. Paso
 Instalar una unica vez el json server ejecutando el siguiente comando en la consola de la pc:
-npm install -g json-server
+npm install -g json-server@0.17.4
 3. Paso
 Ejecutar el servidor del Mock del api ubicandose en la carpte que tiene el mock (Esta) en consola y ejecutar el siguiente comando:
 json-server --watch db.json --routes routes.json --port 3000

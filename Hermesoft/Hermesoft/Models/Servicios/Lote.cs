@@ -22,6 +22,7 @@
     public class LoteDetalle : LoteMapa
     {
         public DateTime FechaVenta { get; set; }
+        public bool Vendido { get; set; }
     }
 
 }

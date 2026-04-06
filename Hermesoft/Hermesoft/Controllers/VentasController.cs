@@ -87,10 +87,9 @@ namespace HermeSoft_Fusion.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AgregarPrima(
-    PrimaViewModel model,
-    string desgloseConDescuentoJson,
-    string desgloseSinDescuentoJson)
+        public async Task<IActionResult> AgregarPrima(PrimaViewModel model,
+                                                        string desgloseConDescuentoJson,
+                                                        string desgloseSinDescuentoJson)
         {
             try
             {

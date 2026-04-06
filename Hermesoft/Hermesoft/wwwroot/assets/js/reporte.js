@@ -52,6 +52,7 @@
 
         marker.estado = lote.estado;
         marker.fechaVenta = lote.fechaVenta;
+        marker.vendido = lote.vendido;
 
         marker.on("click", () => {
             document.getElementById("contenidoModal").innerHTML = `
@@ -97,11 +98,11 @@
 
         if (tipo === "Disponibilidad") {
             markers
-                .filter((m) => m.estado === "verde")
+                .filter((m) => m.estado === "verde" && !m.vendido)
                 .forEach((m) => map.addLayer(m));
         } else if (tipo === "Ventas_Mes") {
             markers
-                .filter((m) => esDelMesActual(m.fechaVenta))
+                .filter((m) => esDelMesActual(m.fechaVenta) && m.vendido)
                 .forEach((m) => map.addLayer(m));
         } else {
             markers.forEach((m) => map.addLayer(m));
