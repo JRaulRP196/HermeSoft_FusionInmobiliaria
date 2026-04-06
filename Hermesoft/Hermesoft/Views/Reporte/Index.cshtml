@@ -36,6 +36,10 @@
                     <option value="Disponibilidad">Disponibilidad</option>
                 </select>
 
+                <div id="ventasMesGroup" class="d-none">
+                    <input type="month" class="form-control" id="filtroMes" />
+                </div>
+
                 <button class="btn btn-outline-secondary btn-sm px-3 w-100 w-md-auto">
                     Descargar
                 </button>
@@ -43,7 +47,12 @@
 
         </div>
         <div class="card-body">
-            <div id="map" style="height: 600px"></div>
+            <div id="mensajeSinVentas" class="alert alert-info d-none mb-3">
+                No se realizaron ventas en el mes seleccionado.
+            </div>
+            <div id="mapContainer">
+                <div id="map" style="height: 600px"></div>
+            </div>
         </div> <!-- end card-body-->
     </div> <!-- end card-->
 </div>

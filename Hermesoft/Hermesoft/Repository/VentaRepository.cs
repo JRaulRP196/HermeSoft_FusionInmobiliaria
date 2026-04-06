@@ -1,6 +1,7 @@
-﻿using HermeSoft_Fusion.Data;
+using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace HermeSoft_Fusion.Repository
 {
@@ -46,6 +47,13 @@ namespace HermeSoft_Fusion.Repository
                         .ThenInclude(p => p.DesglosesPrimas)
                     .Include(v => v.Usuario)
                     .FirstOrDefaultAsync(v => v.NumContrato == numContrato);
+        }
+
+        public async Task<List<Venta>> ObtenerPorRango(DateTime fechaInicio, DateTime fechaFin)
+        {
+            return await _context.VENTAS
+                    .Where(v => v.FechaDeRegistro >= fechaInicio && v.FechaDeRegistro < fechaFin)
+                    .ToListAsync();
         }
 
         #endregion

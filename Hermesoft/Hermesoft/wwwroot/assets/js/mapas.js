@@ -20,59 +20,75 @@ document.addEventListener("DOMContentLoaded", function () {
         azul: "#3b82f6"
     };
 
-    let markers = [];
-    function crearPunto(lote) {
+    const filtroSelect = document.getElementById("filtro");
+    const filtroMes = document.getElementById("filtroMes");
+    const ventasMesGroup = document.getElementById("ventasMesGroup");
+    const mensajeSinVentas = document.getElementById("mensajeSinVentas");
+    const mapContainer = document.getElementById("mapContainer");
+    const isReporte = !!filtroMes;
+    const modalElement = document.getElementById("miModalCentro");
+    const contenidoModal = document.getElementById("contenidoModal");
+    const tieneModal = !!modalElement && !!contenidoModal;
 
-        switch (lote.estado) {
+    let markers = [];
+    function crearPunto(lote, opciones = {}) {
+        let estadoBase = lote.estado;
+
+        switch (estadoBase) {
             case "Disponible":
-                lote.estado = "verde";
+                estadoBase = "verde";
                 break;
             case "En Venta":
-                lote.estado = "amarillo";
+                estadoBase = "amarillo";
                 break;
             case "Vendido":
-                lote.estado = "rojo";
+                estadoBase = "rojo";
                 break;
             case "Entregado":
-                lote.estado = "azul";
+                estadoBase = "azul";
                 break;
         }
 
+        const colorFinal = opciones.color || colores[estadoBase] || colores.verde;
+        const estadoFinal = opciones.estado || estadoBase || "verde";
+
         const marker = L.circleMarker([lote.y, lote.x], {
             radius: 14,
-            color: colores[lote.estado],
-            fillColor: colores[lote.estado],
+            color: colorFinal,
+            fillColor: colorFinal,
             fillOpacity: 0.9
         });
 
-        marker.estado = lote.estado; 
+        marker.estado = estadoFinal;
 
-        marker.on("click", () => {
-            document.getElementById("contenidoModal").innerHTML = `
-            <br>
-            <p><b>Código:</b> ${lote.codigo}</p>
-            <p><b>Área:</b> ${lote.area} m²</p>
-            <p><b>Frente:</b> ${lote.frente} m</p>
-            <p><b>Fondo:</b> ${lote.fondo} m</p>
-            <p><b>Precio m²:</b> ₡${lote.precioM2.toLocaleString()}</p>
-            <p><b>Precio Lista:</b> ₡${lote.precioLista.toLocaleString()}</p>
-            <p><b>Precio Venta:</b> ₡${lote.precioVenta.toLocaleString()}</p>
-            ${lote.estado === "verde" ? `
-                <a class="btn btn-primary waves-effect waves-light" href="/Ventas/StepperRegistro?lote=${encodeURIComponent(lote.codigo)}">
-                    <i class="ri-wallet-3-line align-middle me-2"></i> Iniciar Proceso de Venta
-                </a>
-                <a class="btn btn-primary waves-effect waves-light" href="/Ventas/Prima?lote=${encodeURIComponent(lote.codigo)}">
-                    <i class="ri-wallet-3-line align-middle me-2"></i> Calcular Prima
-                </a>
-            ` : ``}
-        `;
+        if (!opciones.disableModal && tieneModal) {
+            marker.on("click", () => {
+                contenidoModal.innerHTML = `
+                <br>
+                <p><b>Código:</b> ${lote.codigo}</p>
+                <p><b>Área:</b> ${lote.area} m²</p>
+                <p><b>Frente:</b> ${lote.frente} m</p>
+                <p><b>Fondo:</b> ${lote.fondo} m</p>
+                <p><b>Precio m²:</b> ₡${lote.precioM2.toLocaleString()}</p>
+                <p><b>Precio Lista:</b> ₡${lote.precioLista.toLocaleString()}</p>
+                <p><b>Precio Venta:</b> ₡${lote.precioVenta.toLocaleString()}</p>
+                ${marker.estado === "verde" ? `
+                    <a class="btn btn-primary waves-effect waves-light" href="/Ventas/StepperRegistro?lote=${encodeURIComponent(lote.codigo)}">
+                        <i class="ri-wallet-3-line align-middle me-2"></i> Iniciar Proceso de Venta
+                    </a>
+                    <a class="btn btn-primary waves-effect waves-light" href="/Ventas/Prima?lote=${encodeURIComponent(lote.codigo)}">
+                        <i class="ri-wallet-3-line align-middle me-2"></i> Calcular Prima
+                    </a>
+                ` : ``}
+            `;
 
-            const modal = new bootstrap.Modal(document.getElementById("miModalCentro"));
-            modal.show();
-        });
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            });
+        }
 
-        markers.push(marker);      
-        marker.addTo(map);         
+        markers.push(marker);
+        marker.addTo(map);
 
         return marker;
     }
@@ -87,19 +103,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 .filter(m => m.estado === "verde")
                 .forEach(m => map.addLayer(m));
         }
-        else if (tipo === "Ventas_Mes") {
-            markers
-                .filter(m => m.estado === "amarillo")
-                .forEach(m => map.addLayer(m));
-        }
         else {
             markers.forEach(m => map.addLayer(m));
         }
     }
 
-    document.getElementById("filtro").addEventListener("change", function () {
-        aplicarFiltro(this.value);
-    });
+    if (filtroSelect) {
+        filtroSelect.addEventListener("change", function () {
+            if (isReporte && this.value === "Ventas_Mes") {
+                if (ventasMesGroup) ventasMesGroup.classList.remove("d-none");
+                cargarVentasMes();
+                return;
+            }
+
+            if (ventasMesGroup) ventasMesGroup.classList.add("d-none");
+            aplicarFiltro(this.value);
+            if (isReporte) {
+                cargarLotesBase();
+            }
+        });
+    }
 
 
     // ========= SLIDER / SELECTOR DE MAPAS ============
@@ -164,6 +187,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     let overlayActual = null;
+    let mapaActual = null;
+
+    function mostrarMensajeSinVentas(mostrar) {
+        if (!mensajeSinVentas || !mapContainer) return;
+        if (mostrar) {
+            mensajeSinVentas.classList.remove("d-none");
+            mapContainer.classList.add("d-none");
+        } else {
+            mensajeSinVentas.classList.add("d-none");
+            mapContainer.classList.remove("d-none");
+            map.invalidateSize();
+        }
+    }
 
     function limpiarMapa() {
         markers.forEach(m => map.removeLayer(m));
@@ -186,14 +222,52 @@ document.addEventListener("DOMContentLoaded", function () {
         markers.forEach(m => map.removeLayer(m));
         markers = [];
 
+        mapaActual = data;
         overlayActual = L.imageOverlay(data.imagen, bounds).addTo(map);
 
-        $.get('/Lote/GetLotesMapa', { idMapa: data.idMapa }, function (lotes) {
+        if (isReporte && filtroSelect && filtroSelect.value === "Ventas_Mes") {
+            cargarVentasMes();
+        } else {
+            cargarLotesBase();
+        }
+    }
 
+    function cargarLotesBase() {
+        if (!mapaActual) return;
+        mostrarMensajeSinVentas(false);
+        $.get('/Lote/GetLotesMapa', { idMapa: mapaActual.idMapa }, function (lotes) {
+            limpiarMapa();
             lotes.forEach(lote => {
                 crearPunto(lote);
             });
+            if (filtroSelect) aplicarFiltro(filtroSelect.value);
+        });
+    }
 
+    function cargarVentasMes() {
+        if (!mapaActual || !filtroMes) return;
+        const mes = filtroMes.value;
+        if (!mes) {
+            mostrarMensajeSinVentas(false);
+            limpiarMapa();
+            return;
+        }
+
+        $.get('/Reporte/VentasMes', { idMapa: mapaActual.idMapa, mes: mes }, function (respuesta) {
+            const lotes = (respuesta && respuesta.lotes) ? respuesta.lotes : [];
+            limpiarMapa();
+
+            if (!lotes.length) {
+                mostrarMensajeSinVentas(true);
+                return;
+            }
+
+            mostrarMensajeSinVentas(false);
+            lotes.forEach(lote => {
+                crearPunto(lote, { color: colores.verde, estado: "verde", disableModal: true });
+            });
+        }).fail(function () {
+            mostrarMensajeSinVentas(false);
         });
     }
 
@@ -203,4 +277,15 @@ document.addEventListener("DOMContentLoaded", function () {
             $("#condominios").append("<option value='"+data[i].id+"'>"+data[i].nombre+" "+data[i].id +"</option>");
         }
     });
+
+    if (isReporte && filtroMes) {
+        const hoy = new Date();
+        const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}`;
+        if (!filtroMes.value) filtroMes.value = mesActual;
+        filtroMes.addEventListener("change", function () {
+            if (filtroSelect && filtroSelect.value === "Ventas_Mes") {
+                cargarVentasMes();
+            }
+        });
+    }
 });

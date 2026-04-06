@@ -150,6 +150,14 @@ namespace HermeSoft_Fusion.Business
             return await _ventaRepository.Obtener(numContrato);
         }
 
+        public async Task<List<Venta>> ObtenerVentasPorMes(int year, int month)
+        {
+            var inicio = new DateTime(year, month, 1);
+            var fin = inicio.AddMonths(1);
+            var ventas = await _ventaRepository.ObtenerPorRango(inicio, fin);
+            return ventas.Where(v => v.Estado != "ANULADA").ToList();
+        }
+
         #endregion
 
     }
