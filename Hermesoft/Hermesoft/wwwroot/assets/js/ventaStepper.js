@@ -4,6 +4,16 @@
     let ingresoNetoOriginal = 0;
     let gastoFormalizacionOriginal = 0;
     let tipoCambio = 1;
+    const formatter = new Intl.NumberFormat(navigator.language || "es-CR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    function formatearNumero(valor) {
+        const numero = Number(valor);
+        if (Number.isNaN(numero)) return "";
+        return formatter.format(numero);
+    }
 
     $("#banco").on("change", function () {
         var idBanco = this.value;
@@ -108,7 +118,7 @@
             <tr>
                 <td>${cuotasOriginales[i].plazo}</td>
                 <td>${cuotasOriginales[i].tasaInteres}</td>
-                <td>${monto.toFixed(2)}</td>
+                <td>${formatearNumero(monto)}</td>
             </tr>
         `);
         }
@@ -123,7 +133,7 @@
             ingreso = ingreso / tipoCambio;
         }
 
-        $("#ingresoNeto").val(ingreso.toFixed(2));
+        $("#ingresoNeto").val(formatearNumero(ingreso));
     }
 
     function renderFormalizacion() {
@@ -135,6 +145,7 @@
         }
 
         $("#gastoFormalizacion").val(gastoFormalizacion.toFixed(2));
+        $("#gastoFormalizacionDisplay").val(formatearNumero(gastoFormalizacion));
     }
 
     $.get('/Calculos/ObtenerCambioDelDolarJS', function (data) {

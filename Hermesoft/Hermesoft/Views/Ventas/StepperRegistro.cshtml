@@ -173,8 +173,9 @@
                                 </table>
                             </div>
 
-                            <input type="number" id="gastoFormalizacion" asp-for="GastoFormalizacion" class="form-control mt-2" readonly
+                            <input type="text" id="gastoFormalizacionDisplay" class="form-control mt-2" readonly
                                    placeholder="Resultado gasto de formalización" />
+                            <input type="hidden" id="gastoFormalizacion" asp-for="GastoFormalizacion" />
                         </div>
                     </div>
                     <div class="d-flex justify-content-between mt-3">
