@@ -10,10 +10,12 @@ namespace HermeSoft_Fusion.Repository
 
         private HttpClient _httpClient;
         private readonly AppDbContext _context;
+        private readonly string _baseUrl;
 
-        public LoteRepository(IHttpClientFactory httpClientFactory, AppDbContext context)
+        public LoteRepository(IHttpClientFactory httpClientFactory, AppDbContext context, IConfiguration config)
         {
             _httpClient = httpClientFactory.CreateClient();
+            _baseUrl = config["MockApi:BaseUrl"];
             _context = context;
         }
 
@@ -21,7 +23,7 @@ namespace HermeSoft_Fusion.Repository
 
         public async Task<IEnumerable<Lote>> Obtener()
         {
-            var response = await _httpClient.GetAsync($"http://localhost:3000/lotes");
+            var response = await _httpClient.GetAsync($"{_baseUrl}lotes");
             var json = await response.Content.ReadAsStringAsync();
 
             var lotes = JsonSerializer.Deserialize<IEnumerable<Lote>>(json, new JsonSerializerOptions
@@ -34,7 +36,7 @@ namespace HermeSoft_Fusion.Repository
 
         public async Task<Lote> Obtener(string codigoLote)
         {
-            var response = await _httpClient.GetAsync($"http://localhost:3000/lotes/{codigoLote}");
+            var response = await _httpClient.GetAsync($"{_baseUrl}lotes/{codigoLote}");
             var json = await response.Content.ReadAsStringAsync();
 
             var lotes = JsonSerializer.Deserialize<IEnumerable<Lote>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -43,7 +45,7 @@ namespace HermeSoft_Fusion.Repository
 
         public async Task<IEnumerable<Lote>> ObtenerPorCondominio(string condominio)
         {
-            var response = await _httpClient.GetAsync($"http://localhost:3000/lotes/condominio/{condominio}");
+            var response = await _httpClient.GetAsync($"{_baseUrl}lotes/condominio/{condominio}");
             var json = await response.Content.ReadAsStringAsync();
 
             var lotes = JsonSerializer.Deserialize<IEnumerable<Lote>>(json, new JsonSerializerOptions
@@ -56,7 +58,7 @@ namespace HermeSoft_Fusion.Repository
 
         public async Task<IEnumerable<LoteMapa>> ObtenerLotesMapa(int idMapa)
         {
-            var response = await _httpClient.GetAsync("http://localhost:3000/lotes");
+            var response = await _httpClient.GetAsync($"{_baseUrl}lotes");
             var json = await response.Content.ReadAsStringAsync();
 
             var lotesApi = JsonSerializer.Deserialize<List<Lote>>(json,
@@ -100,7 +102,7 @@ namespace HermeSoft_Fusion.Repository
                 "application/json"
             );
 
-            var url = $"http://localhost:3000/lotes/editar/{lote.Codigo}";
+            var url = $"{_baseUrl}lotes/editar/{lote.Codigo}";
 
             var response = await _httpClient.PatchAsync(
                 url,

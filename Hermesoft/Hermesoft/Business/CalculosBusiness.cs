@@ -128,7 +128,9 @@ namespace HermeSoft_Fusion.Business
             var lote = await _loteRepository.Obtener(codLote);
             var montoHonorarioAbogados = lote.PrecioVenta * (honorarioAbogados * 0.01m);
             montoHonorarioAbogados = montoHonorarioAbogados + (montoHonorarioAbogados * (decimal.Parse(_configuracion.ObtenerValor("IVA")) * 0.01m));
-            var porcentajeExtra = seguroVida + seguroDesempleo + comisionBancaria + decimal.Parse(_configuracion.ObtenerValor("TimbreFiscal"));
+            // var porcentajeExtra = seguroVida + seguroDesempleo + comisionBancaria + decimal.Parse(_configuracion.ObtenerValor("TimbreFiscal")); //Q Borrar debugging
+            var timbreFiscal = decimal.Parse(_configuracion.ObtenerValor("TimbreFiscal"), CultureInfo.InvariantCulture);
+            var porcentajeExtra = seguroVida + seguroDesempleo + comisionBancaria + timbreFiscal;
             var montoExtra = lote.PrecioVenta * (porcentajeExtra * 0.01m);
             return montoHonorarioAbogados + montoExtra;
         }

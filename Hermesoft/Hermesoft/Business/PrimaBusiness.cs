@@ -6,7 +6,6 @@ namespace HermeSoft_Fusion.Business
 {
     public class PrimaBusiness
     {
-
         private readonly PrimaRepository _primaRepository;
         private readonly AppDbContext _context;
 
@@ -23,15 +22,7 @@ namespace HermeSoft_Fusion.Business
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                Primas primaBD = await Obtener(prima.CorreoCliente);
-                if (primaBD != null)
-                {
-                    prima = await Editar(primaBD, prima);
-                }
-                else
-                {
-                    await _primaRepository.Agregar(prima);
-                }
+                await _primaRepository.Agregar(prima);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return prima;
@@ -50,6 +41,9 @@ namespace HermeSoft_Fusion.Business
                 primaBD.FechaCierre = prima.FechaCierre;
                 primaBD.Porcentaje = prima.Porcentaje;
                 primaBD.Total = prima.Total;
+                primaBD.CodLote = prima.CodLote;
+                primaBD.Asignado = prima.Asignado;
+
                 _context.DESGLOSES_PRIMAS.RemoveRange(primaBD.DesglosesPrimas);
                 primaBD.DesglosesPrimas.Clear();
 
@@ -57,7 +51,6 @@ namespace HermeSoft_Fusion.Business
                 {
                     desglose.Prima = primaBD;
                     primaBD.DesglosesPrimas.Add(desglose);
-                    
                 }
 
                 await _context.SaveChangesAsync();
@@ -74,7 +67,21 @@ namespace HermeSoft_Fusion.Business
             return await _primaRepository.Obtener(correoCliente);
         }
 
-        #endregion
+        public async Task<List<Primas>> ObtenerPorCorreo(string correoCliente)
+        {
+            return await _primaRepository.ObtenerPorCorreo(correoCliente);
+        }
 
+        public async Task<Primas> ObtenerPorId(int idPrima)
+        {
+            return await _primaRepository.ObtenerPorId(idPrima);
+        }
+
+        public async Task<List<Primas>> ObtenerDisponiblesPorCorreoYLote(string correoCliente, string codLote)
+        {
+            return await _primaRepository.ObtenerDisponiblesPorCorreoYLote(correoCliente, codLote);
+        }
+
+        #endregion
     }
 }

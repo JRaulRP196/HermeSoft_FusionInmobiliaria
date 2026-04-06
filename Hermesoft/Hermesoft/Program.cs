@@ -77,6 +77,9 @@ builder.Services.AddScoped<EstadisticaBusiness>();
 builder.Services.AddScoped<DesglosePrimaBusiness>();
 builder.Services.AddScoped<DesglosePrimaRepository>();
 builder.Services.AddScoped<RecordatorioBusiness>();
+builder.Services.AddScoped<MapaRepository>();
+builder.Services.AddScoped<MapaBusiness>();
+builder.Services.AddScoped<ReporteBusiness>();
 builder.Services.AddScoped<Job>();
 
 builder.Services.AddHangfire(config =>
@@ -108,7 +111,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "*");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET");
+    }
+});
 
 app.UseRouting();
 app.UseAuthentication();

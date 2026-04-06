@@ -8,84 +8,144 @@
 @section styles {
 
     <!-- DataTables -->
-    <link href="~/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/assets/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-
-    <!-- Responsive datatable examples -->
-    <link href="~/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" />
 
 }
 
 @model IEnumerable<Lote>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <a class="btn btn-danger btn-lg d-flex align-items-center" asp-action="Index">
-        Volver
-    </a>
-</div>
+<div class="container-fluid px-2 px-md-4">
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Listado de lotes</h4>
-                <p class="card-title-desc">
-                    Esta es una tabla que detalla los lotes que pueden estar en el mapa del condominio seleccionado
+    <!-- HEADER RESPONSIVE -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+
+        <div>
+            <h3 class="fw-bold mb-1">Listado de Lotes</h3>
+            <p class="text-muted mb-0 small">
+                Administra los lotes disponibles en el sistema
+            </p>
+        </div>
+
+        <a class="btn btn-danger d-flex align-items-center px-3 py-2"
+           asp-action="Index">
+            <i class="fas fa-arrow-left me-2"></i>
+            Volver
+        </a>
+
+    </div>
+
+    <!-- CARD -->
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-body">
+
+            <!-- DESCRIPCIÓN -->
+            <div class="mb-3">
+                <h5 class="fw-semibold">Tabla de Lotes</h5>
+                <p class="text-muted small mb-0">
+                    Visualiza y asigna lotes disponibles en el condominio seleccionado.
                 </p>
+            </div>
 
-                <table id="key-datatable" class="table dt-responsive nowrap w-100">
-                    <thead>
+            <!-- TABLA RESPONSIVE -->
+            <div class="table-responsive">
+
+                <table id="key-datatable"
+                       class="table table-hover table-bordered align-middle nowrap w-100">
+
+                    <thead class="table-dark">
                         <tr>
-                            <th>Código de Lote</th>
+                            <th>Código</th>
                             <th>Condominio</th>
                             <th>Estado</th>
-                            <th>Acciones</th>
+                            <th style="min-width:120px;">Acciones</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        @foreach(Lote lote in Model)
+                        @foreach (Lote lote in Model)
                         {
                             <tr>
-                                <td>@lote.Codigo</td>
-                                <td>@lote.Condominio</td>
-                                <td>@lote.Estado</td>
+                                <td class="fw-semibold">@lote.Codigo</td>
+
                                 <td>
-                                    <a class="btn btn-sm btn-info me-1" asp-route-lote="@lote.Codigo" asp-action="AsignarLote">Asignar</a>
-@*                                     <button class="btn btn-sm btn-danger btn-anular">Desasignar</button> *@
+                                    <span class="text-muted">
+                                        @lote.Condominio
+                                    </span>
                                 </td>
+
+                                <td>
+                                    @if (lote.Estado == "Disponible")
+                                    {
+                                        <span class="badge bg-success px-3 py-2 rounded-pill">
+                                            @lote.Estado
+                                        </span>
+                                    }
+                                    else if (lote.Estado == "Reservado")
+                                    {
+                                        <span class="badge bg-warning px-3 py-2 rounded-pill">
+                                            @lote.Estado
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary px-3 py-2 rounded-pill">
+                                            @lote.Estado
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+
+                                        <a class="btn btn-sm btn-info d-flex align-items-center"
+                                           asp-route-lote="@lote.Codigo"
+                                           asp-action="AsignarLote">
+                                            <i class="fas fa-link me-1"></i>
+                                            <span class="d-none d-md-inline">Asignar</span>
+                                        </a>
+
+                                    </div>
+                                </td>
+
                             </tr>
                         }
                     </tbody>
+
                 </table>
-            </div> <!-- end card body-->
-        </div> <!-- end card -->
-    </div><!-- end col-->
+
+            </div>
+
+        </div>
+    </div>
+
 </div>
-<!-- end row-->
+
 @section scripts {
-    <!-- Required datatable js -->
+
+    <!-- DataTables -->
     <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="~/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <!-- Buttons examples -->
-    <script src="~/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="~/assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
-    <script src="~/assets/libs/jszip/jszip.min.js"></script>
-    <script src="~/assets/libs/pdfmake/build/pdfmake.min.js"></script>
-    <script src="~/assets/libs/pdfmake/build/vfs_fonts.js"></script>
-    <script src="~/assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
-    <script src="~/assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
-    <script src="~/assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
 
-    <script src="~/assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-    <script src="~/assets/libs/datatables.net-select/js/dataTables.select.min.js"></script>
-
-    <!-- Responsive examples -->
+    <!-- Responsive -->
     <script src="~/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
     <script src="~/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
 
-    <!-- Datatable init js -->
-    <script src="~/assets/js/pages/datatables.init.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('#key-datatable').DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                }
+            });
+
+        });
+    </script>
 
     <script src="~/assets/js/app.js"></script>
 }

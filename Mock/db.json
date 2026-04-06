@@ -46,7 +46,7 @@
       "precioLista": 10200000,
       "precioVenta": 9690000,
       "condominio": "CO-01",
-      "estado": "Disponible"
+      "estado": "En Venta"
     },
     {
       "id": "LOT-05",
@@ -58,7 +58,7 @@
       "precioLista": 11040000,
       "precioVenta": 10488000,
       "condominio": "CO-01",
-      "estado": "Disponible"
+      "estado": "En Venta"
     },
     {
       "id": "LOT-06",
@@ -70,7 +70,7 @@
       "precioLista": 11730000,
       "precioVenta": 11143500,
       "condominio": "CO-01",
-      "estado": "Disponible"
+      "estado": "En Venta"
     },
     {
       "id": "LOT-07",
@@ -82,7 +82,7 @@
       "precioLista": 12600000,
       "precioVenta": 11970000,
       "condominio": "CO-01",
-      "estado": "Disponible"
+      "estado": "En Venta"
     },
     {
       "id": "LOT-08",
@@ -118,7 +118,7 @@
       "precioLista": 9860000,
       "precioVenta": 9367000,
       "condominio": "CO-01",
-      "estado": "Disponible"
+      "estado": "En Venta"
     },
     {
       "id": "LOT-11",

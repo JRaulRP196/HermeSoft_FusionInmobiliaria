@@ -55,6 +55,14 @@ namespace HermeSoft_Fusion.Repository
                     .Where(v => v.FechaDeRegistro >= fechaInicio && v.FechaDeRegistro < fechaFin)
                     .ToListAsync();
         }
+        public async Task<Venta> ObtenerPorLote(string codLote)
+        {
+             return await _context.VENTAS
+                    .Include(v => v.Prima)
+                        .ThenInclude(p => p.DesglosesPrimas)
+                    .Include(v => v.Usuario)
+                    .FirstOrDefaultAsync(v => v.CodLote == codLote);
+        }
 
         #endregion
 

@@ -7,12 +7,12 @@ namespace HermeSoft_Fusion.Business
     {
 
         private LoteRepository _repository;
-        private CoordenadasRepository _coordenadasRepository;
+        private readonly VentaRepository _ventaBusiness;
 
-        public LoteBusiness(LoteRepository loteRepository, CoordenadasRepository coordenadasRepository)
+        public LoteBusiness(LoteRepository loteRepository, VentaRepository ventaBusiness)
         {
             _repository = loteRepository;
-            _coordenadasRepository = coordenadasRepository;
+            _ventaBusiness = ventaBusiness;
         }
 
         #region Utilidades
@@ -32,9 +32,53 @@ namespace HermeSoft_Fusion.Business
             return await _repository.ObtenerPorCondominio(condominio);
         }
 
-        public async Task<IEnumerable<LoteMapa>> ObtenerLotesMapa(int idMapa)
+        public async Task<IEnumerable<LoteDetalle>> ObtenerLotesMapa(int idMapa)
         {
-            return await _repository.ObtenerLotesMapa(idMapa);
+            var lotes = await _repository.ObtenerLotesMapa(idMapa);
+            List<LoteDetalle> lotesDetalles = new List<LoteDetalle>();
+            foreach (var lote in lotes)
+            {
+                var venta = await _ventaBusiness.ObtenerPorLote(lote.Codigo);
+                if(venta != null)
+                {
+                    var l = new LoteDetalle
+                    {
+                        Codigo = lote.Codigo,
+                        Area = lote.Area,
+                        PrecioVenta = lote.PrecioVenta,
+                        FechaVenta = venta.FechaDeRegistro,
+                        Condominio = lote.Condominio,
+                        Estado = lote.Estado,
+                        Fondo = lote.Fondo,
+                        Frente = lote.Frente,
+                        PrecioLista = lote.PrecioLista,
+                        PrecioM2 = lote.PrecioM2,
+                        X = lote.X,
+                        Y = lote.Y
+                    };
+                    lotesDetalles.Add(l);
+                }
+                else
+                {
+                    var l = new LoteDetalle
+                    {
+                        Codigo = lote.Codigo,
+                        Area = lote.Area,
+                        PrecioVenta = lote.PrecioVenta,
+                        FechaVenta = DateTime.MinValue,
+                        Condominio = lote.Condominio,
+                        Estado = lote.Estado,
+                        Fondo = lote.Fondo,
+                        Frente = lote.Frente,
+                        PrecioLista = lote.PrecioLista,
+                        PrecioM2 = lote.PrecioM2,
+                        X = lote.X,
+                        Y = lote.Y
+                    };
+                    lotesDetalles.Add(l);
+                }
+            }
+            return lotesDetalles;
         }
 
         public async Task<Lote> Editar(Lote lote)

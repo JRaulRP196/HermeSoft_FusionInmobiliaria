@@ -2,6 +2,8 @@
 using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Usuarios;
 using HermeSoft_Fusion.Repository.Usuarios;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace HermeSoft_Fusion.Business.Usuarios
 {
@@ -36,6 +38,7 @@ namespace HermeSoft_Fusion.Business.Usuarios
                     usuario.IdUsuario = -1;
                     return usuario;
                 }
+                usuario.Password = GenerarClave();
                 string mensajeCorreo = _emailService.GenerarMensajePassword(usuario.Password);
                 usuario.Password = _passwordService.HashPassword(usuario, usuario.Password);
                 await _usuarioRepository.Agregar(usuario);
@@ -154,6 +157,30 @@ namespace HermeSoft_Fusion.Business.Usuarios
         {
             Usuario user = await _usuarioRepository.Obtener(usuario.Correo);
             return user != null;
+        }
+
+        private string GenerarClave(int longitud = 12)
+        {
+            const string caracteres =
+                "abcdefghijklmnopqrstuvwxyz" +
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                "0123456789" +
+                "!@$?_-";
+
+            StringBuilder resultado = new StringBuilder();
+            byte[] buffer = new byte[4];
+
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                for (int i = 0; i < longitud; i++)
+                {
+                    rng.GetBytes(buffer);
+                    uint numero = BitConverter.ToUInt32(buffer, 0);
+                    resultado.Append(caracteres[(int)(numero % (uint)caracteres.Length)]);
+                }
+            }
+
+            return resultado.ToString();
         }
 
     }

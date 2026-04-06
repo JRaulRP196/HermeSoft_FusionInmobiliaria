@@ -30,7 +30,7 @@
         <div class="card-header border-0 d-flex justify-content-between align-items-center px-4 pt-4 rounded-4">
             <h4>Condominio</h4>
             <div class="d-flex align-items-center gap-3 flex-wrap flex-md-nowrap">
-                <select class="form-select w-auto w-100 w-md-auto" id="filtro">
+                <select class="form-select w-auto w-100 w-md-auto" id="filtro" onchange="habilitarDescarga()">
                     <option value="-1" hidden selected>Filtros</option>
                     <option value="Ventas_Mes">Ventas Mes</option>
                     <option value="Disponibilidad">Disponibilidad</option>
@@ -39,8 +39,7 @@
                 <div id="ventasMesGroup" class="d-none">
                     <input type="month" class="form-control" id="filtroMes" />
                 </div>
-
-                <button class="btn btn-outline-secondary btn-sm px-3 w-100 w-md-auto">
+                <button class="btn btn-outline-secondary btn-sm px-3 w-100 w-md-auto d-none" id="btnDescargar">
                     Descargar
                 </button>
             </div>
@@ -58,6 +57,14 @@
 </div>
 
 @section scripts{
-    <script src="~/assets/js/mapas.js"></script>
+    <script src="~/assets/js/reporte.js"></script>
     <script src="~/assets/js/app.js"></script>
+    <script>
+        function habilitarDescarga(){
+            descargarBtn = document.getElementById('btnDescargar');
+            descargarBtn.classList.remove("d-none");
+        }
+
+    </script>
+    <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
 }

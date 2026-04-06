@@ -46,8 +46,12 @@
     </div>
     <!-- END layout-wrapper -->
 
+
+
+
     @Html.Partial("~/Views/Shared/_rightSidebar.cshtml")
 
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <!-- Right bar overlay-->
     <div class="rightbar-overlay"></div>
 
@@ -63,18 +67,25 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const body = document.body;
-            const estado = localStorage.getItem("sidebar-collapsed");
 
-            if (estado === "true") {
-                body.classList.add("vertical-collpsed");
+            if (window.innerWidth > 991) {
+                const estado = localStorage.getItem("sidebar-collapsed");
+
+                if (estado === "true") {
+                    body.classList.add("vertical-collpsed");
+                }
             }
         });
 
         function toggleSidebar() {
             const body = document.body;
 
-            const collapsed = body.classList.toggle("vertical-collpsed");
-            localStorage.setItem("sidebar-collapsed", collapsed);
+            if (window.innerWidth <= 991) {
+                body.classList.toggle("sidebar-enable"); 
+            } else {
+                const collapsed = body.classList.toggle("vertical-collpsed");
+                localStorage.setItem("sidebar-collapsed", collapsed);
+            }
         }
     </script>
 

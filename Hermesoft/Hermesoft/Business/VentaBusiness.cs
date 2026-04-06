@@ -32,25 +32,53 @@ namespace HermeSoft_Fusion.Business
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                Console.WriteLine($"[Business] IdPrima que entra: {venta.IdPrima}");
+                Console.WriteLine($"[Business] CorreoCliente que entra: {venta.CorreoCliente}");
+
                 venta.FechaDeRegistro = DateTime.Now;
                 venta.Estado = "EN PROCESO";
-                var prima = await _primaBusiness.Obtener(venta.CorreoCliente);
-                if(prima == null)
+
+                if (!venta.IdPrima.HasValue)
                 {
-                    throw new Exception($"Debe registrar una prima para el cliente {venta.CorreoCliente}");
+                    throw new Exception("Debe seleccionar una prima para registrar la venta");
                 }
-                venta.IdPrima = prima.IdPrima;
+
+                var prima = await _primaBusiness.ObtenerPorId(venta.IdPrima.Value);
+                if (prima == null)
+                {
+                    throw new Exception("La prima seleccionada no existe");
+                }
+
+                if (!string.Equals(prima.CorreoCliente, venta.CorreoCliente, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new Exception("La prima seleccionada no pertenece al cliente indicado");
+                }
+
+                if (prima.Asignado)
+                {
+                    throw new Exception("La prima seleccionada ya fue asignada a otra venta");
+                }
+
+                if (!string.Equals(prima.CodLote, venta.CodLote, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new Exception("La prima seleccionada no pertenece al lote indicado");
+                }
+
+                prima.Asignado = true;
+
                 await _ventaRepository.Agregar(venta);
 
                 var lote = await _loteBusiness.Obtener(venta.CodLote);
                 lote.Estado = "En Venta";
                 await _loteBusiness.Editar(lote);
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return venta;
             }
             catch (Exception e)
             {
+                await transaction.RollbackAsync();
                 throw new Exception(e.Message);
             }
         }
@@ -156,6 +184,11 @@ namespace HermeSoft_Fusion.Business
             var fin = inicio.AddMonths(1);
             var ventas = await _ventaRepository.ObtenerPorRango(inicio, fin);
             return ventas.Where(v => v.Estado != "ANULADA").ToList();
+        }
+        
+        public async Task<Venta> ObtenerPorLote(string codLote)
+        {
+            return await _ventaRepository.ObtenerPorLote(codLote);
         }
 
         #endregion
