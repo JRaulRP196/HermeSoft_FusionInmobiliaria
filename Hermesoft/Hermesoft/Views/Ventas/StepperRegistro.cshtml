@@ -95,6 +95,15 @@
                                 </select>
                             </div>
 
+                            <div class="col-md-6">
+                                <label class="form-label">Moneda</label>
+                                <select id="monedaSelect" class="form-select">
+                                    <option value="CRC" selected>₡ Colón</option>
+                                    <option value="USD">$ Dólar</option>
+                                </select>
+                                <input type="hidden" id="tipoCambioInput" class="form-control" readonly />
+                            </div>
+
                             <div class="col-md-12">
                                 <label class="form-label">Tipo de asalariado *</label>
                                 <select id="tipoAsalariado" class="form-select" required disabled>
@@ -219,22 +228,7 @@
 
                 <div class="step-content d-none" data-step="4">
                     <div class="row align-items-end mt-4">
-                        <div class="col-md-6">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Moneda</label>
-                                    <select id="monedaSelect" class="form-select">
-                                        <option value="CRC" selected>₡ Colón</option>
-                                        <option value="USD">$ Dólar</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <input type="hidden" id="tipoCambioInput" class="form-control" readonly />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 text-end">
+                        <div class="col-md-12 text-end">
                             <button type="button" class="btn btn-secondary prev-btn">
                                 Anterior
                             </button>
