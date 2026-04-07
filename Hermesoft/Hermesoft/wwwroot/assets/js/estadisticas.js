@@ -36,10 +36,11 @@
         }
 
         if (categorias.length === 0) {
+            $("#opciones").addClass("d-none");
             mostrarMensajeSinDatos();
             return;
         }
-
+        $("#opciones").removeClass("d-none");
         crearGrafico();
     }
 
@@ -87,7 +88,7 @@
                 type: 'bar',
                 height: 350,
                 stacked: true,
-                toolbar: { show: false }
+                toolbar: { show: true }
             },
             plotOptions: {
                 bar: {
@@ -112,5 +113,46 @@
         chart = new ApexCharts(contenedor, options);
         chart.render();
     }
+
+
+    $("#descargar").on("click", async function () {
+
+        const fechaInicio = $("#fechaInicio").val();
+        const fechaFinal = $("#fechaFinal").val();
+
+        if (!chart) {
+            alert("No hay datos para generar el PDF");
+            return;
+        }
+
+        const { imgURI } = await chart.dataURI();
+
+        function toISO(fecha) {
+            return new Date(fecha).toISOString();
+        }
+
+        fetch("/Estadistica/GenerarPdf", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                graficoBase64: imgURI,
+                desde: fechaInicio ? toISO(fechaInicio) : null,
+                hasta: fechaFinal ? toISO(fechaFinal) : null
+            })
+        })
+            .then(res => res.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = (fechaInicio && fechaFinal)
+                    ? `reporte_pagos_${fechaInicio}_${fechaFinal}.pdf`
+                    : `reporte_pagos_${Date.now()}.pdf`;
+                a.click();
+            });
+
+    });
 
 });
