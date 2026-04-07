@@ -193,9 +193,10 @@
         limpiarMapa();
 
         if (!data) {
-            map.removeLayer(overlayActual);
+            if (overlayActual) {
+                map.removeLayer(overlayActual);
+            }
             $("#error").removeClass("d-none");
-            $("#opciones").addClass("d-none");
             return;
         }
 

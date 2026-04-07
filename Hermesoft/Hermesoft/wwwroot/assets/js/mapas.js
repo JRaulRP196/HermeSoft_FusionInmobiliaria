@@ -161,11 +161,11 @@
         const data = mapas[nombreMapa];
 
         limpiarMapa();
-
         if (!data) {
-            map.removeLayer(overlayActual);
+            if (overlayActual) {
+                map.removeLayer(overlayActual);
+            }
             $("#error").removeClass("d-none");
-            $("#listadoLotes").addClass("d-none");
             return;
         }
 
