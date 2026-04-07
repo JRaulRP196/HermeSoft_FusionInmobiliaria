@@ -1,4 +1,5 @@
-﻿using HermeSoft_Fusion.Models.Servicios;
+﻿using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Servicios;
 using HermeSoft_Fusion.Repository;
 
 namespace HermeSoft_Fusion.Business
@@ -8,11 +9,13 @@ namespace HermeSoft_Fusion.Business
 
         private LoteRepository _repository;
         private readonly VentaRepository _ventaBusiness;
+        private readonly CoordenadasRepository _coordenadasRepository;
 
-        public LoteBusiness(LoteRepository loteRepository, VentaRepository ventaBusiness)
+        public LoteBusiness(LoteRepository loteRepository, VentaRepository ventaBusiness, CoordenadasRepository coordenadasRepository)
         {
             _repository = loteRepository;
             _ventaBusiness = ventaBusiness;
+            _coordenadasRepository = coordenadasRepository;
         }
 
         #region Utilidades
@@ -27,9 +30,31 @@ namespace HermeSoft_Fusion.Business
             return await _repository.Obtener(codigoLote);
         }
 
-        public async Task<IEnumerable<Lote>> ObtenerPorCondominio(string condominio)
+        public async Task<IEnumerable<LoteAsignar>> ObtenerPorCondominio(string condominio)
         {
-            return await _repository.ObtenerPorCondominio(condominio);
+            var lotes = await _repository.ObtenerPorCondominio(condominio);
+            List<LoteAsignar> lotesAsignar = new List<LoteAsignar>();
+            foreach (var lote in lotes)
+            {
+                var coordenada = await _coordenadasRepository.GetCoordenada(lote.Codigo);
+                var l = new LoteAsignar
+                {
+                    Codigo = lote.Codigo,
+                    Area = lote.Area,
+                    PrecioVenta = lote.PrecioVenta,
+                    Condominio = lote.Condominio,
+                    Estado = lote.Estado,
+                    Fondo = lote.Fondo,
+                    Frente = lote.Frente,
+                    PrecioLista = lote.PrecioLista,
+                    PrecioM2 = lote.PrecioM2,
+                    Asignado = coordenada != null,
+                    IdCoordenada = coordenada != null ? coordenada.IdCoordenada : (int?)null
+
+                };
+                lotesAsignar.Add(l);
+            }
+            return lotesAsignar;
         }
 
         public async Task<IEnumerable<LoteDetalle>> ObtenerLotesMapa(int idMapa)

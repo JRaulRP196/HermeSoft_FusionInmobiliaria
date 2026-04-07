@@ -37,6 +37,20 @@ namespace HermeSoft_Fusion.Repository
             return null;
         }
 
+        public async Task<Coordenadas> Eliminar(int idCoordenada)
+        {
+            var coordenada = await _context.COORDENADAS.FindAsync(idCoordenada);
+            if (coordenada != null)
+            {
+                _context.COORDENADAS.Remove(coordenada);
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    return coordenada;
+                }
+            }
+            return null;
+        }
+
         public async Task<IEnumerable<Coordenadas>> GetCoordenadasPorMapa(int id)
         {
             IEnumerable<Coordenadas> coordenadas = await _context.COORDENADAS.Where(c => c.IdMapa == id).ToListAsync();

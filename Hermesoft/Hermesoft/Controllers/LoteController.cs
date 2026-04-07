@@ -9,10 +9,12 @@ namespace HermeSoft_Fusion.Controllers
     {
 
         private LoteBusiness _loteBusiness;
+        private readonly CoordenadasBusiness _coordenadasBusiness;
 
-        public LoteController(LoteBusiness loteBusiness)
+        public LoteController(LoteBusiness loteBusiness, CoordenadasBusiness coordenadasBusiness)
         {
             _loteBusiness = loteBusiness;
+            _coordenadasBusiness = coordenadasBusiness;
         }
 
         #region Vistas
@@ -32,6 +34,22 @@ namespace HermeSoft_Fusion.Controllers
         {
             var lot = await _loteBusiness.Obtener(lote);
             return View(lot);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Anular(int idCoordenada)
+        {
+            var result = await _coordenadasBusiness.Eliminar(idCoordenada);
+            if (result != null)
+            {
+                TempData["SuccessMapa"] = "Lote eliminado del mapa correctamente";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["ErrorMapa"] = "Error al eliminar el lote del mapa";
+                return RedirectToAction("Index");
+            }
         }
 
         #endregion

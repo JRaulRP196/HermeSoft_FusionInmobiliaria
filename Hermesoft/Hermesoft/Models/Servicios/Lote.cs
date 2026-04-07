@@ -19,6 +19,12 @@
         public string Y { get; set; }
     }
 
+    public class LoteAsignar : Lote
+    {
+        public bool Asignado { get; set; }
+        public int? IdCoordenada { get; set; }
+    }
+
     public class LoteDetalle : LoteMapa
     {
         public DateTime FechaVenta { get; set; }

@@ -65,7 +65,7 @@
                     </thead>
 
                     <tbody>
-                        @foreach (Lote lote in Model)
+                        @foreach (LoteAsignar lote in Model)
                         {
                             <tr>
                                 <td class="fw-semibold">@lote.Codigo</td>
@@ -100,12 +100,26 @@
                                 <td>
                                     <div class="d-flex flex-wrap gap-2">
 
-                                        <a class="btn btn-sm btn-info d-flex align-items-center"
-                                           asp-route-lote="@lote.Codigo"
-                                           asp-action="AsignarLote">
-                                            <i class="fas fa-link me-1"></i>
-                                            <span class="d-none d-md-inline">Asignar</span>
-                                        </a>
+                                        @if (lote.Asignado)
+                                        {
+                                            <button class="btn btn-sm btn-warning d-flex align-items-center gap-2 shadow-sm"
+                                                    type="button"
+                                                    data-id="@lote.IdCoordenada"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalAnularCoordenadas">
+                                                <i class="fas fa-ban"></i>
+                                                <span class="d-none d-md-inline fw-semibold">Anular</span>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <a class="btn btn-sm btn-info d-flex align-items-center"
+                                               asp-route-lote="@lote.Codigo"
+                                               asp-action="AsignarLote">
+                                                <i class="fas fa-link me-1"></i>
+                                                <span class="d-none d-md-inline">Asignar</span>
+                                            </a>
+                                        }
 
                                     </div>
                                 </td>
@@ -121,6 +135,31 @@
         </div>
     </div>
 
+</div>
+
+<div class="modal fade" id="modalAnularCoordenadas" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar anulación</h5>
+            </div>
+
+            <div class="modal-body">
+                ¿Seguro que deseas anular este registro?
+            </div>
+
+            <div class="modal-footer">
+                <form asp-action="Anular">
+                    <input type="hidden" name="idCoordenada" id="inputIdAnular" />
+
+                    <button type="submit" class="btn btn-danger">Sí, anular</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 @section scripts {
@@ -142,6 +181,16 @@
                 language: {
                     url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
                 }
+            });
+
+            const modal = document.getElementById('modalAnularCoordenadas');
+
+            modal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+
+                const input = document.getElementById('inputIdAnular');
+                input.value = id;
             });
 
         });

@@ -25,6 +25,11 @@ namespace HermeSoft_Fusion.Business
             return await _repository.GetCoordenadasPorMapa(id);
         }
 
+        public async Task<Coordenadas> Eliminar(int idCoordenada)
+        {
+            return await _repository.Eliminar(idCoordenada);
+        }
+
         #endregion
 
     }
