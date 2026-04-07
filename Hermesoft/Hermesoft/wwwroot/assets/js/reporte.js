@@ -197,6 +197,7 @@
                 map.removeLayer(overlayActual);
             }
             $("#error").removeClass("d-none");
+            $("#opciones").addClass("d-none");
             return;
         }
 

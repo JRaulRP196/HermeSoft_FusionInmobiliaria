@@ -166,6 +166,7 @@
                 map.removeLayer(overlayActual);
             }
             $("#error").removeClass("d-none");
+            $("#listadoLotes").addClass("d-none");
             return;
         }
 
