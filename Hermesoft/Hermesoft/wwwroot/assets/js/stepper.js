@@ -27,6 +27,7 @@
         });
 
         currentStep = step;
+        $(document).trigger("stepChanged", [currentStep]);
     }
 
     // Botón siguiente

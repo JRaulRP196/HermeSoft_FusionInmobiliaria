@@ -85,7 +85,7 @@
 
             <div class="col-12 mb-3">
                 <button type="button" id="calcPrima" class="btn btn-outline-primary w-100 d-none">
-                    Calcular prima
+                    <i class="bi bi-calculator"></i> Calcular prima
                 </button>
             </div>
             @if (Model.TieneDesglose)
@@ -94,7 +94,7 @@
                     <button type="button" id="almacenarPrima" class="btn btn-primary w-100"
                             data-bs-toggle="modal"
                             data-bs-target="#modalNuevaPrima">
-                        Registrar Prima Para Venta
+                        <i class="bi bi-save"></i> Registrar Prima Para Venta
                     </button>
                 </div>
             }
@@ -218,9 +218,9 @@
                     }
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
                         <button type="submit" class="btn btn-primary">
-                            Guardar Prima
+                            <i class="bi bi-save"></i> Guardar Prima
                         </button>
                     </div>
                 </form>

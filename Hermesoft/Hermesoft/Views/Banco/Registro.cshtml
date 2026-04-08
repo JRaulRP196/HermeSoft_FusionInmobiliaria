@@ -97,7 +97,7 @@
 
                         <div class="text-end mt-3">
                             <button type="button" class="btn btn-primary next-btn">
-                                Siguiente
+                                Siguiente <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
                     </div>
@@ -143,10 +143,10 @@
 
                         <div class="d-flex justify-content-between mt-3">
                             <button type="button" class="btn btn-secondary prev-btn">
-                                Anterior
+                                <i class="bi bi-arrow-left"></i> Anterior
                             </button>
                             <button type="button" class="btn btn-primary next-btn">
-                                Siguiente
+                                Siguiente <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
                     </div>
@@ -238,24 +238,28 @@
 
                         <div class="d-flex justify-content-between mt-3">
                             <button type="button" class="btn btn-secondary prev-btn">
-                                Anterior
+                                <i class="bi bi-arrow-left"></i> Anterior
                             </button>
                             <button type="button" class="btn btn-primary next-btn">
-                                Siguiente
+                                Siguiente <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
                     </div>
 
                     <div class="step-content d-none" data-step="4">
-                        <div class="d-flex justify-content-between mt-3">
-                            <button type="button" class="btn btn-secondary prev-btn">
-                                Anterior
-                            </button>
-                            <div class="button-items">
-                                <button class="btn btn-primary" type="submit">Guardar</button>
-                                <a class="btn btn-danger" asp-action="Index">Cancelar</a>
+
+                        <div class="row align-items-end mt-4">
+                            <div id="resumenBanco" class="card border-0 shadow-sm rounded-4 p-4"></div>
+
+                            <div class="col-md-12 text-end">
+                                <button type="button" class="btn btn-secondary prev-btn">
+                                    <i class="bi bi-arrow-left"></i> Anterior
+                                </button>
+                                <button class="btn btn-primary" type="submit"><i class="bi bi-save"></i> Guardar</button>
+                                <a class="btn btn-danger" asp-action="Index"><i class="bi bi-x-circle"></i> Cancelar</a>
                             </div>
                         </div>
+
                     </div>
 
                 </form>
@@ -348,4 +352,5 @@
     <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
     <script src="~/assets/js/pages/form-validation.init.js"></script>
     <script src="~/assets/js/escenariosBanco.js"></script>
+    <script src="~/assets/js/resumenBanco.js"></script>
 }

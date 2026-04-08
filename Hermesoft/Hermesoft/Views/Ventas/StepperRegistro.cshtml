@@ -62,6 +62,7 @@
                                 <label class="form-label">Cliente *</label>
                                 <div class="input-group">
                                     <input type="email"
+                                           data-resumen="Cliente"
                                            id="clienteBusqueda"
                                            asp-for="CorreoCliente"
                                            class="form-control"
@@ -113,7 +114,7 @@
 
                             <div class="col-md-4">
                                 <label class="form-label">Lote *</label>
-                                <input id="lote" asp-for="CodLote" class="form-control" value="@loteActual" readonly required />
+                                <input id="lote" asp-for="CodLote" data-resumen="Lote" class="form-control" value="@loteActual" readonly required />
                             </div>
 
                             <div class="col-md-4">
@@ -123,7 +124,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Banco *</label>
-                                <select id="banco" asp-for="IdBanco" class="form-select" required>
+                                <select id="banco" asp-for="IdBanco" class="form-select" data-resumen="Banco" required>
                                     <option value="" selected hidden>Seleccione banco</option>
                                     @foreach (var b in bancos)
                                     {
@@ -134,7 +135,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Escenario *</label>
-                                <select id="escenario" class="form-select" required disabled>
+                                <select id="escenario" class="form-select" data-resumen="Escenario Usado" required disabled>
                                     <option value="" selected hidden>Seleccione escenario</option>
                                 </select>
                             </div>
@@ -150,7 +151,7 @@
 
                             <div class="col-md-12">
                                 <label class="form-label">Tipo de asalariado *</label>
-                                <select id="tipoAsalariado" class="form-select" required disabled>
+                                <select id="tipoAsalariado" class="form-select" data-resumen="Tipo Asalariado" required disabled>
                                     <option value="" selected hidden>Seleccione un tipo de asalariado</option>
                                 </select>
                             </div>
@@ -160,7 +161,7 @@
 
                     <div class="text-end mt-3">
                         <button type="button" class="btn btn-primary next-btn">
-                            Siguiente
+                            Siguiente <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -218,16 +219,16 @@
 
                             <input type="text" id="gastoFormalizacionDisplay" class="form-control mt-2" readonly
                                    placeholder="Resultado gasto de formalización" />
-                            <input type="hidden" id="gastoFormalizacion" asp-for="GastoFormalizacion" />
+                            <input type="hidden" id="gastoFormalizacion" data-resumen="Gasto de Formalización" asp-for="GastoFormalizacion" />
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-between mt-3">
                         <button type="button" class="btn btn-secondary prev-btn">
-                            Anterior
+                            <i class="bi bi-arrow-left"></i> Anterior
                         </button>
                         <button type="button" class="btn btn-primary next-btn">
-                            Siguiente
+                            Siguiente <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -254,7 +255,7 @@
                             <div class="row g-3 mt-2">
                                 <div class="col-md-12">
                                     <label class="form-label">Ingreso Neto Familiar</label>
-                                    <input type="text" id="ingresoNeto" class="form-control" readonly />
+                                    <input type="text" id="ingresoNeto" data-resumen="Ingreso Neto Familiar" class="form-control" readonly />
                                 </div>
                             </div>
 
@@ -263,22 +264,23 @@
 
                     <div class="d-flex justify-content-between mt-3">
                         <button type="button" class="btn btn-secondary prev-btn">
-                            Anterior
+                            <i class="bi bi-arrow-left"></i> Anterior
                         </button>
                         <button type="button" class="btn btn-primary next-btn">
-                            Siguiente
+                            Siguiente <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
                 </div>
 
                 <div class="step-content d-none" data-step="4">
                     <div class="row align-items-end mt-4">
+                        <div id="resumenContainer" class="card border-0 shadow-sm rounded-4 p-4"></div>
                         <div class="col-md-12 text-end">
                             <button type="button" class="btn btn-secondary prev-btn">
-                                Anterior
+                                <i class="bi bi-arrow-left"></i> Anterior
                             </button>
                             <button type="submit" class="btn btn-success">
-                                Registrar Venta
+                                <i class="bi bi-save"></i> Registrar Venta
                             </button>
                         </div>
                     </div>
@@ -293,7 +295,7 @@
 @section scripts {
     <script src="~/assets/js/stepper.js"></script>
     <script src="~/assets/js/ventaStepper.js"></script>
-
+    <script src="~/assets/js/resumenVenta.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const btnBuscar = document.getElementById("btnBuscarPrimas");

@@ -46,7 +46,7 @@
                                 <div class="mb-3">
                                     <label for="validationCustom01" class="form-label">Nombre del Banco</label>
                                     <input type="hidden" asp-for="IdBanco" />
-                                    <input type="text" class="form-control" id="validationCustom01"
+                                    <input type="text" class="form-control" id="Nombre"
                                            placeholder="Nombre del Banco" required asp-for="Nombre">
                                     <div class="valid-feedback">
                                         Excelente!
@@ -56,7 +56,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="validationCustom02" class="form-label">Enlace Web del Banco</label>
-                                    <input type="text" class="form-control" id="validationCustom02"
+                                    <input type="text" class="form-control" id="Enlace"
                                            placeholder="Enlace Web del Banco" asp-for="Enlace" required>
                                     <div class="valid-feedback">
                                         Excelente!
@@ -79,7 +79,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="validationCustom04" class="form-label">Plazo Maximo de Credito</label>
-                                    <input type="number" class="form-control" id="validationCustom04"
+                                    <input type="number" class="form-control" id="MaxCredito"
                                            placeholder="Plazo Maximo de Credito en Anos" asp-for="MaxCredito" required>
                                     <div class="invalid-feedback">
                                         Ingrese un valor valido.
@@ -89,7 +89,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="validationCustom05" class="form-label">Comision Bancaria</label>
-                                    <input type="number" class="form-control" id="validationCustom05"
+                                    <input type="number" class="form-control" id="Comision"
                                            placeholder="%" asp-for="Comision" required>
                                     <div class="invalid-feedback">
                                         Ingrese un valor valido.
@@ -99,7 +99,7 @@
 
                             <div class="text-end mt-3">
                                 <button type="button" class="btn btn-primary next-btn">
-                                    Siguiente
+                                    Siguiente <i class="bi bi-arrow-right"></i>
                                 </button>
                             </div>
 
@@ -155,10 +155,10 @@
 
                         <div class="d-flex justify-content-between mt-3">
                             <button type="button" class="btn btn-secondary prev-btn">
-                                Anterior
+                                <i class="bi bi-arrow-left"></i> Anterior
                             </button>
                             <button type="button" class="btn btn-primary next-btn">
-                                Siguiente
+                                Siguiente <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
                     </div>
@@ -327,23 +327,25 @@
                         </div>
                         <div class="d-flex justify-content-between mt-3">
                             <button type="button" class="btn btn-secondary prev-btn">
-                                Anterior
+                                <i class="bi bi-arrow-left"></i> Anterior
                             </button>
                             <button type="button" class="btn btn-primary next-btn">
-                                Siguiente
+                                Siguiente <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
                     </div>
 
                     <div class="step-content d-none" data-step="4">
 
-                        <div class="d-flex justify-content-between mt-3">
-                            <button type="button" class="btn btn-secondary prev-btn">
-                                Anterior
-                            </button>
-                            <div class="button-items">
-                                <button class="btn btn-primary" type="submit">Guardar</button>
-                                <a class="btn btn-danger" asp-action="Index">Cancelar</a>
+                        <div class="row align-items-end mt-4">
+                            <div id="resumenBanco" class="card border-0 shadow-sm rounded-4 p-4"></div>
+
+                            <div class="col-md-12 text-end">
+                                <button type="button" class="btn btn-secondary prev-btn">
+                                    <i class="bi bi-arrow-left"></i> Anterior
+                                </button>
+                                <button class="btn btn-primary" type="submit"><i class="bi bi-save"></i> Guardar</button>
+                                <a class="btn btn-danger" asp-action="Index"><i class="bi bi-x-circle"></i> Cancelar</a>
                             </div>
                         </div>
 
@@ -444,4 +446,5 @@
     <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
     <script src="~/assets/js/pages/form-validation.init.js"></script>
     <script src="~/assets/js/escenariosBanco.js"></script>
+    <script src="~/assets/js/resumenBanco.js"></script>
 }

@@ -6,7 +6,7 @@
 }
 
 <div class="button-items">
-    <a asp-action="Registro" class="btn btn-primary">Registrar un Nuevo Banco</a>
+    <a asp-action="Registro" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Registrar un Nuevo Banco</a>
 </div>
 
 <div class="row g-3">
@@ -49,7 +49,7 @@
                     }
                     <div class="card-body">
                         <h4 class="card-title">@banco.Nombre</h4>
-                        <a class="btn btn-secondary" asp-action="Detalle" asp-route-id="@banco.IdBanco">Detalle</a>
+                        <a class="btn btn-secondary" asp-action="Detalle" asp-route-id="@banco.IdBanco"><i class="bi bi-eye"></i> Detalle</a>
                     </div>
                 </div>
             </div>

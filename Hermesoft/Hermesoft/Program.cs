@@ -99,7 +99,7 @@ using (var scope = app.Services.CreateScope())
     recurringJobManager.AddOrUpdate<Job>(
         "recordatorio-primas",
         job => job.EnviarRecordatorios(),
-        "8 * * * *"
+        "0 5 * * *"
     );
 }
 

@@ -41,57 +41,145 @@ namespace HermeSoft_Fusion.Controllers
             var base64Data = request.GraficoBase64.Split(',')[1];
             var imageBytes = Convert.FromBase64String(base64Data);
 
+            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/assets/images/logos/logo_fusion_dark.png");
+            var logoBytes = System.IO.File.Exists(logoPath)
+                ? System.IO.File.ReadAllBytes(logoPath)
+                : null;
+
             var pdfBytes = Document.Create(container =>
             {
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4.Landscape());
-                    page.Margin(20);
+                    page.Margin(30);
 
-                    page.Content().Column(col =>
+                    page.Header().Column(header =>
                     {
-                        col.Spacing(15);
-
-                        col.Item().Border(1).Padding(10).Row(row =>
+                        header.Item().Row(row =>
                         {
-                            row.RelativeItem().Text("REPORTE DE PAGOS")
-                                .FontSize(14)
-                                .Bold();
+                            if (logoBytes != null)
+                            {
+                                row.ConstantItem(70).Height(45).Element(e =>
+                                {
+                                    e.Image(logoBytes).FitArea(); 
+                                });
+                            }
 
-                            row.ConstantItem(150).AlignRight().Text($"Fecha: {DateTime.Now:dd/MM/yyyy}")
-                                .FontSize(10);
+                            row.RelativeItem().AlignMiddle().Column(col =>
+                            {
+                                col.Item().Text("REPORTE DE PAGOS")
+                                    .FontSize(20)
+                                    .Bold()
+                                    .FontColor("#1F3A5F");
+
+                                col.Item().Text("Sistema Financiero")
+                                    .FontSize(10)
+                                    .FontColor(Colors.Grey.Darken1);
+                            });
+
+                            row.ConstantItem(150).AlignRight().Column(col =>
+                            {
+                                col.Item().Text("Fecha")
+                                    .SemiBold()
+                                    .FontSize(10);
+
+                                col.Item().Text(DateTime.Now.ToString("dd/MM/yyyy"))
+                                    .FontSize(12)
+                                    .Bold();
+                            });
                         });
 
-                        if(request.Desde != null && request.Hasta != null)
+                        header.Item()
+                            .PaddingTop(5)
+                            .LineHorizontal(2)
+                            .LineColor("#1F3A5F");
+                    });
+
+
+                    page.Content().PaddingTop(15).Column(col =>
+                    {
+                        col.Spacing(15); 
+
+                        if (request.Desde != null && request.Hasta != null)
                         {
-                            col.Item().Border(1).Padding(10).Row(row =>
+                            col.Item().Row(row =>
                             {
-                                row.RelativeItem().Border(1).Padding(10).Column(c =>
-                                {
-                                    c.Item().Text("DESDE").Bold().FontSize(10);
-                                    c.Item().Text(request.Desde).FontSize(9);
-                                });
+                                row.RelativeItem().Background("#EEF2F7")
+                                    .Padding(10) 
+                                    .CornerRadius(8)
+                                    .Column(c =>
+                                    {
+                                        c.Item().Text("Desde")
+                                            .FontSize(10)
+                                            .FontColor(Colors.Grey.Darken1);
+
+                                        c.Item().Text(request.Desde)
+                                            .FontSize(13)
+                                            .Bold();
+                                    });
 
                                 row.Spacing(10);
 
-                                row.RelativeItem().Border(1).Padding(10).Column(c =>
-                                {
-                                    c.Item().Text("HASTA").Bold().FontSize(10);
-                                    c.Item().Text(request.Hasta).FontSize(9);
-                                });
+                                row.RelativeItem().Background("#EEF2F7")
+                                    .Padding(10) 
+                                    .CornerRadius(8)
+                                    .Column(c =>
+                                    {
+                                        c.Item().Text("Hasta")
+                                            .FontSize(10)
+                                            .FontColor(Colors.Grey.Darken1);
+
+                                        c.Item().Text(request.Hasta)
+                                            .FontSize(13)
+                                            .Bold();
+                                    });
                             });
                         }
 
-                        col.Item().Border(1).Padding(10).AlignCenter().AlignMiddle().Element(e =>
-                        {
-                            e.Image(imageBytes).FitWidth();
-                        });
+                        col.Item().Background("#FFFFFF")
+                            .Border(1)
+                            .BorderColor(Colors.Grey.Lighten2)
+                            .CornerRadius(10)
+                            .Padding(15)
+                            .Column(c =>
+                            {
+                                c.Item().Text("Visualización de Pagos")
+                                    .FontSize(13)
+                                    .Bold()
+                                    .FontColor("#1F3A5F");
 
+                                c.Item().PaddingTop(5)
+                                    .LineHorizontal(1)
+                                    .LineColor(Colors.Grey.Lighten2);
+
+                                c.Item().PaddingTop(10)
+                                    .AlignCenter()
+                                    .MaxHeight(300)
+                                    .Element(e =>
+                                    {
+                                        e.Image(imageBytes).FitWidth(); 
+                                    });
+                            });
+                    });
+
+                    page.Footer().PaddingTop(10).Row(row =>
+                    {
+                        row.RelativeItem().Text("Fusion Inmobiliaria")
+                            .FontSize(9)
+                            .FontColor(Colors.Grey.Darken1);
+
+                        row.ConstantItem(150).AlignRight().Text(text =>
+                        {
+                            text.Span("Página ");
+                            text.CurrentPageNumber();
+                            text.Span(" de ");
+                            text.TotalPages();
+                        });
                     });
                 });
             }).GeneratePdf();
 
-            return File(pdfBytes, "application/pdf", "mapa.pdf");
+            return File(pdfBytes, "application/pdf", "reporte_pagos.pdf");
         }
 
         #region js

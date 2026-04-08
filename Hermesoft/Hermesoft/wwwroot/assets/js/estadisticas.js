@@ -38,9 +38,11 @@
         if (categorias.length === 0) {
             $("#opciones").addClass("d-none");
             mostrarMensajeSinDatos();
+            cargarKpis();
             return;
         }
         $("#opciones").removeClass("d-none");
+        cargarKpis();
         crearGrafico();
     }
 
@@ -48,6 +50,21 @@
         e.preventDefault();
         cargarDatos();
     });
+
+    function cargarKpis() {
+
+        let pagosDia = $("#pagosAlDia");
+        let pagosPendientes = $("#pagosPendientes");
+        let pagosAtrasados = $("#pagosAtrasados");
+
+        const totalPagados = pagados.reduce((a, b) => a + b, 0);
+        const totalPendientes = pendientes.reduce((a, b) => a + b, 0);
+        const totalAtrasados = atrasados.reduce((a, b) => a + b, 0);
+
+        pagosDia.text(totalPagados);
+        pagosPendientes.text(totalPendientes);
+        pagosAtrasados.text(totalAtrasados);
+    }
 
     function mostrarMensajeSinDatos() {
 
