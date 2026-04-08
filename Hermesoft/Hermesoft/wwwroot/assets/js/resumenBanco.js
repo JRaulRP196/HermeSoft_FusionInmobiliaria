@@ -113,8 +113,8 @@
             let plazosHTML = "";
             let inputsEscenarios = $(this).find(".inputsEscenario");
             inputsEscenarios.each(function () {
-                const plazo = $(this).find("input[name*='Plazo']").val();
-                const adicional = $(this).find("input[name*='PorcAdicional']").val();
+                const plazo = $(this).find("input[name$='.Plazo']").val();
+                const adicional = $(this).find("input[name$='.PorcAdicional']").val();
 
                 plazosHTML += `
                 <div class="small text-muted">
