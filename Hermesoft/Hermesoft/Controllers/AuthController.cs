@@ -10,16 +10,11 @@ namespace Tocly.Controllers
     public class AuthController : Controller
     {
 
-        private readonly IndicadoresBancariosBusiness _indicadoresBancariosBusiness;
-        private readonly TipoCambioBusiness _tipoCambioBusiness;
         private readonly UsuarioBusiness _usuarioBusiness;
         private readonly PasswordService _passwordService;
 
-        public AuthController(IndicadoresBancariosBusiness indicadoresBancariosBusiness, TipoCambioBusiness tipoCambioBusiness,
-            UsuarioBusiness usuarioBusiness, PasswordService passwordService)
+        public AuthController(UsuarioBusiness usuarioBusiness, PasswordService passwordService)
         {
-            _indicadoresBancariosBusiness = indicadoresBancariosBusiness;
-            _tipoCambioBusiness = tipoCambioBusiness;
             _usuarioBusiness = usuarioBusiness;
             _passwordService = passwordService;
         }
@@ -31,8 +26,6 @@ namespace Tocly.Controllers
         }
         public async Task<IActionResult> Login()
         {
-            await _indicadoresBancariosBusiness.Editar();
-            await _tipoCambioBusiness.Editar();
             return View();
         }
         [HttpPost]

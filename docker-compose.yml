@@ -1,0 +1,57 @@
+services:
+  app:
+    build:
+      context: ./Hermesoft/Hermesoft
+    image: hermesoft_app
+    container_name: hermesoft_app
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__MySqlConnection: "server=db;port=3306;database=fusion;user=root;password=${MYSQL_ROOT_PASSWORD}"
+      MockApi__BaseUrl: "http://mockapi:4000/"
+      Url: "${APP_URL}"
+      EmailSettings__Email: "${EMAIL_USER}"
+      EmailSettings__Password: "${EMAIL_PASSWORD}"
+      BCCR__Token: "${BCCR_TOKEN}"
+    volumes:
+      - mapas:/app/wwwroot/mapas
+      - pdfs:/app/wwwroot/pdfs
+      - uploads:/app/wwwroot/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      mockapi:
+        condition: service_started
+
+  db:
+    image: mysql:8
+    container_name: hermesoft_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: fusion
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./Hermesoft/Hermesoft/Scripts/database_bancos.sql:/docker-entrypoint-initdb.d/database_bancos.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mockapi:
+    build:
+      context: ./Mock
+    image: hermesoft_mockapi
+    container_name: mockapi
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+
+volumes:
+  db_data:
+  mapas:
+  pdfs:
+  uploads:

@@ -20,6 +20,7 @@ namespace HermeSoft_Fusion.Repository.Servicios
             {
                 var desglose = venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente");
                 desglose.Prima.Venta = venta;
+                
                 if (desglose != null && (desglose.FechaCobro - DateTime.Today).TotalDays <= 2)
                 {
                     string mensaje = _emailService.GenerarMensajeRecordatorio(desglose);

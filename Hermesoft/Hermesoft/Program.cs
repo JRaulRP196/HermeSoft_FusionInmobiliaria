@@ -95,11 +95,28 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    var indicadoresBancariosBusiness = scope.ServiceProvider.GetRequiredService<IndicadoresBancariosBusiness>();
+    var tipoCambioBusiness = scope.ServiceProvider.GetRequiredService<TipoCambioBusiness>();
+
+    indicadoresBancariosBusiness.Editar().Wait();
+    tipoCambioBusiness.Editar().Wait();
 
     recurringJobManager.AddOrUpdate<Job>(
         "recordatorio-primas",
         job => job.EnviarRecordatorios(),
         "0 5 * * *"
+    );
+
+    recurringJobManager.AddOrUpdate<IndicadoresBancariosBusiness>(
+        "actualizar-indicadores",
+        x => x.Editar(),
+        "0 6 * * *"
+    );
+
+    recurringJobManager.AddOrUpdate<TipoCambioBusiness>(
+        "actualizar-tipo-cambio",
+        x => x.Editar(),
+        "0 6 * * *"
     );
 }
 

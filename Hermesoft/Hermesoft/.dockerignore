@@ -1,0 +1,13 @@
+bin/
+obj/
+.vs/
+*.user
+
+appsettings.Development.json
+
+wwwroot/mapas/*
+wwwroot/pdfs/*
+wwwroot/uploads/*
+!wwwroot/mapas/.gitkeep
+!wwwroot/pdfs/.gitkeep
+!wwwroot/uploads/.gitkeep
