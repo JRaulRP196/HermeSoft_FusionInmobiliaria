@@ -15,11 +15,13 @@ namespace HermeSoft_Fusion.Controllers
     {
 
         private readonly EstadisticaBusiness _estadisticaBusiness;
+        private readonly VentaBusiness _ventaBusiness;
         private readonly UsuarioBusiness _usuarioBusiness;
 
-        public EstadisticaController(EstadisticaBusiness estadisticaBusiness, UsuarioBusiness usuarioBusiness)
+        public EstadisticaController(EstadisticaBusiness estadisticaBusiness, VentaBusiness ventaBusiness, UsuarioBusiness usuarioBusiness)
         {
             _estadisticaBusiness = estadisticaBusiness;
+            _ventaBusiness = ventaBusiness;
             _usuarioBusiness = usuarioBusiness;
         }
 
@@ -31,8 +33,12 @@ namespace HermeSoft_Fusion.Controllers
 
         public async Task<IActionResult> Primas() 
         {
-            Usuario usuario = await _usuarioBusiness.ObtenerConPrimas(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
-            return View(usuario.Ventas);
+            var usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
+            if(usuario.Rol.Nombre == "Administrador")
+            {
+                return View(await _ventaBusiness.Obtener());
+            }
+            return View(await _ventaBusiness.ObtenerVentasPorUsuario(usuario.IdUsuario));
         }
 
         [HttpPost]

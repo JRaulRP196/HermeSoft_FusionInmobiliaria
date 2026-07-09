@@ -42,7 +42,7 @@
                                 <th>Cliente</th>
                                 <th>Número de contrato</th>
                                 <th>Código de Lote</th>
-                                <th>Asignado</th>
+                                <th>Asesor</th>
                                 <th>Fecha Cobro</th>
                                 <th>Monto</th>
                                 <th>Estado</th>
@@ -60,7 +60,7 @@
                                     <td>@venta.CorreoCliente</td>
                                     <td>@venta.NumContrato</td>
                                     <td>@venta.CodLote</td>
-                                    <td>@(venta.Prima != null && venta.Prima.Asignado ? "Verdadero" : "Falso")</td>
+                                    <td>@(venta.Usuario.Nombre)</td>
                                     <td>@(proximoPendiente?.FechaCobro.ToString("dd/MM/yyyy") ?? "No disponible")</td>
                                     <td>@(proximoPendiente?.Monto.ToString("N2") ?? "No disponible")</td>
                                     <td>

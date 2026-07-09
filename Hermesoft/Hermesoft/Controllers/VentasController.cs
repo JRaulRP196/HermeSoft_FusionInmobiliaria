@@ -39,7 +39,11 @@ namespace HermeSoft_Fusion.Controllers
         {
             Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
             ViewBag.Condominios = await _condominioBusiness.Obtener();
-            return View(usuario.Ventas);
+            if(usuario.Rol.Nombre == "Administrador")
+            {
+                return View(await _ventaBusiness.Obtener());
+            }
+            return View(await _ventaBusiness.ObtenerVentasPorUsuario(usuario.IdUsuario));
         }
 
         [HttpPost]

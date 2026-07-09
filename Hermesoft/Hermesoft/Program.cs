@@ -98,8 +98,15 @@ using (var scope = app.Services.CreateScope())
     var indicadoresBancariosBusiness = scope.ServiceProvider.GetRequiredService<IndicadoresBancariosBusiness>();
     var tipoCambioBusiness = scope.ServiceProvider.GetRequiredService<TipoCambioBusiness>();
 
-    indicadoresBancariosBusiness.Editar().Wait();
-    tipoCambioBusiness.Editar().Wait();
+    try
+    {
+        indicadoresBancariosBusiness.Editar().Wait();
+        tipoCambioBusiness.Editar().Wait();
+    }
+    catch
+    {
+        Console.WriteLine("Error al consultar los indicadores bancarios y el tipo de cambio");
+    }
 
     recurringJobManager.AddOrUpdate<Job>(
         "recordatorio-primas",

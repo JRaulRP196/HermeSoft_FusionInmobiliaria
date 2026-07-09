@@ -26,6 +26,7 @@ namespace HermeSoft_Fusion.Repository
             return await _context.VENTAS
                     .Include(v => v.Prima)
                         .ThenInclude(p => p.DesglosesPrimas)
+                    .Include(v => v.Usuario)
                     .ToListAsync();
         }
 
@@ -55,6 +56,16 @@ namespace HermeSoft_Fusion.Repository
                         .ThenInclude(p => p.DesglosesPrimas)
                     .Include(v => v.Usuario)
                     .FirstOrDefaultAsync(v => v.CodLote == codLote && v.Estado != "ANULADA");
+        }
+
+        public async Task<List<Venta>> ObtenerVentasPorUsuario(int idUsuario)
+        {
+            return await _context.VENTAS
+                .Include(v => v.Prima)
+                    .ThenInclude(p => p.DesglosesPrimas)
+                .Where(v => v.IdUsuario == idUsuario)
+                .ToListAsync();
+
         }
 
         #endregion

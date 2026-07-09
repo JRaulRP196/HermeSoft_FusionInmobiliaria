@@ -183,6 +183,11 @@ namespace HermeSoft_Fusion.Business
             return await _ventaRepository.ObtenerPorLote(codLote);
         }
 
+        public async Task<List<Venta>> ObtenerVentasPorUsuario(int idUsuario)
+        {
+            return await _ventaRepository.ObtenerVentasPorUsuario(idUsuario);
+        }
+
         #endregion
 
     }
