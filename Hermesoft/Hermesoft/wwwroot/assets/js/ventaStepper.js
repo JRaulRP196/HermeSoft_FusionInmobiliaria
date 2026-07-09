@@ -9,6 +9,22 @@
     maximumFractionDigits: 2,
   });
 
+    function desactivarEscenario() {
+        $("#escenario")
+            .prop("disabled", true)
+            .empty()
+            .append('<option value="" selected hidden>Seleccione escenario</option>');
+    }
+
+    function desactivarTipoAsalariado() {
+        $("#tipoAsalariado")
+            .prop("disabled", true)
+            .empty()
+            .append(
+                '<option value="" selected hidden>Seleccione un tipo de asalariado</option>',
+            );
+    }
+
   function formatearNumero(valor) {
     const numero = Number(valor);
     if (Number.isNaN(numero)) return "";
@@ -18,17 +34,9 @@
   $("#banco").on("change", function () {
     var idBanco = this.value;
 
-    $("#escenario")
-      .prop("disabled", true)
-      .empty()
-      .append('<option value="" selected hidden>Seleccione escenario</option>');
+      desactivarEscenario();
+      desactivarTipoAsalariado();
 
-    $("#tipoAsalariado")
-      .prop("disabled", true)
-      .empty()
-      .append(
-        '<option value="" selected hidden>Seleccione un tipo de asalariado</option>',
-      );
 
     cuotaAlta = 0;
     cuotasOriginales = [];
@@ -126,10 +134,9 @@
 
     if (!idEscenario || !codigoLote) {
       return;
-    }
-
-    $.get(
-      "/Calculos/CalcularCuotasBancariaJS",
+      }
+      
+    $.get("/Calculos/CalcularCuotasBancariaJS",
       {
         idEscenario: idEscenario,
         codigoLote: codigoLote,
@@ -138,8 +145,8 @@
         cuotaAlta = 0;
         cuotasOriginales = data;
         renderCuotas();
-
         $("#tipoAsalariado").prop("disabled", false);
+          $("#tipoAsalariado").val("");
         calcularGastoFormalizacion();
       },
     ).fail(function (xhr) {
