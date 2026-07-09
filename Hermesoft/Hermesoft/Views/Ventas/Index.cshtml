@@ -3,6 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @model List<HermeSoft_Fusion.Models.Venta>
+@using System.Security.Claims
 
 @{
     var condominios = ViewBag.Condominios as List<HermeSoft_Fusion.Models.Servicios.Condominio>;
@@ -122,7 +123,7 @@
 
                                         @if (venta.Estado != "ANULADA")
                                         {
-                                            @if (venta.Estado != "TERMINADO")
+                                            @if (venta.Estado != "TERMINADO" && User.IsInRole("Administrador"))
                                             {
                                                 <button class="btn btn-danger w-100 w-md-auto"
                                                         data-numContrato="@venta.NumContrato"

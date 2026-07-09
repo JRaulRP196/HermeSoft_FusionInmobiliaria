@@ -196,6 +196,12 @@ namespace HermeSoft_Fusion.Controllers
         {
             try
             {
+                Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
+                if (usuario == null || usuario.Rol.Nombre != "Administrador")
+                {
+                    TempData["MensajeErrorEmail"] = "No puedes hacer esta acción";
+                    return RedirectToAction("Index"); ;
+                }
                 var venta = await _ventaBusiness.AnularVenta(numContrato, motivo);
                 if (venta == null)
                 {
