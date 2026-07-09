@@ -143,7 +143,13 @@ namespace HermeSoft_Fusion.Business
             if (endeudamientoMaximo == null) throw new Exception("Endeudamiento máximo inválido");
             if (cuotaMensual <= 0) throw new Exception("Cuota mensual no calculada");
 
-            return cuotaMensual / (endeudamientoMaximo.PorcEndeudamiento * 0.01m);
+            var ingresoNetoFamiliar = cuotaMensual / (endeudamientoMaximo.PorcEndeudamiento * 0.01m);
+
+            if(ingresoNetoFamiliar < 400000)
+            {
+                return 400000;
+            }
+            return ingresoNetoFamiliar;
         }
 
         public async Task<double?> ObtenerCambioDelDolar()
