@@ -70,18 +70,19 @@ namespace HermeSoft_Fusion.Business
             if (meses <= 0)
                 throw new Exception("El rango de fechas no genera meses válidos");
 
-            decimal montoMensual = prima.Total / meses;
+            decimal montoMensual = (prima.Total - 300000) / meses;
 
             var desglosePrima = new List<DesglosesPrimas>();
 
-            for (int i = 1; i <= meses; i++)
+            for (int i = 0; i <= meses; i++)
             {
                 desglosePrima.Add(new DesglosesPrimas
                 {
                     FechaCobro = prima.FechaInicio.AddMonths(i),
-                    Monto = montoMensual,
-                    Estado = "Pendiente",
-                    Prima = prima
+                    Monto = i == 0 ? 300000 :  montoMensual,
+                    Estado = i == 0 ? "Terminado" : "Pendiente",
+                    Prima = prima,
+                    FechaPagado = i == 0 ? DateTime.Today : (DateTime?)null
                 });
             }
 
