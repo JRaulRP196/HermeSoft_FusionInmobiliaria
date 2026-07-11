@@ -57,10 +57,15 @@
                 const fila = document.createElement("div");
                 fila.className = "d-flex justify-content-between align-items-center mb-2 p-2 rounded-3 bg-light";
 
-                fila.innerHTML = `
-                            <span class="text-muted small">${item.label}</span>
-                            <span class="fw-semibold">${item.valor}</span>
-                        `;
+                const valorFormateado = !isNaN(item.valor) && item.valor !== null && item.valor !== ""
+                    ? Number(item.valor).toLocaleString("es-CR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
+                    : item.valor;
+
+                fila.innerHTML = `<span class="text-muted small">${item.label}</span>
+                                  <span class="fw-semibold">${valorFormateado}</span>`;
 
                 bloque.appendChild(fila);
             });
