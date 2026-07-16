@@ -2,11 +2,12 @@
 using HermeSoft_Fusion.Business.Usuarios;
 using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Usuarios;
+using HermeSoft_Fusion.Models.ViewModels;
 using HermeSoft_Fusion.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using HermeSoft_Fusion.Models.ViewModels;
+using static QuestPDF.Helpers.Colors;
 
 namespace HermeSoft_Fusion.Controllers
 {
@@ -35,23 +36,49 @@ namespace HermeSoft_Fusion.Controllers
             _condominioBusiness = condominioBusiness;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pagina = 1)
         {
-            Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
-            ViewBag.Condominios = await _condominioBusiness.Obtener();
-            if(usuario.Rol.Nombre == "Administrador")
+            if(ViewBag.Condominios == null)
             {
-                return View(await _ventaBusiness.Obtener());
+                ViewBag.Condominios = await _condominioBusiness.Obtener();
+
             }
-            return View(await _ventaBusiness.ObtenerVentasPorUsuario(usuario.IdUsuario));
+
+            Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
+            const int tamanio = 10;
+
+            int totalRegistros = await _ventaBusiness.ObtenerTotalVentas(usuario);
+            int totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamanio);
+
+            var ventas = await _ventaBusiness.ObtenerPaginado(pagina, tamanio, usuario);
+
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = totalPaginas;
+
+            return View(ventas);
         }
 
+
+
         [HttpPost]
-        public async Task<IActionResult> Index(DateTime filterDesde, DateTime filterHasta, string filterCondominio)
+        public async Task<IActionResult> Index(DateTime filterDesde, DateTime filterHasta, string filterCondominio, int pagina = 1)
         {
+            if (ViewBag.Condominios == null)
+            {
+                ViewBag.Condominios = await _condominioBusiness.Obtener();
+            }
             Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
-            ViewBag.Condominios = await _condominioBusiness.Obtener();
-            return View(await _ventaBusiness.Filtro(usuario.Ventas, filterDesde, filterHasta, filterCondominio));
+            const int tamanio = 10;
+
+            int totalRegistros = await _ventaBusiness.ContarVentasFiltradas(filterDesde, filterHasta, filterCondominio, usuario);
+            int totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamanio);
+
+            var ventas = await _ventaBusiness.ObtenerFiltradoPaginado(filterDesde, filterHasta, filterCondominio, pagina, tamanio, usuario);
+
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = totalPaginas;
+
+            return View(ventas);
         }
 
         public async Task<IActionResult> StepperRegistro(string lote, string cliente) //Q

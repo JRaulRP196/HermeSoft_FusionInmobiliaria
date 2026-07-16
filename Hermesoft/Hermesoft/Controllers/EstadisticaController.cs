@@ -31,14 +31,21 @@ namespace HermeSoft_Fusion.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Primas() 
+        public async Task<IActionResult> Primas(int pagina = 1) 
         {
-            var usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
-            if(usuario.Rol.Nombre == "Administrador")
-            {
-                return View(await _ventaBusiness.Obtener());
-            }
-            return View(await _ventaBusiness.ObtenerVentasPorUsuario(usuario.IdUsuario));
+            Usuario usuario = await _usuarioBusiness.Obtener(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value);
+            const int tamanio = 10;
+
+            var ventas = await _ventaBusiness.ObtenerVentasEnProcesoPaginado(pagina, tamanio, usuario);
+
+            int totalRegistros = ventas.Count();
+            int totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamanio);
+
+
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = totalPaginas;
+
+            return View(ventas);
         }
 
         [HttpPost]
@@ -191,7 +198,7 @@ namespace HermeSoft_Fusion.Controllers
         #region js
 
         [HttpGet]
-        public async Task<IActionResult> PagosPorCondominio(string condominio, DateTime fechaInicio, DateTime fechaFinal)
+        public async Task<IActionResult> PagosPorCondominio(string? condominio, DateTime? fechaInicio, DateTime? fechaFinal)
         {
             try
             {

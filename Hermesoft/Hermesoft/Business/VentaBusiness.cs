@@ -1,8 +1,11 @@
 ﻿using HermeSoft_Fusion.Business.Usuarios;
 using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Models;
+using HermeSoft_Fusion.Models.Usuarios;
+using HermeSoft_Fusion.Models.ViewModels;
 using HermeSoft_Fusion.Repository;
 using HermeSoft_Fusion.Repository.Servicios;
+using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
 
 namespace HermeSoft_Fusion.Business
@@ -149,28 +152,43 @@ namespace HermeSoft_Fusion.Business
             return venta.MotivoNulidad;
         }
 
-        public async Task<List<Venta>> Filtro(List<Venta> ventas, DateTime fechaInicio, DateTime fechaCierre, string condominio)
-        {
-            List<Venta> ventasFiltradas = new List<Venta>();
-            if (condominio != null)
-            {
-                var loteCondominio = await _loteBusiness.ObtenerPorCondominio(condominio);
-                ventasFiltradas = ventas.Where(v => loteCondominio.Any(l => l.Codigo == v.CodLote)).ToList();
-            }
-
-            if (fechaCierre != DateTime.MinValue && fechaInicio != DateTime.MinValue && ventasFiltradas.Any())
-            {
-                ventasFiltradas = ventasFiltradas.Where(v => v.FechaDeRegistro >= fechaInicio && v.FechaDeRegistro <= fechaCierre).ToList();
-            }else if (fechaCierre != DateTime.MinValue && fechaInicio != DateTime.MinValue)
-            {
-                ventasFiltradas = ventas.Where(v => v.FechaDeRegistro >= fechaInicio && v.FechaDeRegistro <= fechaCierre).ToList();
-            }
-            return ventasFiltradas;
-        }
-
         public async Task<List<Venta>> Obtener()
         {
             return await _ventaRepository.Obtener();
+        }
+
+        public async Task<List<Venta>> ObtenerPaginado(int pagina, int tamanio, Usuario usuario)
+        { 
+        
+            return await _ventaRepository.ObtenerPaginado(pagina, tamanio, usuario);
+
+        }
+
+        public async Task<List<Venta>> ObtenerFiltradoPaginado(
+                            DateTime? fechaInicio,
+                            DateTime? fechaFin,
+                            string? condominio,
+                            int pagina,
+                            int tamanio,
+                            Usuario usuario)
+        { 
+        
+            return await _ventaRepository.ObtenerFiltradoPaginado(fechaInicio, fechaFin, condominio, pagina, tamanio, usuario);
+
+        }
+
+        public async Task<int> ContarVentasFiltradas(
+                                DateTime? fechaInicio,
+                                DateTime? fechaFin,
+                                string? condominio,
+                                Usuario usuario)
+        {
+            return await _ventaRepository.ContarVentasFiltradas(fechaInicio, fechaFin, condominio, usuario);
+        }
+
+        public async Task<int> ObtenerTotalVentas(Usuario usuario)
+        {
+            return await _ventaRepository.ObtenerTotalVentas(usuario);
         }
 
         public async Task<Venta> Obtener(int numContrato)
@@ -186,6 +204,16 @@ namespace HermeSoft_Fusion.Business
         public async Task<List<Venta>> ObtenerVentasPorUsuario(int idUsuario)
         {
             return await _ventaRepository.ObtenerVentasPorUsuario(idUsuario);
+        }
+
+        public async Task<PagoCondominioViewModel> ObtenerPagosPorCondominio(string? condominio, DateTime? fechaInicio, DateTime? fechaFinal)
+        {
+            return await _ventaRepository.ObtenerPagosPorCondominio(condominio, fechaInicio, fechaFinal);
+        }
+
+        public async Task<List<Venta>> ObtenerVentasEnProcesoPaginado(int pagina, int tamanio, Usuario usuario)
+        {
+            return await _ventaRepository.ObtenerVentasEnProcesoPaginado(pagina, tamanio, usuario);
         }
 
         #endregion

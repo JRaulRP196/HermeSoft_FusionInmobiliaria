@@ -7,16 +7,13 @@
 
 @{
     var condominios = ViewBag.Condominios as List<HermeSoft_Fusion.Models.Servicios.Condominio>;
+    int paginaActual = ViewBag.PaginaActual;
+    int totalPaginas = ViewBag.TotalPaginas;
+
+    int inicio = Math.Max(1, paginaActual - 2);
+    int fin = Math.Min(totalPaginas, paginaActual + 2);
 }
 
-@section styles {
-
-    <!-- DataTables -->
-    <link href="~/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
-    <link href="~/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" />
-    <link href="~/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" />
-
-}
 
 <div class="container-fluid py-3 py-md-4">
 
@@ -164,6 +161,71 @@
             </table>
         </div>
 
+        <nav>
+            <ul class="pagination justify-content-end">
+
+                <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-pagina="@(paginaActual - 1)">
+                        Anterior
+                    </a>
+                </li>
+
+                @if (inicio > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-route-pagina="1">1</a>
+                    </li>
+
+                    @if (inicio > 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+
+                @for (int i = inicio; i <= fin; i++)
+                {
+                    <li class="page-item @(i == paginaActual ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-pagina="@i">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                @if (fin < totalPaginas)
+                {
+                    @if (fin < totalPaginas - 1)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-pagina="@totalPaginas">
+                            @totalPaginas
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-pagina="@(paginaActual + 1)">
+                        Siguiente
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
     </div>
 </div>
 
@@ -250,16 +312,6 @@
 
 
 @section Scripts {
-    <!-- DataTables -->
-    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="~/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
-
-    <!-- Responsive -->
-    <script src="~/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="~/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
-
-
-
     <script>
 
         async function GenerarComprobante(numContrato){
@@ -292,16 +344,6 @@
             document.getElementById("motivoNulidad").value = data;
         });
 
-        $(document).ready(function () {
-
-            $('#key-datatable').DataTable({
-                responsive: true,
-                autoWidth: false,
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
-                }
-            });
-
-        });
+       
     </script>
 }

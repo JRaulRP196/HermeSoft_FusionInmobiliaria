@@ -5,25 +5,15 @@
     ViewBag.Title = "Estadísticas";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var ventasConPagosPendientes = Model?
-        .Where(v => v.Prima != null
-                 && v.Prima.DesglosesPrimas != null
-                 && v.Prima.DesglosesPrimas.Any(d => d.Estado == "Pendiente")
-                 && v.Estado == "EN PROCESO")
-        .ToList() ?? new List<Venta>();
+    var ventasConPagosPendientes = Model;
+
+    int paginaActual = ViewBag.PaginaActual;
+    int totalPaginas = ViewBag.TotalPaginas;
+
+    int inicio = Math.Max(1, paginaActual - 2);
+    int fin = Math.Min(totalPaginas, paginaActual + 2);
 }
 
-@section styles {
-
-    <!-- DataTables -->
-    <link href="~/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/assets/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-
-    <!-- Responsive datatable examples -->
-    <link href="~/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-
-}
 
 <div class="row">
     <div class="col-12">
@@ -81,6 +71,70 @@
                             }
                         </tbody>
                     </table>
+                    <nav>
+                        <ul class="pagination justify-content-end">
+
+                            <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-action="Primas"
+                                   asp-route-pagina="@(paginaActual - 1)">
+                                    Anterior
+                                </a>
+                            </li>
+
+                            @if (inicio > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-route-pagina="1">1</a>
+                                </li>
+
+                                @if (inicio > 2)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+                            }
+
+                            @for (int i = inicio; i <= fin; i++)
+                            {
+                                <li class="page-item @(i == paginaActual ? "active" : "")">
+                                    <a class="page-link"
+                                       asp-action="Primas"
+                                       asp-route-pagina="@i">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            @if (fin < totalPaginas)
+                            {
+                                @if (fin < totalPaginas - 1)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       asp-action="Primas"
+                                       asp-route-pagina="@totalPaginas">
+                                        @totalPaginas
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-action="Primas"
+                                   asp-route-pagina="@(paginaActual + 1)">
+                                    Siguiente
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
                 }
                 else
                 {
@@ -114,8 +168,6 @@
     <script src="~/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
     <script src="~/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
 
-    <!-- Datatable init js -->
-    <script src="~/assets/js/pages/datatables.init.js"></script>
 
     <script src="~/assets/js/app.js"></script>
 }
