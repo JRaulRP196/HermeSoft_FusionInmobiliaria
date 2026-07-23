@@ -116,8 +116,9 @@
         comisionBancaria: comisionBancaria,
         codLote: codLote,
       },
-      function (data) {
-        gastoFormalizacionOriginal = data;
+        function (data) {
+        $("#porcFormalizacion").val(data.porcentaje);
+        gastoFormalizacionOriginal = data.monto;
         renderFormalizacion();
       },
     ).fail(function (xhr) {

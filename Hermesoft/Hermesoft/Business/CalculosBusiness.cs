@@ -1,6 +1,7 @@
 ﻿using HermeSoft_Fusion.Models;
 using HermeSoft_Fusion.Models.Banco;
 using HermeSoft_Fusion.Models.Servicios;
+using HermeSoft_Fusion.Models.ViewModels;
 using HermeSoft_Fusion.Repository;
 using HermeSoft_Fusion.Repository.Servicios;
 using System.Globalization;
@@ -119,7 +120,7 @@ namespace HermeSoft_Fusion.Business
             return cuotas;
         }
 
-        public async Task<decimal> CalcularGastoFormalizacion(decimal seguroVida, decimal seguroDesempleo, decimal honorarioAbogados, 
+        public async Task<GastoFormalizacionViewModel> CalcularGastoFormalizacion(decimal seguroVida, decimal seguroDesempleo, decimal honorarioAbogados, 
             decimal comisionBancaria, string codLote)
         {
 
@@ -129,11 +130,14 @@ namespace HermeSoft_Fusion.Business
             var lote = await _loteRepository.Obtener(codLote);
             var montoHonorarioAbogados = lote.PrecioVenta * (honorarioAbogados * 0.01m);
             montoHonorarioAbogados = montoHonorarioAbogados + (montoHonorarioAbogados * (decimal.Parse(_configuracion.ObtenerValor("IVA")) * 0.01m));
-            // var porcentajeExtra = seguroVida + seguroDesempleo + comisionBancaria + decimal.Parse(_configuracion.ObtenerValor("TimbreFiscal")); //Q Borrar debugging
             var timbreFiscal = decimal.Parse(_configuracion.ObtenerValor("TimbreFiscal"), CultureInfo.InvariantCulture);
             var porcentajeExtra = seguroVida + seguroDesempleo + comisionBancaria + timbreFiscal;
             var montoExtra = lote.PrecioVenta * (porcentajeExtra * 0.01m);
-            return montoHonorarioAbogados + montoExtra;
+            return new GastoFormalizacionViewModel
+            {
+                Monto = montoHonorarioAbogados + montoExtra,
+                Porcentaje = porcentajeExtra + honorarioAbogados
+            };
         }
 
         public async Task<decimal> CalcularIngresoNetoFamiliar(int idBanco, int idEndeudamiento, decimal cuotaMensual)
