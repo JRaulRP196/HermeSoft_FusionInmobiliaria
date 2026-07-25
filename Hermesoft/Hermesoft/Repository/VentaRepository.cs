@@ -200,10 +200,13 @@ namespace HermeSoft_Fusion.Repository
             }
 
             if (fechaInicio.HasValue && fechaInicio.Value != DateTime.MinValue)
-                consulta = consulta.Where(v => v.FechaDeRegistro >= fechaInicio);
+                consulta = consulta.Where(v => v.FechaDeRegistro >= fechaInicio.Value.Date);
 
             if (fechaFinal.HasValue && fechaFinal.Value != DateTime.MinValue)
-                consulta = consulta.Where(v => v.FechaDeRegistro <= fechaFinal);
+            {
+                var limiteExclusivo = fechaFinal.Value.Date.AddDays(1);
+                consulta = consulta.Where(v => v.FechaDeRegistro < limiteExclusivo);
+            }
 
             PagoCondominioViewModel resultado = new PagoCondominioViewModel
             {

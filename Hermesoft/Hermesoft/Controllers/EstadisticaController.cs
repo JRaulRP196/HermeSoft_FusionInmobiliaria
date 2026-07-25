@@ -200,6 +200,24 @@ namespace HermeSoft_Fusion.Controllers
         [HttpGet]
         public async Task<IActionResult> PagosPorCondominio(string? condominio, DateTime? fechaInicio, DateTime? fechaFinal)
         {
+            if (fechaInicio.HasValue != fechaFinal.HasValue)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Debe indicar las fechas Desde y Hasta."
+                });
+            }
+
+            if (fechaInicio.HasValue && fechaFinal.HasValue && fechaInicio.Value.Date > fechaFinal.Value.Date)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "La fecha Desde no puede ser posterior a la fecha Hasta."
+                });
+            }
+
             try
             {
                 var resultado = await _estadisticaBusiness.PagosPorCondominio(condominio, fechaInicio, fechaFinal);
@@ -207,7 +225,7 @@ namespace HermeSoft_Fusion.Controllers
             }
             catch (Exception e)
             {
-                return Json(new
+                return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     success = false,
                     message = e.Message

@@ -19,37 +19,91 @@
         let fechaInicio = $("#fechaInicio").val();
         let fechaFinal = $("#fechaFinal").val();
 
-        const response = await fetch('/Condominio/Obtener');
-        const data = await response.json();
+        ocultarMensajeFiltro();
 
-        for (let i = 0; i < data.length; i++) {
-
-            const res = await fetch(`/Estadistica/PagosPorCondominio?condominio=${data[i].id}&fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
-            const datos = await res.json();
-
-            if (datos.pagados > 0 || datos.pendientes > 0 || datos.atrasados > 0) {
-                categorias.push(data[i].nombre);
-                pagados.push(datos.pagados);
-                pendientes.push(datos.pendientes);
-                atrasados.push(datos.atrasados);
-            }
-        }
-
-        if (categorias.length === 0) {
-            $("#opciones").addClass("d-none");
-            mostrarMensajeSinDatos();
-            cargarKpis();
+        const errorFechas = validarRangoFechas(fechaInicio, fechaFinal);
+        if (errorFechas) {
+            limpiarResultados();
+            mostrarMensajeFiltro(errorFechas);
             return;
         }
-        $("#opciones").removeClass("d-none");
-        cargarKpis();
-        crearGrafico();
+
+        try {
+            const response = await fetch('/Condominio/Obtener');
+            if (!response.ok) {
+                throw new Error("No fue posible cargar los condominios.");
+            }
+            const data = await response.json();
+
+            for (let i = 0; i < data.length; i++) {
+
+                const parametros = new URLSearchParams({ condominio: data[i].id });
+                if (fechaInicio) parametros.set("fechaInicio", fechaInicio);
+                if (fechaFinal) parametros.set("fechaFinal", fechaFinal);
+
+                const res = await fetch(`/Estadistica/PagosPorCondominio?${parametros}`);
+                const datos = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(datos.message || "No fue posible aplicar el filtro.");
+                }
+
+                if (datos.pagados > 0 || datos.pendientes > 0 || datos.atrasados > 0) {
+                    categorias.push(data[i].nombre);
+                    pagados.push(datos.pagados);
+                    pendientes.push(datos.pendientes);
+                    atrasados.push(datos.atrasados);
+                }
+            }
+
+            if (categorias.length === 0) {
+                $("#opciones").addClass("d-none");
+                mostrarMensajeSinDatos();
+                cargarKpis();
+                return;
+            }
+            $("#opciones").removeClass("d-none");
+            cargarKpis();
+            crearGrafico();
+        } catch (error) {
+            limpiarResultados();
+            mostrarMensajeFiltro(error.message || "Ocurrió un error al cargar la estadística.");
+        }
     }
 
     $("#filtro").on("click", function (e) {
         e.preventDefault();
         cargarDatos();
     });
+
+    function validarRangoFechas(fechaInicio, fechaFinal) {
+        if (!fechaInicio && !fechaFinal) return null;
+        if (!fechaInicio || !fechaFinal) {
+            return "Debe seleccionar las fechas Desde y Hasta.";
+        }
+        if (fechaInicio > fechaFinal) {
+            return "La fecha Desde no puede ser posterior a la fecha Hasta.";
+        }
+        return null;
+    }
+
+    function mostrarMensajeFiltro(mensaje) {
+        $("#mensajeFiltro").text(mensaje).removeClass("d-none");
+    }
+
+    function ocultarMensajeFiltro() {
+        $("#mensajeFiltro").addClass("d-none").text("");
+    }
+
+    function limpiarResultados() {
+        if (chart) {
+            chart.destroy();
+            chart = null;
+        }
+        document.querySelector("#column_stacked").innerHTML = "";
+        $("#opciones").addClass("d-none");
+        cargarKpis();
+    }
 
     function cargarKpis() {
 

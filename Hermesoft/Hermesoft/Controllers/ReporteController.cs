@@ -18,6 +18,13 @@ namespace HermeSoft_Fusion.Controllers
         [HttpPost]
         public IActionResult GenerarPdf([FromBody] PdfRequestMap request)
         {
+            if (request.Desde.HasValue != request.Hasta.HasValue ||
+                (request.Desde.HasValue && request.Hasta.HasValue &&
+                 request.Desde.Value.Date > request.Hasta.Value.Date))
+            {
+                return BadRequest("El rango de fechas indicado no es válido.");
+            }
+
             var base64Data = request.ImagenBase64.Split(',')[1];
             var imageBytes = Convert.FromBase64String(base64Data);
 
@@ -97,6 +104,12 @@ namespace HermeSoft_Fusion.Controllers
 
                                 c.Item().Text($"Tipo de reporte: {request.TipoReporte}")
                                     .FontSize(11);
+
+                                if (request.Desde.HasValue && request.Hasta.HasValue)
+                                {
+                                    c.Item().Text($"Rango: {request.Desde.Value:dd/MM/yyyy} - {request.Hasta.Value:dd/MM/yyyy}")
+                                        .FontSize(11);
+                                }
                             });
 
                         col.Item().Background("#FFFFFF")

@@ -92,6 +92,17 @@
     }
 
     function aplicarFiltro(tipo) {
+        ocultarMensajeFiltro();
+
+        if (tipo === "Ventas_Rango") {
+            const error = validarRangoFechas();
+            if (error) {
+                markers.forEach((m) => map.removeLayer(m));
+                mostrarMensajeFiltro(error);
+                return false;
+            }
+        }
+
         markers.forEach((m) => {
             map.removeLayer(m);
         });
@@ -104,9 +115,25 @@
             markers
                 .filter((m) => esDelMesActual(m.fechaVenta) && m.vendido)
                 .forEach((m) => map.addLayer(m));
+        } else if (tipo === "Ventas_Rango") {
+            const desde = crearFechaLocal(document.getElementById("fechaInicio").value);
+            const hasta = crearFechaLocal(document.getElementById("fechaFinal").value);
+            hasta.setHours(23, 59, 59, 999);
+
+            markers
+                .filter((m) => {
+                    if (!m.vendido || !m.fechaVenta) return false;
+                    const fechaVenta = new Date(m.fechaVenta);
+                    return !Number.isNaN(fechaVenta.getTime()) &&
+                        fechaVenta >= desde &&
+                        fechaVenta <= hasta;
+                })
+                .forEach((m) => map.addLayer(m));
         } else {
             markers.forEach((m) => map.addLayer(m));
         }
+
+        return true;
     }
 
     function cargarFiltro() {
@@ -117,8 +144,49 @@
     }
 
     document.getElementById("filtro").addEventListener("change", function () {
+        const usaRango = this.value === "Ventas_Rango";
+        document.getElementById("rangoFechas").classList.toggle("d-none", !usaRango);
         aplicarFiltro(this.value);
     });
+
+    document.getElementById("fechaInicio").addEventListener("change", aplicarRangoSiCorresponde);
+    document.getElementById("fechaFinal").addEventListener("change", aplicarRangoSiCorresponde);
+
+    function aplicarRangoSiCorresponde() {
+        if (document.getElementById("filtro").value === "Ventas_Rango") {
+            aplicarFiltro("Ventas_Rango");
+        }
+    }
+
+    function crearFechaLocal(valor) {
+        const [anio, mes, dia] = valor.split("-").map(Number);
+        return new Date(anio, mes - 1, dia);
+    }
+
+    function validarRangoFechas() {
+        const fechaInicio = document.getElementById("fechaInicio").value;
+        const fechaFinal = document.getElementById("fechaFinal").value;
+
+        if (!fechaInicio || !fechaFinal) {
+            return "Debe seleccionar las fechas Desde y Hasta.";
+        }
+        if (fechaInicio > fechaFinal) {
+            return "La fecha Desde no puede ser posterior a la fecha Hasta.";
+        }
+        return null;
+    }
+
+    function mostrarMensajeFiltro(mensaje) {
+        const contenedor = document.getElementById("mensajeFiltro");
+        contenedor.textContent = mensaje;
+        contenedor.classList.remove("d-none");
+    }
+
+    function ocultarMensajeFiltro() {
+        const contenedor = document.getElementById("mensajeFiltro");
+        contenedor.textContent = "";
+        contenedor.classList.add("d-none");
+    }
 
     // ========= SLIDER / SELECTOR DE MAPAS ============
 
@@ -368,6 +436,7 @@
                     const select = document.getElementById("filtro");
                     const tipoReporte = select.options[select.selectedIndex].text;
                     const condominio = document.getElementById("nombreCondominio").textContent;
+                    const usaRango = select.value === "Ventas_Rango";
 
                     fetch("/Reporte/GenerarPdf", {
                         method: "POST",
@@ -377,17 +446,25 @@
                         body: JSON.stringify({
                             imagenBase64: finalImg,
                             condominio: condominio,
-                            tipoReporte: tipoReporte
+                            tipoReporte: tipoReporte,
+                            desde: usaRango ? document.getElementById("fechaInicio").value : null,
+                            hasta: usaRango ? document.getElementById("fechaFinal").value : null
                         })
                     })
-                        .then(res => res.blob())
+                        .then(res => {
+                            if (!res.ok) {
+                                throw new Error("No fue posible generar el reporte.");
+                            }
+                            return res.blob();
+                        })
                         .then(blob => {
                             const url = window.URL.createObjectURL(blob);
                             const a = document.createElement("a");
                             a.href = url;
                             a.download = "reporte.pdf";
                             a.click();
-                        });
+                        })
+                        .catch(error => mostrarMensajeFiltro(error.message));
                 };
 
             });
@@ -396,6 +473,10 @@
     }
 
     $("#btnDescargar").on("click", function () {
+        const filtro = document.getElementById("filtro").value;
+        if (!aplicarFiltro(filtro)) {
+            return;
+        }
         capturarMapa();
     });
 
