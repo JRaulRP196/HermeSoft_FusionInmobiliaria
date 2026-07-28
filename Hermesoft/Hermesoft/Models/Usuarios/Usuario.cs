@@ -23,15 +23,13 @@ namespace HermeSoft_Fusion.Models.Usuarios
         [RegularExpression(@"(?i)^[^@\s]+@fusioninmobiliariacr\.com$", ErrorMessage = "El correo debe pertenecer al dominio @fusioninmobiliariacr.com")]
         [StringLength(70)]
         public string Correo { get; set; }
-        [Required]
         [StringLength(300)]
-        public string Password { get; set; }
+        public string? Password { get; set; }
         [Required]
         public bool Estado { get; set; }
-        [Required]
         public int IdRol { get; set; }
         [ForeignKey("IdRol")]
-        public Rol Rol { get; set; }
+        public Rol? Rol { get; set; }
         public List<RecuperacionPassword> Recuperaciones { get; set; } = new();
         public List<Venta> Ventas { get; set; } = new();
     }
