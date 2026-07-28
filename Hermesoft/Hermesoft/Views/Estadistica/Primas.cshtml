@@ -52,7 +52,7 @@
                                     <td>@venta.CodLote</td>
                                     <td>@(venta.Usuario.Nombre)</td>
                                     <td>@(proximoPendiente?.FechaCobro.ToString("dd/MM/yyyy") ?? "No disponible")</td>
-                                    <td>@(proximoPendiente?.Monto.ToString("N2") ?? "No disponible")</td>
+                                    <td>@(proximoPendiente != null ? $"₡{proximoPendiente.Monto:N2}" : "No disponible")</td>
                                     <td>
                                         <span class="badge bg-warning rounded-pill px-3 py-2 me-2">
                                             @(proximoPendiente?.Estado ?? "No disponible")
@@ -60,10 +60,10 @@
                                     </td>
                                     <td>
                                         <a asp-controller="Prima"
-                                               asp-action="Detalle"
-                                               asp-route-idPrima="@venta.Prima?.IdPrima"
-                                               class="btn btn-outline-primary btn-sm"
-                                               title="Ver detalle">
+                                           asp-action="Detalle"
+                                           asp-route-idPrima="@venta.Prima?.IdPrima"
+                                           class="btn btn-outline-primary btn-sm"
+                                           title="Ver detalle">
                                             <i class="fas fa-book-open"></i> Detalle
                                         </a>
                                     </td>

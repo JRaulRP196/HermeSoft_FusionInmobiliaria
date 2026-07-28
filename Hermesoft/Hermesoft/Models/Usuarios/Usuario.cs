@@ -8,7 +8,7 @@ namespace HermeSoft_Fusion.Models.Usuarios
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IdUsuario {  get; set; }
+        public int IdUsuario { get; set; }
         [Required]
         [StringLength(50)]
         public string Nombre { get; set; }
@@ -20,6 +20,7 @@ namespace HermeSoft_Fusion.Models.Usuarios
         public string Apellido2 { get; set; }
         [Required]
         [EmailAddress]
+        [RegularExpression(@"(?i)^[^@\s]+@fusioninmobiliariacr\.com$", ErrorMessage = "El correo debe pertenecer al dominio @fusioninmobiliariacr.com")]
         [StringLength(70)]
         public string Correo { get; set; }
         [Required]
@@ -28,10 +29,10 @@ namespace HermeSoft_Fusion.Models.Usuarios
         [Required]
         public bool Estado { get; set; }
         [Required]
-        public int IdRol {  get; set; }
+        public int IdRol { get; set; }
         [ForeignKey("IdRol")]
         public Rol Rol { get; set; }
-        public List<RecuperacionPassword> Recuperaciones { get; set; } = new ();
-        public List<Venta> Ventas { get; set; } = new ();
+        public List<RecuperacionPassword> Recuperaciones { get; set; } = new();
+        public List<Venta> Ventas { get; set; } = new();
     }
 }
