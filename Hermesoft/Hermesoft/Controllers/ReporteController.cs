@@ -18,6 +18,7 @@ namespace HermeSoft_Fusion.Controllers
         [HttpPost]
         public IActionResult GenerarPdf([FromBody] PdfRequestMap request)
         {
+
             var base64Data = request.ImagenBase64.Split(',')[1];
             var imageBytes = Convert.FromBase64String(base64Data);
 
@@ -97,6 +98,12 @@ namespace HermeSoft_Fusion.Controllers
 
                                 c.Item().Text($"Tipo de reporte: {request.TipoReporte}")
                                     .FontSize(11);
+
+                                if (request.Desde.HasValue && request.Hasta.HasValue)
+                                {
+                                    c.Item().Text($"Rango: {request.Desde.Value:dd/MM/yyyy} - {request.Hasta.Value:dd/MM/yyyy}")
+                                        .FontSize(11);
+                                }
                             });
 
                         col.Item().Background("#FFFFFF")

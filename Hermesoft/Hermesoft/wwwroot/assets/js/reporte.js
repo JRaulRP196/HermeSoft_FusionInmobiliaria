@@ -9,6 +9,7 @@
         minZoom: -2,
     });
 
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         crossOrigin: true
     }).addTo(map);
@@ -91,7 +92,15 @@
         return marker;
     }
 
+    function RangoFechasCorrecto(fechaInicio, fechaFinal) {
+        if (fechaInicio && fechaFinal) {
+            return fechaInicio <= fechaFinal;
+        }
+        return false;
+    }
+
     function aplicarFiltro(tipo) {
+
         markers.forEach((m) => {
             map.removeLayer(m);
         });
@@ -102,11 +111,12 @@
                 .forEach((m) => map.addLayer(m));
         } else if (tipo === "Ventas_Mes") {
             markers
-                .filter((m) => esDelMesActual(m.fechaVenta) && m.vendido)
+                .filter((m) => estaEntreFechas(m.fechaVenta) && m.vendido)
                 .forEach((m) => map.addLayer(m));
         } else {
             markers.forEach((m) => map.addLayer(m));
         }
+
     }
 
     function cargarFiltro() {
@@ -117,7 +127,48 @@
     }
 
     document.getElementById("filtro").addEventListener("change", function () {
-        aplicarFiltro(this.value);
+        if (this.value === "Ventas_Mes") {
+            $("#btnDescargar").addClass("d-none");
+            $("#rangoFechas")
+                .removeClass("d-none")
+                .addClass("d-flex");
+        } else {
+            $("#btnDescargar").removeClass("d-none");
+            $("#rangoFechas")
+                .removeClass("d-flex")
+                .addClass("d-none");
+
+            aplicarFiltro(this.value);
+        }
+    });
+
+    function mostrarMensajeFiltro(mensaje) {
+        $("#mensajeFiltro").text(mensaje).removeClass("d-none");
+    }
+
+    function ocultarMensajeFiltro() {
+        $("#mensajeFiltro").addClass("d-none").text("");
+    }
+
+    $("#btnFiltro").on("click", function () {
+        let fechaInicio = $("#fechaInicio").val();
+        let fechaFinal = $("#fechaFinal").val();
+
+        if (RangoFechasCorrecto(fechaInicio, fechaFinal)) {
+            aplicarFiltro("Ventas_Mes");
+            $("#btnDescargar").removeClass("d-none");
+            ocultarMensajeFiltro();
+        } else {
+            mostrarMensajeFiltro("Fecha incorrecta, favor ingrese un ragon correcto");
+        }
+    });
+
+    $("#fechaInicio").on("change", function () {
+        $("#btnDescargar").addClass("d-none");
+    });
+
+    $("#fechaFinal").on("change", function () {
+        $("#btnDescargar").addClass("d-none");
     });
 
     // ========= SLIDER / SELECTOR DE MAPAS ============
@@ -221,14 +272,20 @@
         });
     }
 
-    function esDelMesActual(fecha) {
-        const hoy = new Date();
+    function estaEntreFechas(fecha) {
+        const fechaInicio = convertirFecha($("#fechaInicio").val());
+        const fechaFinal = convertirFecha($("#fechaFinal").val());
         const fechaVenta = new Date(fecha);
 
-        return (
-            fechaVenta.getMonth() === hoy.getMonth() &&
-            fechaVenta.getFullYear() === hoy.getFullYear()
-        );
+        fechaInicio.setHours(0, 0, 0, 0);
+        fechaFinal.setHours(23, 59, 59, 999);
+
+        return (fechaVenta >= fechaInicio && fechaVenta <= fechaFinal);
+    }
+
+    function convertirFecha(valor) {
+        const [anio, mes, dia] = valor.split("-").map(Number);
+        return new Date(anio, mes - 1, dia);
     }
 
     //Condominios en select
@@ -377,7 +434,9 @@
                         body: JSON.stringify({
                             imagenBase64: finalImg,
                             condominio: condominio,
-                            tipoReporte: tipoReporte
+                            tipoReporte: tipoReporte,
+                            desde: $("#fechaInicio").val() || null,
+                            hasta: $("#fechaFinal").val() || null
                         })
                     })
                         .then(res => res.blob())

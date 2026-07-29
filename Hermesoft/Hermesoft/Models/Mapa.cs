@@ -16,5 +16,7 @@ namespace HermeSoft_Fusion.Models
         public string ImagenBase64 { get; set; }
         public string Condominio { get; set; }
         public string TipoReporte { get; set; }
+        public DateTime? Desde { get; set; }
+        public DateTime? Hasta { get; set; }
     }
 }

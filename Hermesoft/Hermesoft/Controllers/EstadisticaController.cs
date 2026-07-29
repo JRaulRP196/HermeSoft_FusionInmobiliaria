@@ -200,6 +200,7 @@ namespace HermeSoft_Fusion.Controllers
         [HttpGet]
         public async Task<IActionResult> PagosPorCondominio(string? condominio, DateTime? fechaInicio, DateTime? fechaFinal)
         {
+
             try
             {
                 var resultado = await _estadisticaBusiness.PagosPorCondominio(condominio, fechaInicio, fechaFinal);
@@ -207,7 +208,7 @@ namespace HermeSoft_Fusion.Controllers
             }
             catch (Exception e)
             {
-                return Json(new
+                return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     success = false,
                     message = e.Message
