@@ -199,21 +199,24 @@ namespace HermeSoft_Fusion.Repository
                 consulta = consulta.Where(v => codigos.Contains(v.CodLote));
             }
 
+            var desglose = consulta.SelectMany(v => v.Prima.DesglosesPrimas);
+
             if (fechaInicio.HasValue && fechaInicio.Value != DateTime.MinValue)
-                consulta = consulta.Where(v => v.FechaDeRegistro >= fechaInicio.Value.Date);
+                //consulta = consulta.Where(v => v.FechaDeRegistro >= fechaInicio.Value.Date);
+                desglose = desglose.Where(dp => dp.FechaCobro >= fechaInicio.Value.Date);
 
             if (fechaFinal.HasValue && fechaFinal.Value != DateTime.MinValue)
             {
                 var limiteExclusivo = fechaFinal.Value.Date.AddDays(1);
-                consulta = consulta.Where(v => v.FechaDeRegistro < limiteExclusivo);
+                //consulta = consulta.Where(v => v.FechaDeRegistro < limiteExclusivo);
+                desglose = desglose.Where(dp => dp.FechaCobro < limiteExclusivo);
             }
 
             PagoCondominioViewModel resultado = new PagoCondominioViewModel
             {
-                Pendientes = await consulta.SelectMany(v => v.Prima.DesglosesPrimas.Where(dp => dp.Estado == "Pendiente")).CountAsync(),
-                Pagados = await consulta.SelectMany(v => v.Prima.DesglosesPrimas.Where(dp => dp.Estado == "Terminado")).CountAsync(),
-                Atrasados = await consulta.SelectMany(v => v.Prima.DesglosesPrimas.Where(dp => dp.Estado == "Pendiente" &&
-                                                                        dp.FechaCobro < DateTime.Today)).CountAsync()
+                Pendientes = await desglose.Where(dp => dp.Estado == "Pendiente").CountAsync(),
+                Pagados = await desglose.Where(dp => dp.Estado == "Terminado").CountAsync(),
+                Atrasados = await desglose.Where(dp => dp.Estado == "Pendiente" && dp.FechaCobro < DateTime.Today).CountAsync()
             };
 
             return resultado;

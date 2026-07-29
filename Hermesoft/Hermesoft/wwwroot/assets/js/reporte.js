@@ -9,6 +9,7 @@
         minZoom: -2,
     });
 
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         crossOrigin: true
     }).addTo(map);
@@ -91,17 +92,14 @@
         return marker;
     }
 
-    function aplicarFiltro(tipo) {
-        ocultarMensajeFiltro();
-
-        if (tipo === "Ventas_Rango") {
-            const error = validarRangoFechas();
-            if (error) {
-                markers.forEach((m) => map.removeLayer(m));
-                mostrarMensajeFiltro(error);
-                return false;
-            }
+    function RangoFechasCorrecto(fechaInicio, fechaFinal) {
+        if (fechaInicio && fechaFinal) {
+            return fechaInicio <= fechaFinal;
         }
+        return false;
+    }
+
+    function aplicarFiltro(tipo) {
 
         markers.forEach((m) => {
             map.removeLayer(m);
@@ -113,27 +111,12 @@
                 .forEach((m) => map.addLayer(m));
         } else if (tipo === "Ventas_Mes") {
             markers
-                .filter((m) => esDelMesActual(m.fechaVenta) && m.vendido)
-                .forEach((m) => map.addLayer(m));
-        } else if (tipo === "Ventas_Rango") {
-            const desde = crearFechaLocal(document.getElementById("fechaInicio").value);
-            const hasta = crearFechaLocal(document.getElementById("fechaFinal").value);
-            hasta.setHours(23, 59, 59, 999);
-
-            markers
-                .filter((m) => {
-                    if (!m.vendido || !m.fechaVenta) return false;
-                    const fechaVenta = new Date(m.fechaVenta);
-                    return !Number.isNaN(fechaVenta.getTime()) &&
-                        fechaVenta >= desde &&
-                        fechaVenta <= hasta;
-                })
+                .filter((m) => estaEntreFechas(m.fechaVenta) && m.vendido)
                 .forEach((m) => map.addLayer(m));
         } else {
             markers.forEach((m) => map.addLayer(m));
         }
 
-        return true;
     }
 
     function cargarFiltro() {
@@ -144,49 +127,49 @@
     }
 
     document.getElementById("filtro").addEventListener("change", function () {
-        const usaRango = this.value === "Ventas_Rango";
-        document.getElementById("rangoFechas").classList.toggle("d-none", !usaRango);
-        aplicarFiltro(this.value);
+        if (this.value === "Ventas_Mes") {
+            $("#btnDescargar").addClass("d-none");
+            $("#rangoFechas")
+                .removeClass("d-none")
+                .addClass("d-flex");
+        } else {
+            $("#btnDescargar").removeClass("d-none");
+            $("#rangoFechas")
+                .removeClass("d-flex")
+                .addClass("d-none");
+
+            aplicarFiltro(this.value);
+        }
     });
 
-    document.getElementById("fechaInicio").addEventListener("change", aplicarRangoSiCorresponde);
-    document.getElementById("fechaFinal").addEventListener("change", aplicarRangoSiCorresponde);
-
-    function aplicarRangoSiCorresponde() {
-        if (document.getElementById("filtro").value === "Ventas_Rango") {
-            aplicarFiltro("Ventas_Rango");
-        }
-    }
-
-    function crearFechaLocal(valor) {
-        const [anio, mes, dia] = valor.split("-").map(Number);
-        return new Date(anio, mes - 1, dia);
-    }
-
-    function validarRangoFechas() {
-        const fechaInicio = document.getElementById("fechaInicio").value;
-        const fechaFinal = document.getElementById("fechaFinal").value;
-
-        if (!fechaInicio || !fechaFinal) {
-            return "Debe seleccionar las fechas Desde y Hasta.";
-        }
-        if (fechaInicio > fechaFinal) {
-            return "La fecha Desde no puede ser posterior a la fecha Hasta.";
-        }
-        return null;
-    }
-
     function mostrarMensajeFiltro(mensaje) {
-        const contenedor = document.getElementById("mensajeFiltro");
-        contenedor.textContent = mensaje;
-        contenedor.classList.remove("d-none");
+        $("#mensajeFiltro").text(mensaje).removeClass("d-none");
     }
 
     function ocultarMensajeFiltro() {
-        const contenedor = document.getElementById("mensajeFiltro");
-        contenedor.textContent = "";
-        contenedor.classList.add("d-none");
+        $("#mensajeFiltro").addClass("d-none").text("");
     }
+
+    $("#btnFiltro").on("click", function () {
+        let fechaInicio = $("#fechaInicio").val();
+        let fechaFinal = $("#fechaFinal").val();
+
+        if (RangoFechasCorrecto(fechaInicio, fechaFinal)) {
+            aplicarFiltro("Ventas_Mes");
+            $("#btnDescargar").removeClass("d-none");
+            ocultarMensajeFiltro();
+        } else {
+            mostrarMensajeFiltro("Fecha incorrecta, favor ingrese un ragon correcto");
+        }
+    });
+
+    $("#fechaInicio").on("change", function () {
+        $("#btnDescargar").addClass("d-none");
+    });
+
+    $("#fechaFinal").on("change", function () {
+        $("#btnDescargar").addClass("d-none");
+    });
 
     // ========= SLIDER / SELECTOR DE MAPAS ============
 
@@ -289,14 +272,20 @@
         });
     }
 
-    function esDelMesActual(fecha) {
-        const hoy = new Date();
+    function estaEntreFechas(fecha) {
+        const fechaInicio = convertirFecha($("#fechaInicio").val());
+        const fechaFinal = convertirFecha($("#fechaFinal").val());
         const fechaVenta = new Date(fecha);
 
-        return (
-            fechaVenta.getMonth() === hoy.getMonth() &&
-            fechaVenta.getFullYear() === hoy.getFullYear()
-        );
+        fechaInicio.setHours(0, 0, 0, 0);
+        fechaFinal.setHours(23, 59, 59, 999);
+
+        return (fechaVenta >= fechaInicio && fechaVenta <= fechaFinal);
+    }
+
+    function convertirFecha(valor) {
+        const [anio, mes, dia] = valor.split("-").map(Number);
+        return new Date(anio, mes - 1, dia);
     }
 
     //Condominios en select
@@ -436,7 +425,6 @@
                     const select = document.getElementById("filtro");
                     const tipoReporte = select.options[select.selectedIndex].text;
                     const condominio = document.getElementById("nombreCondominio").textContent;
-                    const usaRango = select.value === "Ventas_Rango";
 
                     fetch("/Reporte/GenerarPdf", {
                         method: "POST",
@@ -447,24 +435,18 @@
                             imagenBase64: finalImg,
                             condominio: condominio,
                             tipoReporte: tipoReporte,
-                            desde: usaRango ? document.getElementById("fechaInicio").value : null,
-                            hasta: usaRango ? document.getElementById("fechaFinal").value : null
+                            desde: $("#fechaInicio").val() || null,
+                            hasta: $("#fechaFinal").val() || null
                         })
                     })
-                        .then(res => {
-                            if (!res.ok) {
-                                throw new Error("No fue posible generar el reporte.");
-                            }
-                            return res.blob();
-                        })
+                        .then(res => res.blob())
                         .then(blob => {
                             const url = window.URL.createObjectURL(blob);
                             const a = document.createElement("a");
                             a.href = url;
                             a.download = "reporte.pdf";
                             a.click();
-                        })
-                        .catch(error => mostrarMensajeFiltro(error.message));
+                        });
                 };
 
             });
@@ -473,10 +455,6 @@
     }
 
     $("#btnDescargar").on("click", function () {
-        const filtro = document.getElementById("filtro").value;
-        if (!aplicarFiltro(filtro)) {
-            return;
-        }
         capturarMapa();
     });
 

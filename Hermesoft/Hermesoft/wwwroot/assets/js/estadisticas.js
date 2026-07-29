@@ -25,6 +25,7 @@
         if (errorFechas) {
             limpiarResultados();
             mostrarMensajeFiltro(errorFechas);
+            mostrarMensajeSinDatos();
             return;
         }
 
@@ -44,9 +45,6 @@
                 const res = await fetch(`/Estadistica/PagosPorCondominio?${parametros}`);
                 const datos = await res.json();
 
-                if (!res.ok) {
-                    throw new Error(datos.message || "No fue posible aplicar el filtro.");
-                }
 
                 if (datos.pagados > 0 || datos.pendientes > 0 || datos.atrasados > 0) {
                     categorias.push(data[i].nombre);
