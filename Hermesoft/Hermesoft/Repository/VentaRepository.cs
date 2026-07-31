@@ -155,6 +155,24 @@ namespace HermeSoft_Fusion.Repository
                     .ToListAsync();
         }
 
+        public async Task<List<DesglosesPrimas>> ObtenerPagosProximosVencer()
+        {
+            IQueryable<Venta> consulta = _context.VENTAS
+                .Include(v => v.Prima)
+                    .ThenInclude(p => p.DesglosesPrimas)
+                .Where(v => v.Estado == "EN PROCESO");
+            var desgloses = consulta.SelectMany(v => v.Prima.DesglosesPrimas);
+            DateTime hoy = DateTime.Today;
+            //  5/7/2026
+            //  30/7/2026
+            return desgloses
+                .Include(dp => dp.Prima)
+                    .ThenInclude(p => p.Venta)
+                        .ThenInclude(v => v.Usuario)
+                .Where(dp => dp.Estado == "Pendiente"
+                          && dp.FechaCobro <= hoy.AddDays(2)).ToList();
+        }
+
         public async Task<Venta> Obtener(int numContrato)
         {
             return await _context.VENTAS

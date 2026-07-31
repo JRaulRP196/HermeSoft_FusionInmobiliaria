@@ -3,6 +3,7 @@ using HermeSoft_Fusion.Business.Usuarios;
 using HermeSoft_Fusion.Models.Usuarios;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace Tocly.Controllers
@@ -29,6 +30,7 @@ namespace Tocly.Controllers
             return View();
         }
         [HttpPost]
+        [EnableRateLimiting("LoginLimiter")]
         public async Task<IActionResult> Login(Usuario usuario)
         {
 
@@ -83,11 +85,17 @@ namespace Tocly.Controllers
         [HttpPost]
         public async Task<IActionResult> NuevoPassword(Usuario usuario, string token)
         {
-            if (await _usuarioBusiness.CambiarPassword(usuario, token) == null)
+            Usuario user = await _usuarioBusiness.CambiarPassword(usuario, token);
+            if (user == null)
             {
                 TempData["MensajeError"] = "Enlace expirado o modificado, solicita uno nuevo";
                 return View();
+            }else if(user.Password == null)
+            {
+                TempData["MensajeError"] = "Contraseña poco segura";
+                return RedirectToAction("NuevoPassword", new { token = token });
             }
+            await Logout();
             TempData["MensajeExito"] = "Contraseña nueva, inicia sesión con tus nuevas credenciales";
             return RedirectToAction("Login");
         }

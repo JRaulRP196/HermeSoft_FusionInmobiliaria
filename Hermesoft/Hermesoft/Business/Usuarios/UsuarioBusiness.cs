@@ -4,6 +4,7 @@ using HermeSoft_Fusion.Models.Usuarios;
 using HermeSoft_Fusion.Repository.Usuarios;
 using System.Security.Cryptography;
 using System.Text;
+using Zxcvbn;
 
 namespace HermeSoft_Fusion.Business.Usuarios
 {
@@ -119,7 +120,13 @@ namespace HermeSoft_Fusion.Business.Usuarios
                 if (recuperacion == null || recuperacion.FechaExpiracion < DateTime.Now || recuperacion.Usado == true)
                     return null;
 
+
                 Usuario user = await _usuarioRepository.Obtener(recuperacion.IdUsuario);
+                if (!VerificarFortalezaPassword(usuario.Password))
+                {
+                    user.Password = null;
+                    return user;
+                }
                 user.Password = _passwordService.HashPassword(user, usuario.Password);
                 recuperacion.Usado = true;
                 await _context.SaveChangesAsync();
@@ -183,5 +190,10 @@ namespace HermeSoft_Fusion.Business.Usuarios
             return resultado.ToString();
         }
 
+        private bool VerificarFortalezaPassword(string password)
+        {
+            var result = Core.EvaluatePassword(password);
+            return result.Score >= 3;
+        }
     }
 }

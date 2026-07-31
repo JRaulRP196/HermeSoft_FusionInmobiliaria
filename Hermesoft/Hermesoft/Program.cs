@@ -1,14 +1,15 @@
+using Hangfire;
+using Hangfire.MemoryStorage;
 using HermeSoft_Fusion.Business;
 using HermeSoft_Fusion.Business.Usuarios;
 using HermeSoft_Fusion.Data;
 using HermeSoft_Fusion.Repository;
 using HermeSoft_Fusion.Repository.Servicios;
 using HermeSoft_Fusion.Repository.Usuarios;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http.Headers;
 using QuestPDF.Infrastructure;
-using Hangfire;
-using Hangfire.MemoryStorage;
+using System.Net.Http.Headers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,6 +89,22 @@ builder.Services.AddHangfire(config =>
 
 builder.Services.AddHangfireServer();
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.Redirect("/Pages/Error500");
+        await Task.CompletedTask;
+    };
+
+    options.AddFixedWindowLimiter("LoginLimiter", config =>
+    {
+        config.PermitLimit = 5;
+        config.Window = TimeSpan.FromMinutes(5);
+        config.QueueLimit = 0;
+    });
+});
+
 
 QuestPDF.Settings.License = LicenseType.Community;
 var app = builder.Build();
@@ -111,7 +128,7 @@ using (var scope = app.Services.CreateScope())
     recurringJobManager.AddOrUpdate<Job>(
         "recordatorio-primas",
         job => job.EnviarRecordatorios(),
-        "0 5 * * *"
+        "* * * * *"
     );
 
     recurringJobManager.AddOrUpdate<IndicadoresBancariosBusiness>(
@@ -145,7 +162,12 @@ app.UseStaticFiles(new StaticFileOptions
     }
 });
 
+
+
 app.UseRouting();
+
+app.UseRateLimiter();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

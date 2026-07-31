@@ -1,4 +1,5 @@
 ﻿using HermeSoft_Fusion.Business.Usuarios;
+using HermeSoft_Fusion.Models;
 
 namespace HermeSoft_Fusion.Repository.Servicios
 {
@@ -15,17 +16,11 @@ namespace HermeSoft_Fusion.Repository.Servicios
 
         public async Task EnviarRecordatorios()
         {
-            var ventas = await _ventaRepository.ObtenerPendientes();
-            foreach (var venta in ventas)
+            var desgloses = await _ventaRepository.ObtenerPagosProximosVencer();
+            foreach (var desglose in desgloses)
             {
-                var desglose = venta.Prima.DesglosesPrimas.FirstOrDefault(d => d.Estado == "Pendiente");
-                desglose.Prima.Venta = venta;
-                
-                if (desglose != null && (desglose.FechaCobro - DateTime.Today).TotalDays <= 2)
-                {
                     string mensaje = _emailService.GenerarMensajeRecordatorio(desglose);
-                    await _emailService.EnviarCorreoAsync(venta.CorreoCliente, "Recordatorio de Pago", mensaje);
-                }
+                    await _emailService.EnviarCorreoAsync(desglose.Prima.Venta.CorreoCliente, "Recordatorio de Pago", mensaje);
             }
         }
 

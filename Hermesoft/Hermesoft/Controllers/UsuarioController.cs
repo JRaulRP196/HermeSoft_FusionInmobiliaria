@@ -65,11 +65,13 @@ namespace HermeSoft_Fusion.Controllers
         [HttpPost]
         public async Task<IActionResult> Editar(Usuario usuario)
         {
-            if (await _usuarioBusiness.Editar(usuario) == null)
+            var user = await _usuarioBusiness.Editar(usuario);
+            if (user == null)
             {
                 TempData["MensajeError"] = "Error al cargar el usuario";
                 return RedirectToAction("Index");
             }
+            
             TempData["MensajeExito"] = "Usuario editado correctamente";
             return RedirectToAction("Index");
         }
